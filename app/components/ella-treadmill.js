@@ -1,0 +1,1 @@
+export { default } from 'ella-treadmill/components/ella-treadmill';

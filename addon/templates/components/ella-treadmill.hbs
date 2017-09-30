@@ -1,0 +1,51 @@
+<style type="text/css">
+  #{{elementId}} {
+    position: relative;
+    {{#if totalHeight}}
+      height: {{totalHeight}}{{_rowUnit}};
+    {{/if}}
+
+    width: 100%;
+    display: {{display}};
+    flex-wrap: wrap;
+    align-content: flex-start;
+    justify-content: space-between;
+  }
+
+  #{{elementId}} .ella-treadmill-item {
+    -webkit-overflow-scrolling: 'touch';
+  }
+
+  #{{elementId}}.is-scrolling .ella-treadmill-item {
+    pointer-events: none;
+  }
+</style>
+
+{{#each indices as |idx|}}
+  {{#ella-treadmill-item
+    parent=this
+    index=(get visibleIndices (if idx idx 'firstObject'))
+    item=(get visibleContent (if idx idx 'firstObject'))
+    height=_row
+    heightUnit=_rowUnit
+    columns=columns
+    pageSize=numberOfVisibleItems
+    on-insert="listItemInserted"
+    on-update="listItemUpdated"
+    on-destroy="listItemDestroyed"
+    as |listItem|
+  }}
+    {{#if hasBlock}}
+      {{yield
+        (hash
+          item=listItem.item
+          index=listItem.index
+        )
+      }}
+    {{else}}
+      {{get visibleContent (if idx idx 'firstObject')}}
+    {{/if}}
+  {{/ella-treadmill-item}}
+{{else}}
+  {{yield to="inverse"}}
+{{/each}}
