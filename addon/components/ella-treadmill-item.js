@@ -14,11 +14,16 @@ export default Component.extend({
 
   classNames: 'ella-treadmill-item',
 
+  classNameBindings: ['classRow', 'classColumn'],
+
   ariaRole: 'listitem',
 
   columns: 1,
 
   display: 'block',
+
+  fluctuate: 2,
+  fluctuateColumn: 2,
 
   height: 0,
   heightUnit: 'px',
@@ -31,6 +36,30 @@ export default Component.extend({
   pageSize: 1,
 
   'aria-hidden': computed.lt('index', 0),
+
+  classRow: computed('fluctuate', 'index', 'columns', function() {
+    let {
+      fluctuate,
+      index,
+      columns
+    } = getProperties(this, 'fluctuate', 'index', 'columns');
+
+    let row = Math.floor((index % (fluctuate * columns)) / columns) + 1;
+
+    return `ella-treadmill-item-row-${row}`;
+  }),
+
+  classColumn: computed('index', 'columns', 'fluctuateColumn', function() {
+    let {
+      index,
+      columns,
+      fluctuateColumn
+    } = getProperties(this, 'index', 'columns', 'fluctuateColumn');
+
+    let col = ((index % columns) % fluctuateColumn) + 1;
+
+    return `ella-treadmill-item-column-${col}`;
+  }),
 
   isSampleItem: computed('parent.sampleItem', function() {
     return get(this, 'parent.sampleItem') === this;

@@ -6,12 +6,12 @@
 //   background: lightblue;
 // }
 
-.test-div {
-  height: 480px;
-  overflow: auto;
-  width: 640px;
-}
-
 ella-treadmill-item {
-  background: rgba(0, 0, 0, 0.05);
+  &.ella-treadmill-item-row-1 {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+
+  &.ella-treadmill-item-column-2 {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.02));
+  }
 }

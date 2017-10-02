@@ -930,3 +930,69 @@ test('it repositions grid items after scroll', function(assert) {
     }
   });
 });
+
+test('it renders items with a class name that indicates row membership', function(assert) {
+  this.set('model', LARGE_ARRAY);
+  this.set('fluctuate', 2);
+  this.set('minItemWidth', 100);
+
+  this.render(hbs`
+    {{ella-treadmill fluctuate=fluctuate minItemWidth=minItemWidth content=model}}
+  `);
+
+  document.querySelectorAll('ella-treadmill > ella-treadmill-item').forEach((node, index) => {
+    let expected = `ella-treadmill-item-row-${(index % 2) + 1}`;
+
+    assert.ok(node.classList.contains(expected));
+  });
+
+  this.set('fluctuate', 5);
+
+  document.querySelectorAll('ella-treadmill > ella-treadmill-item').forEach((node, index) => {
+    let expected = `ella-treadmill-item-row-${(index % 5) + 1}`;
+
+    assert.ok(node.classList.contains(expected));
+  });
+
+  this.set('minItemWidth', 25);
+
+  document.querySelectorAll('ella-treadmill > ella-treadmill-item').forEach((node, index) => {
+    if (index < 4) {
+      assert.ok(node.classList.contains('ella-treadmill-item-row-1'));
+    } else if (index === 4) {
+      assert.ok(node.classList.contains('ella-treadmill-item-row-2'));
+    }
+  });
+});
+
+test('it renders items with a class name that indicates column membership', function(assert) {
+  this.set('model', LARGE_ARRAY);
+  this.set('fluctuateColumn', 2);
+  this.set('minItemWidth', 33);
+
+  this.render(hbs`
+    {{ella-treadmill fluctuateColumn=fluctuateColumn minItemWidth=minItemWidth content=model}}
+  `);
+
+  document.querySelectorAll('ella-treadmill > ella-treadmill-item').forEach((node, index) => {
+    let expected = `ella-treadmill-item-column-${((index % 3) % 2) + 1}`;
+
+    assert.ok(node.classList.contains(expected));
+  });
+
+  this.set('minItemWidth', 20);
+
+  document.querySelectorAll('ella-treadmill > ella-treadmill-item').forEach((node, index) => {
+    let expected = `ella-treadmill-item-column-${((index % 5) % 2) + 1}`;
+
+    assert.ok(node.classList.contains(expected));
+  });
+
+  this.set('fluctuateColumn', 3);
+
+  document.querySelectorAll('ella-treadmill > ella-treadmill-item').forEach((node, index) => {
+    let expected = `ella-treadmill-item-column-${((index % 5) % 3) + 1}`;
+
+    assert.ok(node.classList.contains(expected));
+  });
+});

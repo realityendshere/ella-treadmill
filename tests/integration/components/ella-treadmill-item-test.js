@@ -193,3 +193,79 @@ test('its position changes when the columns and pageSize attributes are set', fu
 
   assert.equal(geometry.top, comparison.top + (1 * comparison.height));
 });
+
+test('it adds a class name to indicate row membership', function(assert) {
+  this.set('fluctuate', 2);
+  this.set('columns', 1);
+  this.set('index', 0);
+
+  this.render(hbs`
+    {{ella-treadmill-item fluctuate=fluctuate columns=columns index=index}}
+  `);
+
+  for (let i = 0; i < 6; ++i) {
+    let query = `ella-treadmill-item.ella-treadmill-item-row-${(i % 2) + 1}`;
+
+    this.set('index', i);
+
+    assert.ok(document.querySelector(query));
+  }
+
+  this.set('fluctuate', 4);
+
+  for (let i = 0; i < 6; ++i) {
+    let query = `ella-treadmill-item.ella-treadmill-item-row-${(i % 4) + 1}`;
+
+    this.set('index', i);
+
+    assert.ok(document.querySelector(query));
+  }
+
+  this.set('columns', 3);
+
+  for (let i = 0; i < 6; ++i) {
+    this.set('index', i);
+
+    if (i < 3) {
+      assert.ok(document.querySelector('ella-treadmill-item.ella-treadmill-item-row-1'));
+    } else {
+      assert.ok(document.querySelector('ella-treadmill-item.ella-treadmill-item-row-2'));
+    }
+  }
+});
+
+test('it adds a class name to indicate column membership', function(assert) {
+  this.set('columns', 5);
+  this.set('index', 0);
+  this.set('fluctuateColumn', 2);
+
+  this.render(hbs`
+    {{ella-treadmill-item columns=columns index=index fluctuateColumn=fluctuateColumn}}
+  `);
+
+  for (let i = 0; i < 6; ++i) {
+    let query = `ella-treadmill-item.ella-treadmill-item-column-${(i % 2) + 1}`;
+
+    this.set('index', i);
+
+    if (i < 5) {
+      assert.ok(document.querySelector(query));
+    } else {
+      assert.ok(document.querySelector('ella-treadmill-item.ella-treadmill-item-column-1'));
+    }
+  }
+
+  this.set('fluctuateColumn', 4);
+
+  for (let i = 0; i < 6; ++i) {
+    let query = `ella-treadmill-item.ella-treadmill-item-column-${(i % 4) + 1}`;
+
+    this.set('index', i);
+
+    if (i < 5) {
+      assert.ok(document.querySelector(query));
+    } else {
+      assert.ok(document.querySelector('ella-treadmill-item.ella-treadmill-item-column-1'));
+    }
+  }
+});

@@ -47,6 +47,9 @@ export default Component.extend({
 
   display: 'flex',
 
+  fluctuate: 2,
+  fluctuateColumn: 2,
+
   itemHeight: 0,
   itemWidth: 0,
 

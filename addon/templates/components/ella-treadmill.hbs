@@ -9,6 +9,7 @@
     display: {{display}};
     flex-wrap: wrap;
     align-content: flex-start;
+    box-sizing: border-box;
   }
 
   #{{elementId}} .ella-treadmill-item {
@@ -29,6 +30,8 @@
     heightUnit=_rowUnit
     columns=columns
     pageSize=numberOfVisibleItems
+    fluctuate=fluctuate
+    fluctuateColumn=fluctuateColumn
     on-insert="listItemInserted"
     on-update="listItemUpdated"
     on-destroy="listItemDestroyed"
