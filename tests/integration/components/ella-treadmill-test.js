@@ -907,10 +907,26 @@ test('it repositions grid items after scroll', function(assert) {
       let geom = items.item(i).getBoundingClientRect();
       let expected = document.getElementById(`test${i}`).getBoundingClientRect();
 
-      assert.equal(geom.height, expected.height, 'repositioned height matches comparison element');
-      assert.equal(geom.width, expected.width, 'repositioned width matches comparison element');
-      assert.equal(geom.top, expected.top, 'repositioned top position matches comparison element');
-      assert.equal(geom.left, expected.left, 'repositioned left position matches comparison element');
+      assert.equal(
+        Math.round(10 * geom.height),
+        Math.round(10 * expected.height),
+        'repositioned height matches comparison element'
+      );
+      assert.equal(
+        Math.round(10 * geom.width),
+        Math.round(10 * expected.width),
+        'repositioned width matches comparison element'
+      );
+      assert.equal(
+        Math.round(10 * geom.top),
+        Math.round(10 * expected.top),
+        'repositioned top position matches comparison element'
+      );
+      assert.equal(
+        Math.round(10 * geom.left),
+        Math.round(10 * expected.left),
+        'repositioned left position matches comparison element'
+      );
     }
   });
 });

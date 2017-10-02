@@ -80,8 +80,15 @@ export default Component.extend({
         break;
       case 'px':
         parent = this.scrollingParent();
-        parentWidth = get(parent, 'clientWidth') || get(this, '_defaultWidth');
+
+        if (parent === window) {
+          parentWidth = get(document, 'body.clientWidth');
+        } else {
+          parentWidth = get(parent, 'clientWidth') || get(this, '_defaultWidth');
+        }
+
         result = Math.floor(parentWidth / minItemWidth);
+
         break;
       default:
         result = 1;
@@ -347,7 +354,7 @@ export default Component.extend({
       return /(auto|scroll)/.test(overflowProperties(parent));
     });
 
-    return scroller || window;
+    return scroller || get(document, 'body');
   },
 
   didInsertElement() {
