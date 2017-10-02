@@ -354,7 +354,7 @@ export default Component.extend({
       return /(auto|scroll)/.test(overflowProperties(parent));
     });
 
-    return scroller || get(document, 'body');
+    return scroller || window;
   },
 
   didInsertElement() {
