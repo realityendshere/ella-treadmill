@@ -7,21 +7,6 @@
 <p>&nbsp;</p>
 <p>&nbsp;</p>
 <p>&nbsp;</p>
-
-<div class="test-div">
-  {{#ella-treadmill
-    row=(if rowHeight rowHeight 200)
-    minItemWidth=(if rowHeight rowHeight 200)
-    widthUnit="px"
-    content=model
-    as |listing|
-  }}
-    [{{{listing.index}}}]: I am item #{{listing.item}}
-  {{else}}
-    <p>Nothing to see here.</p>
-  {{/ella-treadmill}}
-</div>
-
 <p>&nbsp;</p>
 <p>&nbsp;</p>
 
