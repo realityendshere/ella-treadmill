@@ -82,6 +82,23 @@ test('it does not set a height property when no content provided', function(asse
   assert.equal(element.clientHeight, 0);
 });
 
+test('it renders an inverse block when no content to display', function(assert) {
+  this.set('model', []);
+
+  this.render(hbs`
+    {{#ella-treadmill content=model as |listing|}}
+      I am a listing.
+    {{else}}
+      Nothing to see here.
+    {{/ella-treadmill}}
+  `);
+
+  let element = document.querySelector('ella-treadmill');
+
+  assert.equal(element.querySelectorAll('ella-treadmill-item').length, 0);
+  assert.equal(element.innerText, 'Nothing to see here.');
+});
+
 test('it renders with a default row height', function(assert) {
   this.set('model', ONE_ITEM_ARRAY);
 
