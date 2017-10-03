@@ -24,17 +24,17 @@
 {{#each indices as |idx|}}
   {{#ella-treadmill-item
     parent=this
-    index=(get visibleIndices (if idx idx 'firstObject'))
-    item=(get visibleContent (if idx idx 'firstObject'))
+    index=(get visibleIndices (concat '' idx))
+    item=(get visibleContent (concat '' idx))
     height=_row
     heightUnit=_rowUnit
     columns=columns
     pageSize=numberOfVisibleItems
     fluctuate=fluctuate
     fluctuateColumn=fluctuateColumn
-    on-insert="listItemInserted"
-    on-update="listItemUpdated"
-    on-destroy="listItemDestroyed"
+    on-insert=(action "listItemInserted")
+    on-update=(action "listItemUpdated")
+    on-destroy=(action "listItemDestroyed")
     as |listItem|
   }}
     {{#if hasBlock}}
@@ -45,7 +45,7 @@
         )
       }}
     {{else}}
-      {{get visibleContent (if idx idx 'firstObject')}}
+      {{get visibleContent (concat '' idx)}}
     {{/if}}
   {{/ella-treadmill-item}}
 {{else}}

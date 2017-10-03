@@ -1,3 +1,5 @@
+/* eslint ember/named-functions-in-promises: 0 */
+
 import { moduleForComponent, test } from 'ember-qunit';
 import Ember from 'ember';
 import hbs from 'htmlbars-inline-precompile';
@@ -177,7 +179,12 @@ test('it renders with a custom row height unit (rem)', function(assert) {
 
   this.render(hbs`
     {{ella-treadmill row=5.35 rowUnit='rem' content=model}}
-    <div id="measurement" style="height: {{expectedHeight}};">&nbsp;</div>
+    <style type="text/css">
+      #measurement {
+        height: {{expectedHeight}};
+      }
+    </style>
+    <div id="measurement">&nbsp;</div>
   `);
 
   let element = document.querySelector('ella-treadmill');
@@ -283,7 +290,8 @@ test('it renders enough list items to fill the available vertical space (em)', f
   });
 
   return wait().then(() => {
-    let itemCountAttr = this.$('ella-treadmill').attr('data-visible-items');
+    let element = document.querySelector('ella-treadmill');
+    let itemCountAttr = parseInt(element.attributes['data-visible-items'].value, 10);
     let itemCount = document.querySelectorAll('ella-treadmill > ella-treadmill-item').length;
 
     assert.ok(itemCount > Math.ceil(600 / expected.clientHeight));
@@ -319,7 +327,8 @@ test('it renders enough list items to fill the available vertical space (rem)', 
   });
 
   return wait().then(() => {
-    let itemCountAttr = this.$('ella-treadmill').attr('data-visible-items');
+    let element = document.querySelector('ella-treadmill');
+    let itemCountAttr = parseInt(element.attributes['data-visible-items'].value, 10);
     let itemCount = document.querySelectorAll('ella-treadmill > ella-treadmill-item').length;
 
     assert.ok(itemCount > Math.ceil(600 / expected.clientHeight));
@@ -352,7 +361,8 @@ test('it renders enough list items to fill the available vertical space (%)', fu
   });
 
   return wait().then(() => {
-    let itemCountAttr = this.$('ella-treadmill').attr('data-visible-items');
+    let element = document.querySelector('ella-treadmill');
+    let itemCountAttr = parseInt(element.attributes['data-visible-items'].value, 10);
     let itemCount = document.querySelectorAll('ella-treadmill > ella-treadmill-item').length;
 
     assert.equal(itemCount, 6);

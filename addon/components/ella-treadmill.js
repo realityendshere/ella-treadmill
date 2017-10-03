@@ -20,6 +20,12 @@ const NO_WINDOW_HEIGHT = 1024;
 const NO_WINDOW_WIDTH = 768;
 const DEFAULT_ROW_HEIGHT = 50;
 
+const FAKE_WINDOW = {
+  clientWidth: NO_WINDOW_WIDTH,
+  clientHeight: NO_WINDOW_HEIGHT,
+  scrollY: 0
+};
+
 let ancestors = function(node, parents = []) {
   return (node === null || node.parentNode === null) ?
     parents : ancestors(node.parentNode, parents.concat([node]));
@@ -71,6 +77,9 @@ export default Component.extend({
   scrolling: 0,
   scrollTop: 0,
 
+  height: computed.alias('row'),
+  heightUnit: computed.alias('rowUnit'),
+
   columns: computed('minItemWidth', 'widthUnit', 'parentWidth', function() {
     let { minItemWidth, widthUnit } = getProperties(this, 'minItemWidth', 'widthUnit');
     let parent;
@@ -106,7 +115,13 @@ export default Component.extend({
   }).readOnly(),
 
   geometryElement: computed(function() {
-    return get(this, 'element').getBoundingClientRect();
+    let element = get(this, 'element');
+
+    if (!element) {
+      return {};
+    }
+
+    return element.getBoundingClientRect();
   }).volatile(),
 
   geometryParent: computed(function() {
@@ -115,9 +130,6 @@ export default Component.extend({
     return (parent && typeof parent.getBoundingClientRect === 'function') ?
       parent.getBoundingClientRect() : {};
   }).volatile(),
-
-  height: computed.alias('row'),
-  heightUnit: computed.alias('rowUnit'),
 
   indices: computed('numberOfVisibleItems', 'content.length', function() {
     let maxIdx = Math.min(get(this, 'numberOfVisibleItems'), get(this, 'content.length'));
@@ -297,69 +309,6 @@ export default Component.extend({
     };
   }),
 
-  resizeTask: task(function* () {
-    this.incrementProperty('resizing');
-    this._updateGeometry();
-    yield timeout(RECALC_INTERVAL);
-  }),
-
-  resizeEndTask: task(function* () {
-    try {
-      yield this._updateGeometry();
-    } finally {
-      this.set('resizing', 0);
-      this.sendAction('on-resize-end');
-    }
-  }),
-
-  scrollTask: task(function* () {
-    this.incrementProperty('scrolling');
-    this._updateGeometry();
-    yield timeout(RECALC_INTERVAL);
-  }),
-
-  scrollEndTask: task(function* () {
-    try {
-      yield this._updateGeometry();
-    } finally {
-      this.set('scrolling', 0);
-      this.sendAction('on-scroll-end');
-    }
-  }),
-
-  updateGeometry: task(function* () {
-    this._updateGeometry();
-    yield timeout(RECALC_INTERVAL);
-  }).enqueue(),
-
-  _updateGeometry() {
-    let parent = this.scrollingParent();
-
-    setProperties(this, {
-      scrollTop: parent ? (parent.scrollTop || parent.scrollY) : 0,
-      parentHeight: get(this, 'geometryParent.height') || get(this, '_defaultHeight'),
-      parentWidth: get(this, 'geometryParent.width') || get(this, '_defaultWidth')
-    });
-  },
-
-  scrollingParent() {
-    let element = get(this, 'element');
-
-    let overflowProperties = function(node) {
-      return [
-        getComputedStyle(node, null).getPropertyValue('overflow'),
-        getComputedStyle(node, null).getPropertyValue('overflow-x'),
-        getComputedStyle(node, null).getPropertyValue('overflow-y')
-      ].join(' ');
-    };
-
-    let scroller = A(ancestors(element.parentNode)).find((parent) => {
-      return /(auto|scroll)/.test(overflowProperties(parent));
-    });
-
-    return scroller || window;
-  },
-
   didInsertElement() {
     let scrollHandler = get(this, '_scrollHandler');
     let resizeHandler = get(this, '_resizeHandler');
@@ -378,7 +327,7 @@ export default Component.extend({
       window.addEventListener('resize', resizeHandler);
     }
 
-    get(this, 'updateGeometry').perform();
+    this.updateGeometry();
   },
 
   willDestroyElement() {
@@ -419,5 +368,75 @@ export default Component.extend({
         set(this, 'sampleItem', null);
       }
     }
+  },
+
+  resizeTask: task(function* () {
+    this.incrementProperty('resizing');
+    this.updateGeometry();
+    yield timeout(RECALC_INTERVAL);
+  }),
+
+  resizeEndTask: task(function* () {
+    try {
+      yield this.updateGeometry();
+    } finally {
+      let fn = get(this, 'on-resize-end');
+      set(this, 'resizing', 0);
+
+      if (typeof fn === 'function') {
+        fn();
+      }
+    }
+  }),
+
+  scrollTask: task(function* () {
+    this.incrementProperty('scrolling');
+    this.updateGeometry();
+    yield timeout(RECALC_INTERVAL);
+  }),
+
+  scrollEndTask: task(function* () {
+    try {
+      yield this.updateGeometry();
+    } finally {
+      let fn = get(this, 'on-scroll-end');
+      set(this, 'scrolling', 0);
+
+      if (typeof fn === 'function') {
+        fn();
+      }
+    }
+  }),
+
+  updateGeometry() {
+    let parent = this.scrollingParent();
+
+    setProperties(this, {
+      scrollTop: parent ? (parent.scrollTop || parent.scrollY) : 0,
+      parentHeight: get(this, 'geometryParent.height') || get(this, '_defaultHeight'),
+      parentWidth: get(this, 'geometryParent.width') || get(this, '_defaultWidth')
+    });
+  },
+
+  scrollingParent() {
+    let element = get(this, 'element');
+
+    if (!element) {
+      return window || FAKE_WINDOW;
+    }
+
+    let overflowProperties = function(node) {
+      return [
+        getComputedStyle(node, null).getPropertyValue('overflow'),
+        getComputedStyle(node, null).getPropertyValue('overflow-x'),
+        getComputedStyle(node, null).getPropertyValue('overflow-y')
+      ].join(' ');
+    };
+
+    let scroller = A(ancestors(element.parentNode)).find((parent) => {
+      return /(auto|scroll)/.test(overflowProperties(parent));
+    });
+
+    return scroller || window || FAKE_WINDOW;
   }
 });

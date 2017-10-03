@@ -90,7 +90,11 @@ export default Component.extend({
   }).readOnly(),
 
   didInsertElement() {
-    this.sendAction('on-insert', this);
+    let fn = get(this, 'on-insert');
+
+    if (typeof fn === 'function') {
+      fn(this);
+    }
   },
 
   didUpdate() {
@@ -99,13 +103,18 @@ export default Component.extend({
     }
 
     let element = get(this, 'element');
+    let fn = get(this, 'on-update');
 
-    if (element && typeof element.getBoundingClientRect === 'function') {
-      this.sendAction('on-update', element.getBoundingClientRect());
+    if (element && typeof element.getBoundingClientRect === 'function' && typeof fn === 'function') {
+      fn(element.getBoundingClientRect());
     }
   },
 
   willDestroyElement() {
-    this.sendAction('on-destroy', this);
+    let fn = get(this, 'on-destroy');
+
+    if (typeof fn === 'function') {
+      fn(this);
+    }
   }
 });

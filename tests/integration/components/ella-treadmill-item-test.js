@@ -2,7 +2,7 @@ import { moduleForComponent, test } from 'ember-qunit';
 import Ember from 'ember';
 import hbs from 'htmlbars-inline-precompile';
 
-const { run } = Ember;
+const { get, run } = Ember;
 
 moduleForComponent('ella-treadmill-item', 'Integration | Component | ella treadmill item', {
   integration: true
@@ -102,12 +102,12 @@ test('it triggers an "on-insert" action when added to the DOM', function(assert)
   });
 
   this.render(hbs`
-    {{ella-treadmill-item height=50 on-insert="addedToDOM"}}
+    {{ella-treadmill-item height=50 on-insert=(action "addedToDOM")}}
   `);
 
   let element = document.querySelector('ella-treadmill-item');
 
-  assert.equal(actionTriggered.get('element'), element);
+  assert.equal(get(actionTriggered, 'element'), element);
 });
 
 test('it triggers an "on-destroy" action before removed from the DOM', function(assert) {
@@ -120,7 +120,7 @@ test('it triggers an "on-destroy" action before removed from the DOM', function(
 
   this.render(hbs`
     {{#if showTest}}
-      {{ella-treadmill-item height=50 on-destroy="aboutToDestroy"}}
+      {{ella-treadmill-item height=50 on-destroy=(action "aboutToDestroy")}}
     {{/if}}
   `);
 
@@ -143,7 +143,7 @@ test('it triggers an "on-update" action when re-rendered (if it is the sample it
   });
 
   this.render(hbs`
-    {{ella-treadmill-item height=height isSampleItem=isSampleItem on-update="updateHandler"}}
+    {{ella-treadmill-item height=height isSampleItem=isSampleItem on-update=(action "updateHandler")}}
   `);
 
   assert.equal(actionTriggered, false);
