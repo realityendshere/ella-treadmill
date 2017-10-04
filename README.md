@@ -17,7 +17,7 @@ element takes a new position below the scrolling area and updates to read
 
 ## Requirements
 
-Ember Try tells me that Emberella Treadmill will work with Ember 2.4LTS or
+Ember Try tells me that Emberella Treadmill will work with Ember 2.4 LTS or
 newer. It also passes all tests in the latest versions of Chrome, Firefox, and
 Safari (macOS and iOS).
 
@@ -44,7 +44,7 @@ From the root directory of your Ember project
 $ npm install ember-ella-treadmill --save-dev
 ```
 
-## Use It
+## Quickstart
 
 At a minimum, Emberella Treadmill requires an array of content and something to
 display for each item in the array. So, assuming `model` is defined in the
