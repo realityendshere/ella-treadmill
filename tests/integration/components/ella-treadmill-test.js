@@ -15,7 +15,7 @@ moduleForComponent('ella-treadmill', 'Integration | Component | ella treadmill',
   }
 });
 
-const { run } = Ember;
+const { run, A } = Ember;
 // const { getComputedStyle } = window;
 
 const DEFAULT_HEIGHT = 50;
@@ -102,13 +102,21 @@ test('it renders an inverse block when no content to display', function(assert) 
 });
 
 test('it renders with a default row height', function(assert) {
-  this.set('model', ONE_ITEM_ARRAY);
+  let model = A(range(1, 1));
+
+  this.set('model', model);
 
   this.render(hbs`{{ella-treadmill content=model}}`);
 
   let element = document.querySelector('ella-treadmill');
 
   assert.equal(element.clientHeight, DEFAULT_HEIGHT, 'height multiplies by 1');
+
+  run(() => {
+    this.get('model').pushObject('b');
+  });
+
+  assert.equal(element.clientHeight, DEFAULT_HEIGHT * 2, 'height multiplies by 2');
 
   this.set('model', LARGE_ARRAY);
 
@@ -769,7 +777,7 @@ test('it has an "overdraw" attribute that enables a few extra items to be render
   });
 });
 
-test('it renders items in a grid when "minItemWidth" set as percentage', function(assert) {
+test('it renders items in a grid when "minColumnWidth" set as percentage', function(assert) {
   let testElement = document.getElementById('ember-testing');
 
   testElement.style.height = '600px';
@@ -778,7 +786,7 @@ test('it renders items in a grid when "minItemWidth" set as percentage', functio
   this.set('model', LARGE_ARRAY);
 
   this.render(hbs`
-    {{ella-treadmill row=60 minItemWidth=33 widthUnit="%" content=model}}
+    {{ella-treadmill row=60 minColumnWidth=33 widthUnit="%" content=model}}
     <div id="test0" style="height: 60px; width: 200px; position: absolute; top: 0; left: 0;">&nbsp;</div>
     <div id="test1" style="height: 60px; width: 200px; position: absolute; top: 0; left: 200px;">&nbsp;</div>
     <div id="test2" style="height: 60px; width: 200px; position: absolute; top: 0; left: 400px;">&nbsp;</div>
@@ -825,7 +833,7 @@ test('it renders items in a grid when "minItemWidth" set as percentage', functio
   });
 });
 
-test('it renders items in a grid when "minItemWidth" set in pixels', function(assert) {
+test('it renders items in a grid when "minColumnWidth" set in pixels', function(assert) {
   let testElement = document.getElementById('ember-testing');
 
   testElement.style.height = '600px';
@@ -834,7 +842,7 @@ test('it renders items in a grid when "minItemWidth" set in pixels', function(as
   this.set('model', LARGE_ARRAY);
 
   this.render(hbs`
-    {{ella-treadmill row=60 minItemWidth=180 widthUnit="px" content=model}}
+    {{ella-treadmill row=60 minColumnWidth=180 widthUnit="px" content=model}}
     <div id="test0" style="height: 60px; width: 200px; position: absolute; top: 0; left: 0;">&nbsp;</div>
     <div id="test1" style="height: 60px; width: 200px; position: absolute; top: 0; left: 200px;">&nbsp;</div>
     <div id="test2" style="height: 60px; width: 200px; position: absolute; top: 0; left: 400px;">&nbsp;</div>
@@ -893,7 +901,7 @@ test('it repositions grid items after scroll', function(assert) {
 
   this.render(hbs`
     <div id="bumper" style="height: 372px;">&nbsp;</div>
-    {{ella-treadmill row=150 minItemWidth=300 widthUnit="px" content=model}}
+    {{ella-treadmill row=150 minColumnWidth=300 widthUnit="px" content=model}}
     <div id="test0" style="height: 150px; width: 300px; position: absolute; top: 35022px; left: 0;">&nbsp;</div>
     <div id="test1" style="height: 150px; width: 300px; position: absolute; top: 35022px; left: 300px;">&nbsp;</div>
     <div id="test2" style="height: 150px; width: 300px; position: absolute; top: 35022px; left: 600px;">&nbsp;</div>
@@ -944,10 +952,10 @@ test('it repositions grid items after scroll', function(assert) {
 test('it renders items with a class name that indicates row membership', function(assert) {
   this.set('model', LARGE_ARRAY);
   this.set('fluctuate', 2);
-  this.set('minItemWidth', 100);
+  this.set('minColumnWidth', 100);
 
   this.render(hbs`
-    {{ella-treadmill fluctuate=fluctuate minItemWidth=minItemWidth content=model}}
+    {{ella-treadmill fluctuate=fluctuate minColumnWidth=minColumnWidth content=model}}
   `);
 
   document.querySelectorAll('ella-treadmill > ella-treadmill-item').forEach((node, index) => {
@@ -964,7 +972,7 @@ test('it renders items with a class name that indicates row membership', functio
     assert.ok(node.classList.contains(expected));
   });
 
-  this.set('minItemWidth', 25);
+  this.set('minColumnWidth', 25);
 
   document.querySelectorAll('ella-treadmill > ella-treadmill-item').forEach((node, index) => {
     if (index < 4) {
@@ -978,10 +986,10 @@ test('it renders items with a class name that indicates row membership', functio
 test('it renders items with a class name that indicates column membership', function(assert) {
   this.set('model', LARGE_ARRAY);
   this.set('fluctuateColumn', 2);
-  this.set('minItemWidth', 33);
+  this.set('minColumnWidth', 33);
 
   this.render(hbs`
-    {{ella-treadmill fluctuateColumn=fluctuateColumn minItemWidth=minItemWidth content=model}}
+    {{ella-treadmill fluctuateColumn=fluctuateColumn minColumnWidth=minColumnWidth content=model}}
   `);
 
   document.querySelectorAll('ella-treadmill > ella-treadmill-item').forEach((node, index) => {
@@ -990,7 +998,7 @@ test('it renders items with a class name that indicates column membership', func
     assert.ok(node.classList.contains(expected));
   });
 
-  this.set('minItemWidth', 20);
+  this.set('minColumnWidth', 20);
 
   document.querySelectorAll('ella-treadmill > ella-treadmill-item').forEach((node, index) => {
     let expected = `ella-treadmill-item-column-${((index % 5) % 2) + 1}`;

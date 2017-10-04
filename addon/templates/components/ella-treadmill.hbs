@@ -6,7 +6,7 @@
     {{/if}}
 
     width: 100%;
-    display: {{display}};
+    display: flex;
     flex-wrap: wrap;
     align-content: flex-start;
     box-sizing: border-box;
@@ -21,7 +21,7 @@
   }
 </style>
 
-{{#each indices as |idx|}}
+{{#each indices as |_ idx|}}
   {{#ella-treadmill-item
     parent=this
     index=(get visibleIndices (concat '' idx))
