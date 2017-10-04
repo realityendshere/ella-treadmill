@@ -20,7 +20,10 @@
     "doc": "doc",
     "test": "tests"
   },
-  "repository": "",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/realityendshere/ella-treadmill.git"
+  },
   "scripts": {
     "build": "ember build",
     "start": "ember server",
