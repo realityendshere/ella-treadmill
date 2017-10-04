@@ -15,7 +15,7 @@ const {
   A
 } = Ember;
 
-const RECALC_INTERVAL = 20;
+const RECALC_INTERVAL = 10;
 const NO_WINDOW_HEIGHT = 1024;
 const NO_WINDOW_WIDTH = 768;
 const DEFAULT_ROW_HEIGHT = 50;
@@ -839,7 +839,7 @@ export default Component.extend({
 
   resizeTask: task(function* () {
     this.incrementProperty('resizing');
-    this.updateGeometry();
+    this.updateGeometry().sendStateUpdate();
     yield timeout(RECALC_INTERVAL);
   }),
 
@@ -847,18 +847,14 @@ export default Component.extend({
     try {
       yield this.updateGeometry();
     } finally {
-      let fn = get(this, 'on-resize-end');
       set(this, 'resizing', 0);
-
-      if (typeof fn === 'function') {
-        fn();
-      }
+      this.sendClosureAction('on-resize-end').sendStateUpdate();
     }
   }),
 
   scrollTask: task(function* () {
     this.incrementProperty('scrolling');
-    this.updateGeometry();
+    this.updateGeometry().sendStateUpdate();
     yield timeout(RECALC_INTERVAL);
   }),
 
@@ -866,20 +862,51 @@ export default Component.extend({
     try {
       yield this.updateGeometry();
     } finally {
-      let fn = get(this, 'on-scroll-end');
       set(this, 'scrolling', 0);
-
-      if (typeof fn === 'function') {
-        fn();
-      }
+      this.sendClosureAction('on-scroll-end').sendStateUpdate();
     }
   }),
+
+  /**
+   * Adheres to the recommended use of "closure actions."
+   *
+   * @method sendClosureAction
+   * @param {String} action The name of the action to send
+   * @param ...args Parameters to pass through to the action call
+   * @chainable
+   * @public
+   */
+  sendClosureAction(action, ...args) {
+    let fn = get(this, action);
+
+    if (typeof fn === 'function') {
+      fn(...args);
+    }
+
+    return this;
+  },
+
+  /**
+   * Send action(s) with state data about this listing.
+   *
+   * @method sendStateUpdate
+   * @chainable
+   * @public
+   */
+  sendStateUpdate() {
+    let startingIndex = get(this, 'startingIndex');
+    let item = get(this, '_content').objectAt(startingIndex);
+
+    this.sendClosureAction('on-first-index-change', item, startingIndex);
+
+    return this;
+  },
 
   /**
    * Updates properties regarding scroll position and parent dimensions.
    *
    * @method updateGeometry
-   * @return {Null}
+   * @chainable
    * @public
    */
   updateGeometry() {
@@ -890,6 +917,8 @@ export default Component.extend({
       parentHeight: get(this, 'geometryParent.height') || get(this, '_defaultHeight'),
       parentWidth: get(this, 'geometryParent.width') || get(this, '_defaultWidth')
     });
+
+    return this;
   },
 
   /**

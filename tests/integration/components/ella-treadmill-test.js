@@ -481,6 +481,38 @@ test('it triggers an "on-scroll-end" action', function(assert) {
   });
 });
 
+test('it triggers "on-first-index-change" action', function(assert) {
+  let testElement = document.getElementById('ember-testing');
+  let actionTriggered = false;
+
+  testElement.style.height = '600px';
+
+  this.set('model', LARGE_ARRAY);
+
+  this.on('handleFirstIndexChanged', function (item, index) {
+    actionTriggered = {
+      item: item,
+      index: index
+    };
+  });
+
+  this.render(hbs`
+    <div id="bumper" style="height: 300px;">&nbsp;</div>
+    {{ella-treadmill row=100 content=model on-first-index-change=(action "handleFirstIndexChanged")}}
+  `);
+
+  assert.equal(actionTriggered, false, 'action not yet called');
+
+  run(() => {
+    testElement.scrollTop = 30010;
+  });
+
+  return wait().then(() => {
+    assert.equal(actionTriggered.item, 298, 'action called with expected content');
+    assert.equal(actionTriggered.index, 297, 'action called with expected index');
+  });
+});
+
 test('it updates the data-scroll-top attribute', function(assert) {
   this.set('model', LARGE_ARRAY);
 
