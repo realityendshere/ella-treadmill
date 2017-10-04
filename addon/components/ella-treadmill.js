@@ -16,6 +16,7 @@ const {
 } = Ember;
 
 const RECALC_INTERVAL = 10;
+const DEBOUNCE_INTERVAL = 50;
 const NO_WINDOW_HEIGHT = 1024;
 const NO_WINDOW_WIDTH = 768;
 const DEFAULT_ROW_HEIGHT = 50;
@@ -201,21 +202,21 @@ export default Component.extend({
    * the component element's width, flexible columns will rendered to fill the
    * available horizontal space.
    *
-   * For example, if the component's rendered element is 600px wide,
-   * `minColumnWidth: 180`, and `widthUnit: 'px'`, `ella-treadmill` would
-   * place items into a grid with 3 columns of `200px` width. Resizing the
-   * viewport to allow the component's element to be `720px` wide would
-   * rearrange the grid into four columns, each `180px` wide.
+   * For example, if the component's rendered element is 600px wide and
+   * `minColumnWidth: 180px`, `ella-treadmill` would place items into a grid
+   * with 3 columns of `200px` width. Resizing the viewport to allow the
+   * component's element to be `720px` wide would rearrange the grid into four
+   * columns, each `180px` wide.
    *
    * The default behavior is to show a long list of items in a single column.
-   * (`minColumnWidth: 180` and `widthUnit: '%'`)
+   * (`minColumnWidth: '100%'`)
    *
    * @property minColumnWidth
-   * @type {Number}
-   * @default 100
+   * @type {Number|String}
+   * @default '100%'
    * @public
    */
-  minColumnWidth: 100,
+  minColumnWidth: '100%',
 
   /**
    * An additional number of rows, indicated by a percentage, to render above
@@ -284,29 +285,16 @@ export default Component.extend({
   resizing: 0,
 
   /**
-   * The numeric height of each row.
+   * The height of each row.
    *
    * The default height of each row is `50px`.
    *
    * @property row
-   * @type {Number}
+   * @type {Number|String}
    * @default 50
    * @public
    */
   row: DEFAULT_ROW_HEIGHT,
-
-  /**
-   * The unit of measurement to use when defining the height of each row.
-   * (e.g. 'px', 'em', 'rem', '%', etc.)
-   *
-   * The default height of each row is `50px`.
-   *
-   * @property rowUnit
-   * @type {String}
-   * @default 'px'
-   * @public
-   */
-  rowUnit: 'px',
 
   /**
    * A sample child element to reference when computing how many child elements
@@ -355,19 +343,6 @@ export default Component.extend({
   scrollTop: 0,
 
   /**
-   * The unit of measurement to use when defining the width of each column.
-   * (only 'px' and '%' are officially supported)
-   *
-   * The default width of each column is `100%`.
-   *
-   * @property widthUnit
-   * @type {String}
-   * @default '%'
-   * @public
-   */
-  widthUnit: '%',
-
-  /**
    * The number of items to render per row.
    *
    * @property columns
@@ -376,15 +351,18 @@ export default Component.extend({
    * @public
    * @readOnly
    */
-  columns: computed('minColumnWidth', 'widthUnit', 'parentWidth', function() {
-    let { minColumnWidth, widthUnit } = getProperties(this, 'minColumnWidth', 'widthUnit');
+  columns: computed('minColumnWidth', 'parentWidth', function() {
+    let col = get(this, 'minColumnWidth');
+    let colUnit = this.unitString(col);
     let element;
     let elementWidth;
     let result;
 
-    switch (widthUnit) {
+    col = parseFloat(col, 10);
+
+    switch (colUnit) {
       case '%':
-        result = Math.floor(100 / minColumnWidth);
+        result = Math.floor(100 / col);
         break;
       case 'px':
         element = get(this, 'element');
@@ -395,7 +373,7 @@ export default Component.extend({
           elementWidth = get(this, '_defaultWidth');
         }
 
-        result = Math.floor(elementWidth / minColumnWidth);
+        result = Math.floor(elementWidth / col);
 
         break;
       default:
@@ -686,7 +664,7 @@ export default Component.extend({
 
     return (evt) => {
       get(this, 'resizeTask').perform();
-      debounce(this, debouncedHandler, evt, interval * 2);
+      debounce(this, debouncedHandler, evt, DEBOUNCE_INTERVAL);
     };
   }).readOnly(),
 
@@ -700,11 +678,14 @@ export default Component.extend({
    * @private
    * @readOnly
    */
-  _row: computed('row', 'rowUnit', 'parentHeight', function() {
-    let { row, rowUnit } = getProperties(this, 'row', 'rowUnit');
+  _row: computed('row', 'parentHeight', function() {
+    let row = get(this, 'row') || '';
+    let rowUnit = this.unitString(row);
     let parent;
     let parentHeight;
     let result;
+
+    row = parseFloat(row, 10);
 
     switch (rowUnit) {
       case '%':
@@ -730,8 +711,9 @@ export default Component.extend({
    * @private
    * @readOnly
    */
-  _rowUnit: computed('rowUnit', function() {
-    let rowUnit = get(this, 'rowUnit');
+  _rowUnit: computed('row', function() {
+    let row = get(this, 'row') || '';
+    let rowUnit = this.unitString(row);
     let result;
 
     switch (rowUnit) {
@@ -739,7 +721,7 @@ export default Component.extend({
         result = 'px';
         break;
       default:
-        result =  rowUnit;
+        result = rowUnit;
         break;
     }
 
@@ -764,7 +746,7 @@ export default Component.extend({
 
     return (evt) => {
       get(this, 'scrollTask').perform();
-      debounce(this, debouncedHandler, evt, interval * 2);
+      debounce(this, debouncedHandler, evt, DEBOUNCE_INTERVAL);
     };
   }).readOnly(),
 
@@ -868,6 +850,22 @@ export default Component.extend({
   }),
 
   /**
+   * Take a sizing style like `100px` or `22.56rem` and find its unit of
+   * measure (e.g. `px` or `rem`).
+   *
+   * @method unitString
+   * @param measure A CSS measurement
+   * @param {String} instead A unit of measurement to send if no matches
+   * @return {String}
+   * @public
+   */
+  unitString(measure = '', instead = 'px') {
+    let unit = `${measure}`.match(/[^-\d\.]+$/g);
+
+    return unit ? unit[0] : instead;
+  },
+
+  /**
    * Adheres to the recommended use of "closure actions."
    *
    * @method sendClosureAction
@@ -894,10 +892,10 @@ export default Component.extend({
    * @public
    */
   sendStateUpdate() {
-    let startingIndex = get(this, 'startingIndex');
-    let item = get(this, '_content').objectAt(startingIndex);
-
-    this.sendClosureAction('on-first-index-change', item, startingIndex);
+    this.sendClosureAction(
+      'on-update',
+      getProperties(this, 'scrollTop', 'topDelta', 'startingIndex', 'numberOfVisibleItems')
+    );
 
     return this;
   },

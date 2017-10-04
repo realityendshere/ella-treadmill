@@ -11,15 +11,13 @@
 <p>&nbsp;</p>
 
 {{#ella-treadmill
+  content=model
   row=(if rowHeight rowHeight 200)
   minColumnWidth=(if rowHeight rowHeight 200)
-  widthUnit="px"
-  content=model
   overdraw=20
-  as |listing|
+  as |item index|
 }}
-  [{{{listing.index}}}]: I am item #{{listing.item}}
+  [{{{index}}}]: I am item #{{item}}
 {{else}}
   <p>Nothing to see here.</p>
 {{/ella-treadmill}}
-

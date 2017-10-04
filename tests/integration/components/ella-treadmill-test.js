@@ -20,7 +20,7 @@ const { run, A } = Ember;
 
 const DEFAULT_HEIGHT = 50;
 
-let range = function (start, end) {
+let range = function(start, end) {
   return Array(end - start + 1).fill().map((_, idx) => start + idx)
 }
 
@@ -88,7 +88,7 @@ test('it renders an inverse block when no content to display', function(assert) 
   this.set('model', []);
 
   this.render(hbs`
-    {{#ella-treadmill content=model as |listing|}}
+    {{#ella-treadmill content=model as |item index|}}
       I am a listing.
     {{else}}
       Nothing to see here.
@@ -186,7 +186,7 @@ test('it renders with a custom row height unit (rem)', function(assert) {
   this.set('expectedHeight', (LARGE_ARRAY.length * 5.35) + 'rem');
 
   this.render(hbs`
-    {{ella-treadmill row=5.35 rowUnit='rem' content=model}}
+    {{ella-treadmill row='5.35rem' content=model}}
     <style type="text/css">
       #measurement {
         height: {{expectedHeight}};
@@ -206,7 +206,7 @@ test('it renders with a custom row height unit (%)', function(assert) {
 
   this.render(hbs`
     <div style="height: 500px; overflow: auto;">
-      {{ella-treadmill row=20 rowUnit='%' content=model}}
+      {{ella-treadmill row='20%' content=model}}
     </div>
   `);
 
@@ -279,7 +279,7 @@ test('it renders enough list items to fill the available vertical space (em)', f
   this.set('model', LARGE_ARRAY);
 
   this.render(hbs`
-    {{ella-treadmill row=2.35 rowUnit='em' content=model}}
+    {{ella-treadmill row='2.35em' content=model}}
     <div id="measurement" style="height: 2.35em;">&nbsp;</div>
   `);
 
@@ -316,7 +316,7 @@ test('it renders enough list items to fill the available vertical space (rem)', 
   this.set('model', LARGE_ARRAY);
 
   this.render(hbs`
-    {{ella-treadmill row=3.1 rowUnit='rem' content=model}}
+    {{ella-treadmill row='3.1rem' content=model}}
     <div id="measurement" style="height: 3.1rem;">&nbsp;</div>
   `);
 
@@ -353,7 +353,7 @@ test('it renders enough list items to fill the available vertical space (%)', fu
   this.set('model', LARGE_ARRAY);
 
   this.render(hbs`
-    {{ella-treadmill row=20 rowUnit='%' content=model}}
+    {{ella-treadmill row='20%' content=model}}
   `);
 
   let element = document.querySelector('ella-treadmill');
@@ -415,7 +415,7 @@ test('it triggers an "on-resize-end" action', function(assert) {
 
   this.set('model', LARGE_ARRAY);
 
-  this.on('handleResizeEnd', function () {
+  this.on('handleResizeEnd', function() {
     actionTriggered = true;
   });
 
@@ -460,7 +460,7 @@ test('it triggers an "on-scroll-end" action', function(assert) {
   testElement.style.height = '500px';
 
   this.set('model', LARGE_ARRAY);
-  this.on('handleScrollEnd', function () {
+  this.on('handleScrollEnd', function() {
     actionTriggered = true;
   });
 
@@ -481,7 +481,7 @@ test('it triggers an "on-scroll-end" action', function(assert) {
   });
 });
 
-test('it triggers "on-first-index-change" action', function(assert) {
+test('it triggers "on-update" action', function(assert) {
   let testElement = document.getElementById('ember-testing');
   let actionTriggered = false;
 
@@ -489,16 +489,13 @@ test('it triggers "on-first-index-change" action', function(assert) {
 
   this.set('model', LARGE_ARRAY);
 
-  this.on('handleFirstIndexChanged', function (item, index) {
-    actionTriggered = {
-      item: item,
-      index: index
-    };
+  this.on('handleListingStateChanged', function(props) {
+    actionTriggered = props;
   });
 
   this.render(hbs`
     <div id="bumper" style="height: 300px;">&nbsp;</div>
-    {{ella-treadmill row=100 content=model on-first-index-change=(action "handleFirstIndexChanged")}}
+    {{ella-treadmill row=100 content=model on-update=(action "handleListingStateChanged")}}
   `);
 
   assert.equal(actionTriggered, false, 'action not yet called');
@@ -508,8 +505,7 @@ test('it triggers "on-first-index-change" action', function(assert) {
   });
 
   return wait().then(() => {
-    assert.equal(actionTriggered.item, 298, 'action called with expected content');
-    assert.equal(actionTriggered.index, 297, 'action called with expected index');
+    assert.equal(actionTriggered.startingIndex, 297, 'action called with expected index');
   });
 });
 
@@ -657,8 +653,8 @@ test('it displays the correct content item in each listing (block usage)', funct
   this.set('model', LARGE_ARRAY);
 
   this.render(hbs`
-    {{#ella-treadmill row=100 content=model as |listing|}}
-      [{{{listing.index}}}]: I am item #{{listing.item}}
+    {{#ella-treadmill row=100 content=model as |item index|}}
+      [{{{index}}}]: I am item #{{item}}
     {{/ella-treadmill}}
   `);
 
@@ -818,7 +814,7 @@ test('it renders items in a grid when "minColumnWidth" set as percentage', funct
   this.set('model', LARGE_ARRAY);
 
   this.render(hbs`
-    {{ella-treadmill row=60 minColumnWidth=33 widthUnit="%" content=model}}
+    {{ella-treadmill row=60 minColumnWidth='33%' content=model}}
     <div id="test0" style="height: 60px; width: 200px; position: absolute; top: 0; left: 0;">&nbsp;</div>
     <div id="test1" style="height: 60px; width: 200px; position: absolute; top: 0; left: 200px;">&nbsp;</div>
     <div id="test2" style="height: 60px; width: 200px; position: absolute; top: 0; left: 400px;">&nbsp;</div>
@@ -874,7 +870,7 @@ test('it renders items in a grid when "minColumnWidth" set in pixels', function(
   this.set('model', LARGE_ARRAY);
 
   this.render(hbs`
-    {{ella-treadmill row=60 minColumnWidth=180 widthUnit="px" content=model}}
+    {{ella-treadmill row=60 minColumnWidth='180px' content=model}}
     <div id="test0" style="height: 60px; width: 200px; position: absolute; top: 0; left: 0;">&nbsp;</div>
     <div id="test1" style="height: 60px; width: 200px; position: absolute; top: 0; left: 200px;">&nbsp;</div>
     <div id="test2" style="height: 60px; width: 200px; position: absolute; top: 0; left: 400px;">&nbsp;</div>
@@ -933,7 +929,7 @@ test('it repositions grid items after scroll', function(assert) {
 
   this.render(hbs`
     <div id="bumper" style="height: 372px;">&nbsp;</div>
-    {{ella-treadmill row=150 minColumnWidth=300 widthUnit="px" content=model}}
+    {{ella-treadmill row=150 minColumnWidth='300px' content=model}}
     <div id="test0" style="height: 150px; width: 300px; position: absolute; top: 35022px; left: 0;">&nbsp;</div>
     <div id="test1" style="height: 150px; width: 300px; position: absolute; top: 35022px; left: 300px;">&nbsp;</div>
     <div id="test2" style="height: 150px; width: 300px; position: absolute; top: 35022px; left: 600px;">&nbsp;</div>
@@ -984,7 +980,7 @@ test('it repositions grid items after scroll', function(assert) {
 test('it renders items with a class name that indicates row membership', function(assert) {
   this.set('model', LARGE_ARRAY);
   this.set('fluctuate', 2);
-  this.set('minColumnWidth', 100);
+  this.set('minColumnWidth', '100%');
 
   this.render(hbs`
     {{ella-treadmill fluctuate=fluctuate minColumnWidth=minColumnWidth content=model}}
@@ -1004,7 +1000,7 @@ test('it renders items with a class name that indicates row membership', functio
     assert.ok(node.classList.contains(expected));
   });
 
-  this.set('minColumnWidth', 25);
+  this.set('minColumnWidth', '25%');
 
   document.querySelectorAll('ella-treadmill > ella-treadmill-item').forEach((node, index) => {
     if (index < 4) {
@@ -1018,7 +1014,7 @@ test('it renders items with a class name that indicates row membership', functio
 test('it renders items with a class name that indicates column membership', function(assert) {
   this.set('model', LARGE_ARRAY);
   this.set('fluctuateColumn', 2);
-  this.set('minColumnWidth', 33);
+  this.set('minColumnWidth', '33%');
 
   this.render(hbs`
     {{ella-treadmill fluctuateColumn=fluctuateColumn minColumnWidth=minColumnWidth content=model}}
@@ -1030,7 +1026,7 @@ test('it renders items with a class name that indicates column membership', func
     assert.ok(node.classList.contains(expected));
   });
 
-  this.set('minColumnWidth', 20);
+  this.set('minColumnWidth', '20%');
 
   document.querySelectorAll('ella-treadmill > ella-treadmill-item').forEach((node, index) => {
     let expected = `ella-treadmill-item-column-${((index % 5) % 2) + 1}`;

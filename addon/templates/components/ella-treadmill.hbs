@@ -35,15 +35,10 @@
     on-insert=(action "listItemInserted")
     on-update=(action "listItemUpdated")
     on-destroy=(action "listItemDestroyed")
-    as |listItem|
+    as |item index|
   }}
     {{#if hasBlock}}
-      {{yield
-        (hash
-          item=listItem.item
-          index=listItem.index
-        )
-      }}
+      {{yield item index}}
     {{else}}
       {{get visibleContent (concat '' idx)}}
     {{/if}}
