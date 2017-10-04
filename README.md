@@ -15,7 +15,7 @@ listing element with "Aaron" moves out of view above the scrolling area. That
 element takes a new position below the scrolling area and updates to read
 "Alex".
 
-##Requirements
+## Requirements
 
 Ember Try tells me that Emberella Treadmill will work with Ember 2.4LTS or
 newer. It also passes all tests in the latest versions of Chrome, Firefox, and
@@ -24,11 +24,11 @@ Safari (macOS and iOS).
 It uses "flexbox" and CSS transforms. So, any browser that doesn't support those
 features will likely not work correctly.
 
-##Installation
+## Installation
 
 As an Ember Addon, it's easy to get started with Emberella Treadmill.
 
-###Ember CLI
+### Ember CLI
 
 From the root directory of your Ember project
 
@@ -36,7 +36,7 @@ From the root directory of your Ember project
 $ ember install ember-ella-treadmill
 ```
 
-###Plain NPM
+### Plain NPM
 
 From the root directory of your Ember project
 
@@ -44,7 +44,7 @@ From the root directory of your Ember project
 $ npm install ember-ella-treadmill --save-dev
 ```
 
-##Use It
+## Use It
 
 At a minimum, Emberella Treadmill requires an array of content and something to
 display for each item in the array. So, assuming `model` is defined in the
@@ -72,13 +72,13 @@ custom messaging.
 {{/ella-treadmill}}
 ```
 
-###Options
+### Options
 
 Displaying a list of `50px` tall items is good. Applying custom row heights or
 rendering listings in a grid format is even better. Emberella Treadmill offers a
 few options for adjusting the size and position of listings.
 
-####fluctuate
+#### fluctuate
 
 Each item rendered by Emberella Treadmill will have a class name indicating
 which row it belongs to. Typically, items will alternate between the class name
@@ -118,7 +118,7 @@ Every fourth row will contain items with the class name
 {{/ella-treadmill}}
 ```
 
-####fluctuateColumn
+#### fluctuateColumn
 
 Each item rendered by Emberella Treadmill will have a class name indicating
 which column it belongs to. Typically, items will alternate between the class
@@ -158,7 +158,7 @@ Every third column will contain items with the class name
 {{/ella-treadmill}}
 ```
 
-####minColumnWidth
+#### minColumnWidth
 
 If `minColumnWidth` is less than 50% of the Emberella Treadmill component
 element's width, flexible columns will rendered to fill the available horizontal
@@ -195,7 +195,7 @@ wide.
 {{/ella-treadmill}}
 ```
 
-####overdraw
+#### overdraw
 
 Emberella Treadmill will typically render only enough rows to fill the currently
 visible portion of the scrolling parent plus one additional row. Sometimes,
@@ -216,7 +216,7 @@ this `overdraw` value of `20` would render 8 additional items (four above the
 viewable area and four below the viewable area). That's 20% more items in each
 scrolling direction.
 
-####row
+#### row
 
 Specify the height of each listing.
 
@@ -248,9 +248,9 @@ will be visible on screen.
 You can also specify row height in `em`, `rem`, `vh`, or (in theory) any other
 CSS unit of measure.
 
-###Actions
+### Actions
 
-####on-scroll-end
+#### on-scroll-end
 
 Triggered whenever scrolling events have ceased for more than 50ms.
 
@@ -263,7 +263,7 @@ Triggered whenever scrolling events have ceased for more than 50ms.
 {{/ella-treadmill}}
 ```
 
-####on-resize-end
+#### on-resize-end
 
 Triggered whenever resizing events have ceased for more than 50ms.
 
@@ -276,7 +276,7 @@ Triggered whenever resizing events have ceased for more than 50ms.
 {{/ella-treadmill}}
 ```
 
-####on-update
+#### on-update
 
 Triggered whenever resizing or scrolling may have altered key state properties
 in the component instance.
@@ -308,7 +308,7 @@ actions: {
 }
 ```
 
-##But Why?
+## But Why?
 
 Pagination and "infinite scroll" can be painfully difficult to use.
 
@@ -328,7 +328,7 @@ in sequential order.
 
 It simply behaves like a scrolling list. Period.
 
-##Contributing
+## Contributing
 
 If you use Ember CLI (and I hope you do), here are the standard instructions for
 installing and modifying this addon for yourself or to pitch in with
