@@ -6,9 +6,9 @@ elements at the same time. That's where Emberella Treadmill comes in.
 
 Provided an array of content, Emberella Treadmill renders the minimum number of
 child listings to fill the visible portion of a scrolling area. As customers
-scroll, these child listings are "recycled" (repositioned and rerendered with
-new content) appropriately to create the illusion of a long, continuously
-scrolling list.
+scroll, these child listings are "recycled" (repositioned and redrawn with new
+content) appropriately to create the illusion of a long, continuously scrolling
+list.
 
 For example, I have about 1,000 contacts in my address book. As I scroll, the
 listing element with "Aaron" moves out of view above the scrolling area. That
@@ -47,11 +47,10 @@ $ npm install ember-ella-treadmill --save-dev
 ## Quickstart
 
 At a minimum, Emberella Treadmill requires an array of content and something to
-display for each item in the array. So, assuming `model` is defined in the
-controller as an array of 8,712 people profiles.
-
-This would display a listing of 8,712 names and email addresses 435,600 pixels
-tall (the default listing height is `50px`).
+display for each item in the array. Assuming `model` is defined in the
+controller as an array of 8,712 people profiles, the following would display a
+listing of 8,712 names and email addresses 435,600 pixels tall (the default
+listing height is `50px`).
 
 ```
 {{#ella-treadmill content=model as |item|}}
@@ -109,8 +108,8 @@ Setting `fluctuate` to `4` would add class names to items as follows:
 * Row 6: `ella-treadmill-item-row-2`
 * and so on...
 
-Every fourth row will contain items with the class name
-`ella-treadmill-item-row-1` in the following code example.
+Every fourth row (1st, 5th, 9th, 13th, etc) will contain items with the class
+name `ella-treadmill-item-row-1` in the following code example.
 
 ```
 {{#ella-treadmill content=model fluctuate=4 as |item|}}
@@ -149,8 +148,8 @@ Setting `fluctuateColumn` to `3` would add class names to items as follows:
 * Column 6: `ella-treadmill-item-column-3`
 * and so on...
 
-Every third column will contain items with the class name
-`ella-treadmill-item-column-1` in the following code example.
+Every third column (1st, 4th, 7th, 10th, etc) will contain items with the
+class name `ella-treadmill-item-column-1` in the following code example.
 
 ```
 {{#ella-treadmill content=model fluctuateColumn=3 as |item|}}
