@@ -249,6 +249,19 @@ CSS unit of measure.
 
 ### Actions
 
+#### on-scroll-start
+
+Triggered for the first in a series of `scroll` events.
+
+```
+{{#ella-treadmill
+  content=model
+  on-scroll-start=(action'doSomethingWhenScrollngStarts') as |item|
+}}
+  <p>{{item.name}}</p>
+{{/ella-treadmill}}
+```
+
 #### on-scroll-end
 
 Triggered whenever scrolling events have ceased for more than 50ms.
@@ -257,6 +270,19 @@ Triggered whenever scrolling events have ceased for more than 50ms.
 {{#ella-treadmill
   content=model
   on-scroll-end=(action'doSomethingAfterScroll') as |item|
+}}
+  <p>{{item.name}}</p>
+{{/ella-treadmill}}
+```
+
+#### on-resize-start
+
+Triggered for the first in a series of `resize` events.
+
+```
+{{#ella-treadmill
+  content=model
+  on-resize-start=(action 'doSomethingWhenResizingStarts') as |item|
 }}
   <p>{{item.name}}</p>
 {{/ella-treadmill}}

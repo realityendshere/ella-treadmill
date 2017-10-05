@@ -407,6 +407,36 @@ test('it adds an "is-resizing" class while resizing', function(assert) {
   });
 });
 
+test('it triggers an "on-resize-start" action', function(assert) {
+  let testElement = document.getElementById('ember-testing');
+  let actionTriggered = 0;
+
+  testElement.style.height = '500px';
+
+  this.set('model', LARGE_ARRAY);
+
+  this.on('handleResizeStart', function() {
+    actionTriggered = actionTriggered + 1;
+  });
+
+  this.render(hbs`{{ella-treadmill row=100 content=model on-resize-start=(action "handleResizeStart")}}`);
+
+  assert.equal(actionTriggered, 0, 'action not yet called');
+
+  run(() => {
+    testElement.style.height = '600px';
+    testElement.dispatchEvent(new Event('resize'));
+    testElement.style.height = '620px';
+    testElement.dispatchEvent(new Event('resize'));
+    testElement.style.height = '610px';
+    testElement.dispatchEvent(new Event('resize'));
+  });
+
+  return wait().then(() => {
+    assert.equal(actionTriggered, 1, 'action called just once');
+  });
+});
+
 test('it triggers an "on-resize-end" action', function(assert) {
   let testElement = document.getElementById('ember-testing');
   let actionTriggered = false;
@@ -450,6 +480,39 @@ test('it adds an "is-scrolling" class while scrolling', function(assert) {
 
   return wait().then(() => {
     assert.ok(document.querySelector('ella-treadmill.not-scrolling'), 'removes class when events stop');
+  });
+});
+
+test('it triggers an "on-scroll-start" action', function(assert) {
+  let testElement = document.getElementById('ember-testing');
+  let actionTriggered = 0;
+
+  testElement.style.height = '500px';
+
+  this.set('model', LARGE_ARRAY);
+  this.on('handleScrollStart', function() {
+    actionTriggered = actionTriggered + 1;
+  });
+
+  this.render(hbs`
+    <div style="overflow: auto; height: 500px;" id="scroller">
+      {{ella-treadmill row=100 content=model on-scroll-start=(action "handleScrollStart")}}
+    </div>
+  `);
+
+  assert.equal(actionTriggered, 0, 'action not yet called');
+
+  run(() => {
+    document.getElementById('scroller').scrollTop = 100;
+    document.getElementById('scroller').scrollTop = 101;
+    document.getElementById('scroller').scrollTop = 102;
+    document.getElementById('scroller').scrollTop = 103;
+    document.getElementById('scroller').scrollTop = 104;
+    document.getElementById('scroller').scrollTop = 105;
+  });
+
+  return wait().then(() => {
+    assert.equal(actionTriggered, 1, 'action called just once');
   });
 });
 

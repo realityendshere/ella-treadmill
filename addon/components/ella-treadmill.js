@@ -820,6 +820,10 @@ export default Component.extend({
   },
 
   resizeTask: task(function* () {
+    if (get(this, 'resizing') === 0) {
+      this.sendClosureAction('on-resize-start');
+    }
+
     this.incrementProperty('resizing');
     this.updateGeometry().sendStateUpdate();
     yield timeout(RECALC_INTERVAL);
@@ -835,6 +839,10 @@ export default Component.extend({
   }),
 
   scrollTask: task(function* () {
+    if (get(this, 'scrolling') === 0) {
+      this.sendClosureAction('on-scroll-start');
+    }
+
     this.incrementProperty('scrolling');
     this.updateGeometry().sendStateUpdate();
     yield timeout(RECALC_INTERVAL);
