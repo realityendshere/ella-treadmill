@@ -603,7 +603,13 @@ export default Component.extend({
    * @readOnly
    */
   _content: computed('content.[]', function() {
-    return A([].concat(get(this, 'content')));
+    let content = get(this, 'content');
+
+    if (typeof content.objectsAt !== 'function') {
+      content = A([].concat(content));
+    }
+
+    return content;
   }).readOnly(),
 
   /**
