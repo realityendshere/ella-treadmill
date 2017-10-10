@@ -539,24 +539,24 @@ export default Component.extend({
    * @public
    * @readOnly
    */
-  visibleContent: computed('visibleIndices', '_content', function() {
+  visibleContent: computed('visibleIndexes', '_content', function() {
     let {
-      visibleIndices,
+      visibleIndexes,
       _content
-    } = getProperties(this, 'visibleIndices', '_content');
+    } = getProperties(this, 'visibleIndexes', '_content');
 
-    return A(_content.objectsAt(visibleIndices));
+    return A(_content.objectsAt(visibleIndexes));
   }).readOnly(),
 
   /**
    * The indexes of the content to render.
    *
-   * @property visibleIndices
+   * @property visibleIndexes
    * @type {Array}
    * @public
    * @readOnly
    */
-  visibleIndices: computed('startingIndex', 'numberOfVisibleItems', 'content.[]', function() {
+  visibleIndexes: computed('startingIndex', 'numberOfVisibleItems', 'content.[]', function() {
     let {
       startingIndex,
       numberOfVisibleItems
@@ -860,6 +860,7 @@ export default Component.extend({
     } finally {
       set(this, 'scrolling', 0);
       this.sendClosureAction('on-scroll-end').sendStateUpdate();
+      this.notifyPropertyChange('visibleContent');
     }
   }),
 
@@ -906,10 +907,13 @@ export default Component.extend({
    * @public
    */
   sendStateUpdate() {
-    this.sendClosureAction(
-      'on-update',
-      getProperties(this, 'scrollTop', 'topDelta', 'startingIndex', 'numberOfVisibleItems')
+    let props = getProperties(this,
+      'scrollTop', 'topDelta', 'startingIndex', 'numberOfVisibleItems', 'visibleIndexes'
     );
+
+    props.visibleIndexes = props.visibleIndexes.slice().sort();
+
+    this.sendClosureAction('on-update', props);
 
     return this;
   },

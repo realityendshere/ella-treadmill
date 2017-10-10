@@ -568,7 +568,18 @@ test('it triggers "on-update" action', function(assert) {
   });
 
   return wait().then(() => {
-    assert.equal(actionTriggered.startingIndex, 297, 'action called with expected index');
+    assert.equal(actionTriggered.scrollTop, 30010, 'action called with expected scrollTop');
+    assert.equal(actionTriggered.startingIndex, 297, 'action called with expected startingIndex');
+    assert.equal(
+      actionTriggered.numberOfVisibleItems,
+      7,
+      'action called with expected numberOfVisibleItems'
+    );
+    assert.deepEqual(
+      actionTriggered.visibleIndexes,
+      [297, 298, 299, 300, 301, 302, 303],
+      'action called with expected visibleIndexes'
+    );
   });
 });
 

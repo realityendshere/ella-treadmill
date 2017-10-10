@@ -24,7 +24,7 @@
 {{#each indices as |_ idx|}}
   {{#ella-treadmill-item
     parent=this
-    index=(get visibleIndices (concat '' idx))
+    index=(get visibleIndexes (concat '' idx))
     item=(get visibleContent (concat '' idx))
     height=_row
     heightUnit=_rowUnit

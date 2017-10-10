@@ -327,7 +327,8 @@ actions: {
     //   'scrollTop': 1078, // The parent scroll position
     //   'topDelta': 673,  // parent top - component top
     //   'startingIndex': 14, // which index is visually first (closest to top left)
-    //   'numberOfVisibleItems': 12 // The number of rendered listings
+    //   'numberOfVisibleItems': 12, // The number of rendered listings
+    //   'visibleIndexes': [14, 15, 16, ... 23, 24, 25] // Array of currently visible indexes
     // }
   }
 }
