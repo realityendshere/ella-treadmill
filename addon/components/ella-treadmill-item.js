@@ -305,7 +305,7 @@ export default Component.extend({
     }
   },
 
-  didUpdate() {
+  didRender() {
     if (!get(this, 'isSampleItem')) {
       return;
     }
