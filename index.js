@@ -2,5 +2,5 @@
 'use strict';
 
 module.exports = {
-  name: 'ella-treadmill'
+  name: 'ember-ella-treadmill'
 };

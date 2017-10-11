@@ -1,1 +1,1 @@
-export { default } from 'ella-treadmill/components/ella-treadmill';
+export { default } from 'ember-ella-treadmill/components/ella-treadmill';

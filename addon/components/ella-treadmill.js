@@ -9,14 +9,10 @@ const {
   getProperties,
   set,
   setProperties,
-  run: {
-    debounce
-  },
   A
 } = Ember;
 
-const RECALC_INTERVAL = 10;
-const DEBOUNCE_INTERVAL = 50;
+const RECALC_INTERVAL = 100;
 const NO_WINDOW_HEIGHT = 1024;
 const NO_WINDOW_WIDTH = 768;
 const DEFAULT_ROW_HEIGHT = 50;
@@ -661,16 +657,8 @@ export default Component.extend({
    * @readOnly
    */
   _resizeHandler: computed(function() {
-    let interval = RECALC_INTERVAL;
-
-    let debouncedHandler = () => {
-      get(this, 'resizeTask').cancelAll();
-      get(this, 'resizeEndTask').perform();
-    };
-
-    return (evt) => {
+    return () => {
       get(this, 'resizeTask').perform();
-      debounce(this, debouncedHandler, evt, DEBOUNCE_INTERVAL);
     };
   }).readOnly(),
 
@@ -743,16 +731,8 @@ export default Component.extend({
    * @readOnly
    */
   _scrollHandler: computed(function() {
-    let interval = RECALC_INTERVAL;
-
-    let debouncedHandler = () => {
-      get(this, 'scrollTask').cancelAll();
-      get(this, 'scrollEndTask').perform();
-    };
-
-    return (evt) => {
+    return () => {
       get(this, 'scrollTask').perform();
-      debounce(this, debouncedHandler, evt, DEBOUNCE_INTERVAL);
     };
   }).readOnly(),
 
@@ -826,43 +806,60 @@ export default Component.extend({
   },
 
   resizeTask: task(function* () {
+    let prevParentHeight = null;
+    let prevParentWidth = null;
+    let currentParentHeight = false;
+    let currentParentWidth = false;
+
     if (get(this, 'resizing') === 0) {
       this.sendClosureAction('on-resize-start');
     }
 
-    this.incrementProperty('resizing');
-    this.updateGeometry().sendStateUpdate();
-    yield timeout(RECALC_INTERVAL);
-  }),
+    while(prevParentHeight !== currentParentHeight || prevParentWidth !== currentParentWidth) {
+      prevParentHeight = get(this, 'parentHeight');
+      prevParentWidth = get(this, 'parentWidth');
 
-  resizeEndTask: task(function* () {
-    try {
-      yield this.updateGeometry();
-    } finally {
-      set(this, 'resizing', 0);
-      this.sendClosureAction('on-resize-end').sendStateUpdate();
+      this.incrementProperty('resizing');
+
+      yield timeout(RECALC_INTERVAL);
+
+      this.updateGeometry().sendStateUpdate();
+
+      currentParentHeight = get(this, 'parentHeight');
+      currentParentWidth = get(this, 'parentWidth');
     }
-  }),
+
+    set(this, 'resizing', 0);
+
+    this.updateGeometry();
+    this.sendClosureAction('on-resize-end').sendStateUpdate();
+  }).restartable(),
 
   scrollTask: task(function* () {
+    let prevTop = null;
+    let currentTop = false;
+
     if (get(this, 'scrolling') === 0) {
       this.sendClosureAction('on-scroll-start');
     }
 
-    this.incrementProperty('scrolling');
-    this.updateGeometry().sendStateUpdate();
-    yield timeout(RECALC_INTERVAL);
-  }),
+    while(prevTop !== currentTop) {
+      prevTop = get(this, 'scrollTop');
 
-  scrollEndTask: task(function* () {
-    try {
-      yield this.updateGeometry();
-    } finally {
-      set(this, 'scrolling', 0);
-      this.sendClosureAction('on-scroll-end').sendStateUpdate();
-      this.notifyPropertyChange('visibleContent');
+      this.incrementProperty('scrolling');
+      this.updateGeometry().sendStateUpdate();
+
+      yield timeout(RECALC_INTERVAL);
+
+      currentTop = get(this, 'scrollTop');
     }
-  }),
+
+    set(this, 'scrolling', 0);
+
+    this.updateGeometry();
+    this.sendClosureAction('on-scroll-end').sendStateUpdate();
+    this.notifyPropertyChange('visibleContent');
+  }).restartable(),
 
   /**
    * Take a sizing style like `100px` or `22.56rem` and find its unit of
@@ -875,7 +872,7 @@ export default Component.extend({
    * @public
    */
   unitString(measure = '', instead = 'px') {
-    let unit = `${measure}`.match(/[^-\d\.]+$/g);
+    let unit = `${measure}`.match(/[^-\d.]+$/g);
 
     return unit ? unit[0] : instead;
   },

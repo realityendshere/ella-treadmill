@@ -91,7 +91,10 @@ test('it computes a new top position when provided a numeric "index"', function(
   comparison = document.getElementById('measurement').getBoundingClientRect();
   geometry = document.querySelector('ella-treadmill-item').getBoundingClientRect();
 
-  assert.equal(geometry.top, comparison.top + (this.get('index') * comparison.height));
+  assert.equal(
+    Math.round(geometry.top),
+    Math.round(comparison.top + (this.get('index') * comparison.height))
+  );
 });
 
 test('it triggers an "on-insert" action when added to the DOM', function(assert) {
