@@ -360,24 +360,24 @@ If you use Ember CLI (and I hope you do), here are the standard instructions for
 installing and modifying this addon for yourself or to pitch in with
 enhancements or bugfixes.
 
-## Installation
+### Installation
 
 * `git clone http://github.com/realityendshere/ella-treadmill.git` this repository
 * `cd ella-treadmill`
 * `npm install` (or `yarn install`)
 
-## Running
+### Running
 
 * `ember serve`
 * Visit your app at [http://localhost:4200](http://localhost:4200).
 
-## Running Tests
+### Running Tests
 
 * `yarn test` (Runs `ember try:each` to test your addon against multiple Ember versions)
 * `ember test`
 * `ember test --server`
 
-## Building
+### Building
 
 * `ember build`
 
