@@ -10,8 +10,7 @@ const {
   set,
   setProperties,
   A,
-  run,
-  uuid
+  run
 } = Ember;
 
 const RECALC_INTERVAL = 50;
@@ -932,28 +931,13 @@ export default Component.extend({
     let itemHeight = get(this, 'sampleItem.element.clientHeight');
     let row = Math.floor(idx / columns);
     let top = row * itemHeight;
-    let anchor = document.createElement("div");
-    let id = `anchor-${uuid()}`;
     let delta = get(this, 'scrollTop') - get(this, 'topDelta');
 
-    anchor.id = id;
-    anchor.style.position = 'absolute';
-    anchor.style.top = `${top}px`;
-    anchor.style.width = `1px`;
-    anchor.style.height = `1px`;
-    anchor.style.zIndex = -999;
-
-    element.appendChild(anchor);
-
-    let scrollTo = get(anchor, 'offsetTop');
-
     if (typeof parent.scrollTo === 'function') {
-      parent.scrollTo(parent.scrollX, scrollTo + delta);
+      parent.scrollTo(parent.scrollX, top + delta);
     } else {
-      parent.scrollTop = scrollTo;
+      parent.scrollTop = top;
     }
-
-    element.removeChild(anchor);
 
     return this;
   },
