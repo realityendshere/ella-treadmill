@@ -114,8 +114,6 @@ export default Component.extend({
     'scrolling:is-scrolling:not-scrolling'
   ],
 
-  anchor: false,
-
   /**
    * Applied as the `role` attribute on the component's element.
    *
@@ -464,6 +462,34 @@ export default Component.extend({
   indices: computed('numberOfVisibleItems', function() {
     return [...Array(get(this, 'numberOfVisibleItems'))];
   }).readOnly(),
+
+  /**
+   * The Emberella Treadmill will scroll to the item with the numeric index
+   * provided to the `moveTo` property. For example, the following would scroll
+   * to the 300th item in the list.
+   *
+   * ```
+   * {{#ella-treadmill content=model moveTo=300 as |item| }}
+   *   // ITEM CONTENT
+   * {{/ella-treadmill}}
+   * ```
+   *
+   * @property moveTo
+   * @type {Number}
+   * @default undefined
+   * @public
+   */
+  moveTo: computed('_moveTo', {
+    get() {
+      return get(this, '_moveTo');
+    },
+
+    set(key, value) {
+      value = parseInt(value, 10);
+
+      return value ? set(this, '_moveTo', value) : set(this, '_moveTo', undefined);
+    }
+  }),
 
   /**
    * The computed number of items to render.
@@ -824,17 +850,10 @@ export default Component.extend({
   resizeTask: task(function* () {
     if (get(this, 'resizing') === 0) {
       this.sendStateUpdate('on-resize-start');
-
-      this.__startingIndex__ = get(this, 'startingIndex');
-      this.__columns__ = get(this, 'columns');
     }
 
     this.incrementProperty('resizing');
     this.updateGeometry().sendStateUpdate('on-resize');
-
-    if (get(this, 'anchor') && get(this, 'columns') !== this.__columns__) {
-      this.scrollToIndex(this.__startingIndex__);
-    }
 
     yield timeout(RECALC_INTERVAL);
 
@@ -843,9 +862,6 @@ export default Component.extend({
     this.updateGeometry();
     this.notifyPropertyChange('visibleContent');
     this.sendStateUpdate('on-resize').sendStateUpdate('on-resize-end');
-
-    this.__startingIndex__ = undefined;
-    this.__columns__ = undefined;
   }).restartable(),
 
   scrollTask: task(function* () {
@@ -864,6 +880,15 @@ export default Component.extend({
     this.notifyPropertyChange('visibleContent');
     this.sendStateUpdate('on-scroll').sendStateUpdate('on-scroll-end');
   }).restartable(),
+
+  moveToTask: task(function* () {
+    let moveTo = get(this, 'moveTo');
+
+    if (moveTo) {
+      yield this.scrollToIndex(moveTo);
+      set(this, 'moveTo', null);
+    }
+  }),
 
   /**
    * Find the scrolling parent of the component. This may be an HTML element,
@@ -898,6 +923,11 @@ export default Component.extend({
   scrollToIndex(idx) {
     let parent = this.scrollingParent();
     let element = get(this, 'element');
+
+    if (!parent || !element) {
+      return this;
+    }
+
     let columns = get(this, 'columns');
     let itemHeight = get(this, 'sampleItem.element.clientHeight');
     let row = Math.floor(idx / columns);
@@ -1073,9 +1103,11 @@ export default Component.extend({
       if (sizeChanged) {
         resizeHandler();
       }
+
+      get(this, 'moveToTask').perform();
     }
 
-    if (scrollChanged || sizeChanged) {
+    if (scrollChanged || sizeChanged || get(this, '_moveTo')) {
       run(callHandlers);
     }
   },
