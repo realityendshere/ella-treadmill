@@ -1,6 +1,6 @@
 import Ember from 'ember';
 
-const { Route } = Ember;
+const { Route, set } = Ember;
 
 export default Route.extend({
   model() {
@@ -11,5 +11,9 @@ export default Route.extend({
     }
 
     return range(1, 1000);
+  },
+
+  setupController(controller, model) {
+    set(controller, 'numbers', model);
   }
 });

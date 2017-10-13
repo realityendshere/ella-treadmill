@@ -233,7 +233,6 @@ test('it renders enough list items to fill the available vertical space (default
 
   run(() => {
     testElement.style.height = (16.7 * DEFAULT_HEIGHT) + 'px';
-    testElement.dispatchEvent(new Event('resize'));
   });
 
   return wait().then(() => {
@@ -294,7 +293,6 @@ test('it renders enough list items to fill the available vertical space (em)', f
 
   run(() => {
     testElement.style.height = '600px';
-    testElement.dispatchEvent(new Event('resize'));
   });
 
   return wait().then(() => {
@@ -331,7 +329,6 @@ test('it renders enough list items to fill the available vertical space (rem)', 
 
   run(() => {
     testElement.style.height = '600px';
-    testElement.dispatchEvent(new Event('resize'));
   });
 
   return wait().then(() => {
@@ -365,7 +362,6 @@ test('it renders enough list items to fill the available vertical space (%)', fu
 
   run(() => {
     testElement.style.height = '600px';
-    testElement.dispatchEvent(new Event('resize'));
   });
 
   return wait().then(() => {
@@ -397,10 +393,13 @@ test('it adds an "is-resizing" class while resizing', function(assert) {
   this.render(hbs`{{ella-treadmill}}`);
 
   run(() => {
-    testElement.dispatchEvent(new Event('resize'));
+    testElement.style.height = '600px';
+    testElement.style.height = '620px';
   });
 
-  assert.ok(document.querySelector('ella-treadmill.is-resizing'), 'adds class for event');
+  run.later(() => {
+    assert.ok(document.querySelector('ella-treadmill.is-resizing'), 'adds class for event');
+  }, 20);
 
   return wait().then(() => {
     assert.ok(document.querySelector('ella-treadmill.not-resizing'), 'removes class when events stop');
@@ -425,11 +424,8 @@ test('it triggers an "on-resize-start" action', function(assert) {
 
   run(() => {
     testElement.style.height = '600px';
-    testElement.dispatchEvent(new Event('resize'));
     testElement.style.height = '620px';
-    testElement.dispatchEvent(new Event('resize'));
     testElement.style.height = '610px';
-    testElement.dispatchEvent(new Event('resize'));
   });
 
   return wait().then(() => {
@@ -455,7 +451,7 @@ test('it triggers an "on-resize-end" action', function(assert) {
 
   run(() => {
     testElement.style.height = '600px';
-    testElement.dispatchEvent(new Event('resize'));
+    testElement.style.height = '620px';
   });
 
   return wait().then(() => {
@@ -473,10 +469,17 @@ test('it adds an "is-scrolling" class while scrolling', function(assert) {
   this.render(hbs`{{ella-treadmill row=100 content=model}}`);
 
   run(() => {
-    testElement.dispatchEvent(new Event('scroll'));
+    testElement.scrollTop = 100;
+    testElement.scrollTop = 101;
+    testElement.scrollTop = 102;
+    testElement.scrollTop = 103;
+    testElement.scrollTop = 104;
+    testElement.scrollTop = 105;
   });
 
-  assert.ok(document.querySelector('ella-treadmill.is-scrolling'), 'adds class for event');
+  run.later(() => {
+    assert.ok(document.querySelector('ella-treadmill.is-scrolling'), 'adds class for event');
+  }, 20);
 
   return wait().then(() => {
     assert.ok(document.querySelector('ella-treadmill.not-scrolling'), 'removes class when events stop');
@@ -523,8 +526,8 @@ test('it triggers an "on-scroll-end" action', function(assert) {
   testElement.style.height = '500px';
 
   this.set('model', LARGE_ARRAY);
-  this.on('handleScrollEnd', function() {
-    actionTriggered = true;
+  this.on('handleScrollEnd', function(props) {
+    actionTriggered = props;
   });
 
   this.render(hbs`
@@ -540,11 +543,22 @@ test('it triggers an "on-scroll-end" action', function(assert) {
   });
 
   return wait().then(() => {
-    assert.ok(actionTriggered, 'action called');
+    assert.equal(actionTriggered.scrollTop, 100, 'action called with expected scrollTop');
+    assert.equal(actionTriggered.startingIndex, 1, 'action called with expected startingIndex');
+    assert.equal(
+      actionTriggered.numberOfVisibleItems,
+      6,
+      'action called with expected numberOfVisibleItems'
+    );
+    assert.deepEqual(
+      actionTriggered.visibleIndexes,
+      [1, 2, 3, 4, 5, 6],
+      'action called with expected visibleIndexes'
+    );
   });
 });
 
-test('it triggers "on-update" action', function(assert) {
+test('it triggers "on-scroll" action', function(assert) {
   let testElement = document.getElementById('ember-testing');
   let actionTriggered = false;
 
@@ -558,7 +572,7 @@ test('it triggers "on-update" action', function(assert) {
 
   this.render(hbs`
     <div id="bumper" style="height: 300px;">&nbsp;</div>
-    {{ella-treadmill row=100 content=model on-update=(action "handleListingStateChanged")}}
+    {{ella-treadmill row=100 content=model on-scroll=(action "handleListingStateChanged")}}
   `);
 
   assert.equal(actionTriggered, false, 'action not yet called');
@@ -578,6 +592,44 @@ test('it triggers "on-update" action', function(assert) {
     assert.deepEqual(
       actionTriggered.visibleIndexes,
       [297, 298, 299, 300, 301, 302, 303],
+      'action called with expected visibleIndexes'
+    );
+  });
+});
+
+test('it triggers "on-resize" action', function(assert) {
+  let testElement = document.getElementById('ember-testing');
+  let actionTriggered = false;
+
+  testElement.style.height = '600px';
+
+  this.set('model', LARGE_ARRAY);
+
+  this.on('handleListingStateChanged', function(props) {
+    actionTriggered = props;
+  });
+
+  this.render(hbs`
+    {{ella-treadmill row=100 content=model on-resize=(action "handleListingStateChanged")}}
+  `);
+
+  assert.equal(actionTriggered, false, 'action not yet called');
+
+  run(() => {
+    testElement.style.height = '1200px';
+  });
+
+  return wait().then(() => {
+    assert.notOk(actionTriggered.scrollTop, 'action called with falsy scrollTop');
+    assert.equal(actionTriggered.startingIndex, 0, 'action called with expected startingIndex');
+    assert.equal(
+      actionTriggered.numberOfVisibleItems,
+      13,
+      'action called with expected numberOfVisibleItems'
+    );
+    assert.deepEqual(
+      actionTriggered.visibleIndexes,
+      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
       'action called with expected visibleIndexes'
     );
   });
@@ -919,7 +971,6 @@ test('it renders items in a grid when "minColumnWidth" set as percentage', funct
 
   run(() => {
     testElement.style.width = '1200px';
-    testElement.dispatchEvent(new Event('resize'));
   });
 
   return wait().then(() => {
@@ -975,7 +1026,6 @@ test('it renders items in a grid when "minColumnWidth" set in pixels', function(
 
   run(() => {
     testElement.style.width = '900px';
-    testElement.dispatchEvent(new Event('resize'));
   });
 
   return wait().then(() => {

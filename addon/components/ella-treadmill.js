@@ -9,10 +9,11 @@ const {
   getProperties,
   set,
   setProperties,
-  A
+  A,
+  run
 } = Ember;
 
-const RECALC_INTERVAL = 100;
+const RECALC_INTERVAL = 50;
 const NO_WINDOW_HEIGHT = 1024;
 const NO_WINDOW_WIDTH = 768;
 const DEFAULT_ROW_HEIGHT = 50;
@@ -121,6 +122,36 @@ export default Component.extend({
    * @public
    */
   ariaRole: 'list',
+
+  /**
+   * The component element's height captured on first render and on
+   * scroll/resize events.
+   *
+   * This property is updated frequently by the component. Setting it has no
+   * lasting effect.
+   *
+   * @property elementHeight
+   * @type {Number}
+   * @default 0
+   * @public
+   * @readOnly
+   */
+  elementHeight: 0,
+
+  /**
+   * The component element's height captured on first render and on
+   * scroll/resize events.
+   *
+   * This property is updated frequently by the component. Setting it has no
+   * lasting effect.
+   *
+   * @property elementWidth
+   * @type {Number}
+   * @default 0
+   * @public
+   * @readOnly
+   */
+  elementWidth: 0,
 
   /**
    * How frequently to cycle through class names that indicate membership in a
@@ -347,11 +378,10 @@ export default Component.extend({
    * @public
    * @readOnly
    */
-  columns: computed('minColumnWidth', 'parentWidth', function() {
+  columns: computed('minColumnWidth', 'elementWidth', function() {
     let col = get(this, 'minColumnWidth');
     let colUnit = this.unitString(col);
-    let element;
-    let elementWidth;
+    let elementWidth = get(this, 'elementWidth');
     let result;
 
     col = parseFloat(col, 10);
@@ -361,14 +391,6 @@ export default Component.extend({
         result = Math.floor(100 / col);
         break;
       case 'px':
-        element = get(this, 'element');
-
-        if (element) {
-          elementWidth = get(element, 'clientWidth');
-        } else {
-          elementWidth = get(this, '_defaultWidth');
-        }
-
         result = Math.floor(elementWidth / col);
 
         break;
@@ -431,8 +453,8 @@ export default Component.extend({
    * component's template iterates over this array to render the appropriate
    * number of child elements.
    *
-   * @property geometryElement
-   * @type {Object}
+   * @property indices
+   * @type {Array}
    * @public
    * @readOnly
    */
@@ -657,9 +679,55 @@ export default Component.extend({
    * @readOnly
    */
   _resizeHandler: computed(function() {
-    return () => {
+    let callback = () => {
       get(this, 'resizeTask').perform();
     };
+
+    return callback;
+  }).readOnly(),
+
+  _requestAnimationFrameFn: computed(function() {
+    let {
+      requestAnimationFrame,
+      mozRequestAnimationFrame,
+      webkitRequestAnimationFrame,
+      msRequestAnimationFrame
+    } = getProperties(
+      window || {},
+      'requestAnimationFrame',
+      'mozRequestAnimationFrame',
+      'webkitRequestAnimationFrame',
+      'msRequestAnimationFrame'
+    );
+
+    return requestAnimationFrame ||
+      mozRequestAnimationFrame ||
+      webkitRequestAnimationFrame ||
+      msRequestAnimationFrame ||
+      function (fn) {
+        return setTimeout(fn, 20);
+      };
+  }).readOnly(),
+
+  _cancelAnimationFrameFn: computed(function() {
+    let {
+      cancelAnimationFrame,
+      mozCancelAnimationFrame,
+      webkitCancelAnimationFrame,
+      msCancelAnimationFrame
+    } = getProperties(
+      window || {},
+      'cancelAnimationFrame',
+      'mozCancelAnimationFrame',
+      'webkitCancelAnimationFrame',
+      'msCancelAnimationFrame'
+    );
+
+    return cancelAnimationFrame ||
+      mozCancelAnimationFrame ||
+      webkitCancelAnimationFrame ||
+      msCancelAnimationFrame ||
+      clearTimeout;
   }).readOnly(),
 
   /**
@@ -731,57 +799,20 @@ export default Component.extend({
    * @readOnly
    */
   _scrollHandler: computed(function() {
-    return () => {
+    let callback = () => {
       get(this, 'scrollTask').perform();
     };
+
+    return callback;
   }).readOnly(),
 
   didInsertElement() {
-    let resizeHandler = get(this, '_resizeHandler');
-    let scrollHandler = get(this, '_scrollHandler');
-    let parents = ancestors(get(this, 'element.parentNode'));
-    let parent = this.scrollingParent();
-
-    parents.forEach((node) => {
-      node.addEventListener('resize', resizeHandler);
-    });
-
-    if (parent) {
-      parent.addEventListener('scroll', scrollHandler);
-    }
-
-    if (document) {
-      document.addEventListener('scroll', scrollHandler);
-    }
-
-    if (window) {
-      window.addEventListener('resize', resizeHandler);
-    }
-
+    this._rafWatcherBegin();
     this.updateGeometry();
   },
 
   willDestroyElement() {
-    let resizeHandler = get(this, '_resizeHandler');
-    let scrollHandler = get(this, '_scrollHandler');
-    let parents = ancestors(get(this, 'element.parentNode'));
-    let parent = this.scrollingParent();
-
-    if (window) {
-      window.removeEventListener('resize', resizeHandler);
-    }
-
-    if (document) {
-      document.removeEventListener('scroll', scrollHandler);
-    }
-
-    if (parent) {
-      parent.removeEventListener('scroll', scrollHandler);
-    }
-
-    parents.forEach((node) => {
-      node.removeEventListener('resize', resizeHandler);
-    });
+    this._rafWatcherEnd();
   },
 
   actions: {
@@ -806,59 +837,37 @@ export default Component.extend({
   },
 
   resizeTask: task(function* () {
-    let prevParentHeight = null;
-    let prevParentWidth = null;
-    let currentParentHeight = false;
-    let currentParentWidth = false;
-
     if (get(this, 'resizing') === 0) {
-      this.sendClosureAction('on-resize-start');
+      this.sendStateUpdate('on-resize-start');
     }
 
-    while(prevParentHeight !== currentParentHeight || prevParentWidth !== currentParentWidth) {
-      prevParentHeight = get(this, 'parentHeight');
-      prevParentWidth = get(this, 'parentWidth');
+    this.incrementProperty('resizing');
+    this.updateGeometry().sendStateUpdate('on-resize');
 
-      this.incrementProperty('resizing');
-
-      yield timeout(RECALC_INTERVAL);
-
-      this.updateGeometry().sendStateUpdate();
-
-      currentParentHeight = get(this, 'parentHeight');
-      currentParentWidth = get(this, 'parentWidth');
-    }
+    yield timeout(RECALC_INTERVAL);
 
     set(this, 'resizing', 0);
 
     this.updateGeometry();
-    this.sendClosureAction('on-resize-end').sendStateUpdate();
+    this.notifyPropertyChange('visibleContent');
+    this.sendStateUpdate('on-resize').sendStateUpdate('on-resize-end');
   }).restartable(),
 
   scrollTask: task(function* () {
-    let prevTop = null;
-    let currentTop = false;
-
     if (get(this, 'scrolling') === 0) {
-      this.sendClosureAction('on-scroll-start');
+      this.sendStateUpdate('on-scroll-start');
     }
 
-    while(prevTop !== currentTop) {
-      prevTop = get(this, 'scrollTop');
+    this.incrementProperty('scrolling');
+    this.updateGeometry().sendStateUpdate('on-scroll');
 
-      this.incrementProperty('scrolling');
-      this.updateGeometry().sendStateUpdate();
-
-      yield timeout(RECALC_INTERVAL);
-
-      currentTop = get(this, 'scrollTop');
-    }
+    yield timeout(RECALC_INTERVAL);
 
     set(this, 'scrolling', 0);
 
     this.updateGeometry();
-    this.sendClosureAction('on-scroll-end').sendStateUpdate();
     this.notifyPropertyChange('visibleContent');
+    this.sendStateUpdate('on-scroll').sendStateUpdate('on-scroll-end');
   }).restartable(),
 
   /**
@@ -900,17 +909,20 @@ export default Component.extend({
    * Send action(s) with state data about this listing.
    *
    * @method sendStateUpdate
+   * @param {String} action The action to send
    * @chainable
    * @public
    */
-  sendStateUpdate() {
+  sendStateUpdate(action = 'on-update') {
     let props = getProperties(this,
       'scrollTop', 'topDelta', 'startingIndex', 'numberOfVisibleItems', 'visibleIndexes'
     );
 
-    props.visibleIndexes = props.visibleIndexes.slice().sort();
+    props.visibleIndexes = props.visibleIndexes.slice().sort(function(a, b) {
+      return a - b;
+    });
 
-    this.sendClosureAction('on-update', props);
+    this.sendClosureAction(action, props);
 
     return this;
   },
@@ -924,11 +936,14 @@ export default Component.extend({
    */
   updateGeometry() {
     let parent = this.scrollingParent();
+    let geometryParent = get(this, 'geometryParent');
 
     setProperties(this, {
-      scrollTop: parent ? (parent.scrollTop || parent.scrollY) : 0,
-      parentHeight: get(this, 'geometryParent.height') || get(this, '_defaultHeight'),
-      parentWidth: get(this, 'geometryParent.width') || get(this, '_defaultWidth')
+      scrollTop: (parent ? (parent.scrollTop || parent.scrollY) : 0) || null,
+      parentHeight: get(geometryParent, 'height') || get(this, '_defaultHeight'),
+      parentWidth: get(geometryParent, 'width') || get(this, '_defaultWidth'),
+      elementHeight: get(this, 'element.clientHeight') || get(this, '_defaultHeight'),
+      elementWidth: get(this, 'element.clientWidth') || get(this, '_defaultWidth')
     });
 
     return this;
@@ -962,5 +977,93 @@ export default Component.extend({
     });
 
     return scroller || window || FAKE_WINDOW;
+  },
+
+  _rafWatcherBegin() {
+    let rafFn = get(this, '_requestAnimationFrameFn');
+
+    let step = () => {
+      this._rafWatcherPerform();
+      nextStep();
+    };
+
+    let nextStep = () => {
+      this.__rafWatcherId__ = rafFn(step);
+    };
+
+    this._rafWatcherSetup();
+
+    nextStep();
+  },
+
+  _rafWatcherEnd() {
+    let rafCancelFn = get(this, '_cancelAnimationFrameFn');
+
+    if (this.__rafId__) {
+      rafCancelFn(this.__rafId__);
+      this.__rafId__ = undefined;
+    }
+  },
+
+  _rafWatcherPerform() {
+    let parent = this.scrollingParent();
+
+    let scrollTop = parent ? (parent.scrollTop || parent.scrollY) : 0;
+    let scrollChanged = false;
+
+    if (scrollTop !== this.__scrollTop__) {
+      scrollChanged = true;
+      this.__scrollTop__ = scrollTop;
+    }
+
+    let elementWidth = get(this, 'element.clientWidth');
+    let elementHeight = get(this, 'element.clientHeight');
+    let parentWidth = get(parent, 'clientWidth') || get(parent, 'innerWidth');
+    let parentHeight = get(parent, 'clientHeight') || get(parent, 'innerHeight');
+    let sizeChanged = false;
+
+    if (
+      elementWidth !== this.__elementWidth__ ||
+      elementHeight !== this.__elementHeight__ ||
+      parentWidth !== this.__parentWidth__ ||
+      parentHeight !== this.__parentHeight__
+    ) {
+      sizeChanged = true;
+      this.__elementWidth__ = elementWidth;
+      this.__elementHeight__ = elementHeight;
+      this.__parentWidth__ = parentWidth;
+      this.__parentHeight__ = parentHeight;
+    }
+
+    let scrollHandler = get(this, '_scrollHandler');
+    let resizeHandler = get(this, '_resizeHandler');
+
+    let callHandlers = () => {
+      if (scrollChanged) {
+        scrollHandler();
+      }
+
+      if (sizeChanged) {
+        resizeHandler();
+      }
+    }
+
+    if (scrollChanged || sizeChanged) {
+      run(callHandlers);
+    }
+  },
+
+  _rafWatcherSetup() {
+    let parent = this.scrollingParent();
+
+    this.__elementWidth__ = get(this, 'element.clientWidth');
+    this.__elementHeight__ = get(this, 'element.clientHeight');
+
+    this.__parentWidth__ = get(parent, 'clientWidth') || get(parent, 'innerWidth');
+    this.__parentHeight__ = get(parent, 'clientHeight') || get(parent, 'innerHeight');
+
+    this.__scrollTop__ = parent ? (parent.scrollTop || parent.scrollY) : 0;
+
+    return this;
   }
 });

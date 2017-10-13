@@ -15,3 +15,12 @@ ella-treadmill-item {
     background-image: linear-gradient(rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.02));
   }
 }
+
+.containment {
+  width: 100%;
+  transition: width 1s;
+
+  &.is-small {
+    width: 50%;
+  }
+}

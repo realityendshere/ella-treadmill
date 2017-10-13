@@ -249,6 +249,27 @@ CSS unit of measure.
 
 ### Actions
 
+Emberella Treadmill will send the following actions. All actions deliver the
+current state of the component instance in the form of a plain Javascript
+object.
+
+```
+actions: {
+  handleSomeActionFromTreadmill(properties) {
+    // Do something with the Treadmill's state
+    // `properties` is a plain Javascript object in the following format:
+
+    // {
+    //   'scrollTop': 1078, // The parent scroll position
+    //   'topDelta': 673,  // parent top - component top
+    //   'startingIndex': 14, // which index is visually first (closest to top left)
+    //   'numberOfVisibleItems': 12, // The number of rendered listings
+    //   'visibleIndexes': [14, 15, 16, ... 23, 24, 25] // Array of currently visible indexes
+    // }
+  }
+}
+```
+
 #### on-scroll-start
 
 Triggered for the first in a series of `scroll` events.
@@ -256,7 +277,20 @@ Triggered for the first in a series of `scroll` events.
 ```
 {{#ella-treadmill
   content=model
-  on-scroll-start=(action'doSomethingWhenScrollngStarts') as |item|
+  on-scroll-start=(action'handleSomeActionFromTreadmill') as |item|
+}}
+  <p>{{item.name}}</p>
+{{/ella-treadmill}}
+```
+
+#### on-scroll
+
+Triggered repeatedly as the scroll position changes.
+
+```
+{{#ella-treadmill
+  content=model
+  on-scroll=(action 'handleSomeActionFromTreadmill') as |item|
 }}
   <p>{{item.name}}</p>
 {{/ella-treadmill}}
@@ -269,7 +303,7 @@ Triggered whenever scrolling events have ceased for more than 50ms.
 ```
 {{#ella-treadmill
   content=model
-  on-scroll-end=(action'doSomethingAfterScroll') as |item|
+  on-scroll-end=(action'handleSomeActionFromTreadmill') as |item|
 }}
   <p>{{item.name}}</p>
 {{/ella-treadmill}}
@@ -282,7 +316,20 @@ Triggered for the first in a series of `resize` events.
 ```
 {{#ella-treadmill
   content=model
-  on-resize-start=(action 'doSomethingWhenResizingStarts') as |item|
+  on-resize-start=(action 'handleSomeActionFromTreadmill') as |item|
+}}
+  <p>{{item.name}}</p>
+{{/ella-treadmill}}
+```
+
+#### on-resize
+
+Triggered repeatedly as the component's element resizes.
+
+```
+{{#ella-treadmill
+  content=model
+  on-resize=(action 'handleSomeActionFromTreadmill') as |item|
 }}
   <p>{{item.name}}</p>
 {{/ella-treadmill}}
@@ -295,43 +342,10 @@ Triggered whenever resizing events have ceased for more than 50ms.
 ```
 {{#ella-treadmill
   content=model
-  on-resize-end=(action 'doSomethingAfterResize') as |item|
+  on-resize-end=(action 'handleSomeActionFromTreadmill') as |item|
 }}
   <p>{{item.name}}</p>
 {{/ella-treadmill}}
-```
-
-#### on-update
-
-Triggered whenever resizing or scrolling may have altered key state properties
-in the component instance.
-
-```
-{{#ella-treadmill
-  content=model
-  on-update=(action 'handleUpdatedDataFromTreadmill') as |item|
-}}
-  <p>{{item.name}}</p>
-{{/ella-treadmill}}
-```
-
-The above template assumes the controller has a relevant action handler:
-
-```
-actions: {
-  handleUpdatedDataFromTreadmill(props) {
-    // Do something with the treadmill's state
-    // props is a plain javascript object in the following format:
-
-    // {
-    //   'scrollTop': 1078, // The parent scroll position
-    //   'topDelta': 673,  // parent top - component top
-    //   'startingIndex': 14, // which index is visually first (closest to top left)
-    //   'numberOfVisibleItems': 12, // The number of rendered listings
-    //   'visibleIndexes': [14, 15, 16, ... 23, 24, 25] // Array of currently visible indexes
-    // }
-  }
-}
 ```
 
 ## But Why?
