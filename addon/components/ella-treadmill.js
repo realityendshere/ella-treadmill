@@ -853,19 +853,33 @@ export default Component.extend({
   }).restartable(),
 
   /**
-   * Take a sizing style like `100px` or `22.56rem` and find its unit of
-   * measure (e.g. `px` or `rem`).
+   * Find the scrolling parent of the component. This may be an HTML element,
+   * the window (in a browser) or a fake window object for Node.
    *
-   * @method unitString
-   * @param measure A CSS measurement
-   * @param {String} instead A unit of measurement to send if no matches
-   * @return {String}
+   * @method scrollingParent
+   * @return {HtmlElement|window|Object}
    * @public
    */
-  unitString(measure = '', instead = 'px') {
-    let unit = `${measure}`.match(/[^-\d.]+$/g);
+  scrollingParent() {
+    let element = get(this, 'element');
 
-    return unit ? unit[0] : instead;
+    if (!element) {
+      return window || FAKE_WINDOW;
+    }
+
+    let overflowProperties = function(node) {
+      return [
+        getComputedStyle(node, null).getPropertyValue('overflow'),
+        getComputedStyle(node, null).getPropertyValue('overflow-x'),
+        getComputedStyle(node, null).getPropertyValue('overflow-y')
+      ].join(' ');
+    };
+
+    let scroller = A(ancestors(element.parentNode)).find((parent) => {
+      return /(auto|scroll)/.test(overflowProperties(parent));
+    });
+
+    return scroller || window || FAKE_WINDOW;
   },
 
   /**
@@ -910,6 +924,22 @@ export default Component.extend({
   },
 
   /**
+   * Take a sizing style like `100px` or `22.56rem` and find its unit of
+   * measure (e.g. `px` or `rem`).
+   *
+   * @method unitString
+   * @param measure A CSS measurement
+   * @param {String} instead A unit of measurement to send if no matches
+   * @return {String}
+   * @public
+   */
+  unitString(measure = '', instead = 'px') {
+    let unit = `${measure}`.match(/[^-\d.]+$/g);
+
+    return unit ? unit[0] : instead;
+  },
+
+  /**
    * Updates properties regarding scroll position and parent dimensions.
    *
    * @method updateGeometry
@@ -929,36 +959,6 @@ export default Component.extend({
     });
 
     return this;
-  },
-
-  /**
-   * Find the scrolling parent of the component. This may be an HTML element,
-   * the window (in a browser) or a fake window object for Node.
-   *
-   * @method scrollingParent
-   * @return {HtmlElement|window|Object}
-   * @public
-   */
-  scrollingParent() {
-    let element = get(this, 'element');
-
-    if (!element) {
-      return window || FAKE_WINDOW;
-    }
-
-    let overflowProperties = function(node) {
-      return [
-        getComputedStyle(node, null).getPropertyValue('overflow'),
-        getComputedStyle(node, null).getPropertyValue('overflow-x'),
-        getComputedStyle(node, null).getPropertyValue('overflow-y')
-      ].join(' ');
-    };
-
-    let scroller = A(ancestors(element.parentNode)).find((parent) => {
-      return /(auto|scroll)/.test(overflowProperties(parent));
-    });
-
-    return scroller || window || FAKE_WINDOW;
   },
 
   _rafWatcherBegin() {
