@@ -471,7 +471,7 @@ test('its "data-first-visible-index" updates when columns', function(assert) {
   let element = document.querySelector('ella-treadmill');
 
   run(() => {
-    testElement.scrollTop = 3000;
+    testElement.scrollTop = 3030;
     testElement.style.width = '1000px';
   });
 
@@ -480,53 +480,49 @@ test('its "data-first-visible-index" updates when columns', function(assert) {
   });
 });
 
-test('"anchor=false" allows updates to the first visible index on resize', function(assert) {
+test('"moveTo=" scrolls that index into view', function(assert) {
   let testElement = document.getElementById('ember-testing');
 
   testElement.style.height = '500px';
 
   this.set('model', LARGE_ARRAY);
+  this.set('moveTo', 300);
 
-  this.render(hbs`{{ella-treadmill content=model row='100px' minColumnWidth='100px' anchor=false}}`);
-
-  let element = document.querySelector('ella-treadmill');
-
-  run(() => {
-    testElement.scrollTop = 3000;
-    testElement.style.width = '1000px';
-  });
-
-  run.later(() => {
-    testElement.style.width = '500px';
-  }, 21);
+  this.render(hbs`
+    {{ella-treadmill moveTo=moveTo content=model row='100px' minColumnWidth='100px'}}
+  `);
 
   return wait().then(() => {
-    assert.equal(element.attributes['data-first-visible-index'].value, '150');
+    let element = document.querySelector('ella-treadmill');
+    let result = parseInt(element.attributes['data-first-visible-index'].value, 10);
+
+    // Firefox behaves slightly differently
+    assert.ok(A([290, 300]).includes(result));
   });
 });
 
-test('"anchor=true" prevents updates to the first visible index on resize', function(assert) {
+test('setting "moveTo" scrolls that index into view', function(assert) {
   let testElement = document.getElementById('ember-testing');
 
   testElement.style.height = '500px';
 
   this.set('model', LARGE_ARRAY);
+  this.set('moveTo', 0);
 
-  this.render(hbs`{{ella-treadmill content=model row='100px' minColumnWidth='100px' anchor=true}}`);
-
-  let element = document.querySelector('ella-treadmill');
+  this.render(hbs`
+    {{ella-treadmill moveTo=moveTo content=model row='100px' minColumnWidth='100px'}}
+  `);
 
   run(() => {
-    testElement.scrollTop = 3000;
-    testElement.style.width = '1000px';
-  });
-
-  run.later(() => {
-    testElement.style.width = '500px';
-  }, 21);
+    this.set('moveTo', 300);
+  })
 
   return wait().then(() => {
-    assert.equal(element.attributes['data-first-visible-index'].value, '300');
+    let element = document.querySelector('ella-treadmill');
+    let result = parseInt(element.attributes['data-first-visible-index'].value, 10);
+
+    // Firefox behaves slightly differently
+    assert.ok(A([290, 300]).includes(result));
   });
 });
 
