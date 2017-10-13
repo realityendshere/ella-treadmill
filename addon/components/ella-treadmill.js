@@ -613,6 +613,18 @@ export default Component.extend({
   }).readOnly(),
 
   /**
+   * Determine the available function for `cancelAnimationFrame` or equivalent.
+   *
+   * @property _cancelAnimationFrameFn
+   * @type {Function}
+   * @private
+   * @readOnly
+   */
+  _cancelAnimationFrameFn: computed(function() {
+    return get(window || {}, 'cancelAnimationFrame') || clearTimeout;
+  }).readOnly(),
+
+  /**
    * Coerce provided content into an Ember Array
    *
    * @property _content
@@ -686,48 +698,18 @@ export default Component.extend({
     return callback;
   }).readOnly(),
 
+  /**
+   * Determine the available function for `requestAnimationFrame` or equivalent.
+   *
+   * @property _requestAnimationFrameFn
+   * @type {Function}
+   * @private
+   * @readOnly
+   */
   _requestAnimationFrameFn: computed(function() {
-    let {
-      requestAnimationFrame,
-      mozRequestAnimationFrame,
-      webkitRequestAnimationFrame,
-      msRequestAnimationFrame
-    } = getProperties(
-      window || {},
-      'requestAnimationFrame',
-      'mozRequestAnimationFrame',
-      'webkitRequestAnimationFrame',
-      'msRequestAnimationFrame'
-    );
-
-    return requestAnimationFrame ||
-      mozRequestAnimationFrame ||
-      webkitRequestAnimationFrame ||
-      msRequestAnimationFrame ||
-      function (fn) {
-        return setTimeout(fn, 20);
-      };
-  }).readOnly(),
-
-  _cancelAnimationFrameFn: computed(function() {
-    let {
-      cancelAnimationFrame,
-      mozCancelAnimationFrame,
-      webkitCancelAnimationFrame,
-      msCancelAnimationFrame
-    } = getProperties(
-      window || {},
-      'cancelAnimationFrame',
-      'mozCancelAnimationFrame',
-      'webkitCancelAnimationFrame',
-      'msCancelAnimationFrame'
-    );
-
-    return cancelAnimationFrame ||
-      mozCancelAnimationFrame ||
-      webkitCancelAnimationFrame ||
-      msCancelAnimationFrame ||
-      clearTimeout;
+    return get(window || {}, 'requestAnimationFrame') || function (fn) {
+      return setTimeout(fn, 20);
+    };
   }).readOnly(),
 
   /**
