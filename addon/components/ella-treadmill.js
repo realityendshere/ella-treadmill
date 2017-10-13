@@ -10,7 +10,8 @@ const {
   set,
   setProperties,
   A,
-  run
+  run,
+  uuid
 } = Ember;
 
 const RECALC_INTERVAL = 50;
@@ -112,6 +113,8 @@ export default Component.extend({
     'resizing:is-resizing:not-resizing',
     'scrolling:is-scrolling:not-scrolling'
   ],
+
+  anchor: false,
 
   /**
    * Applied as the `role` attribute on the component's element.
@@ -821,10 +824,17 @@ export default Component.extend({
   resizeTask: task(function* () {
     if (get(this, 'resizing') === 0) {
       this.sendStateUpdate('on-resize-start');
+
+      this.__startingIndex__ = get(this, 'startingIndex');
+      this.__columns__ = get(this, 'columns');
     }
 
     this.incrementProperty('resizing');
     this.updateGeometry().sendStateUpdate('on-resize');
+
+    if (get(this, 'anchor') && get(this, 'columns') !== this.__columns__) {
+      this.scrollToIndex(this.__startingIndex__);
+    }
 
     yield timeout(RECALC_INTERVAL);
 
@@ -833,6 +843,9 @@ export default Component.extend({
     this.updateGeometry();
     this.notifyPropertyChange('visibleContent');
     this.sendStateUpdate('on-resize').sendStateUpdate('on-resize-end');
+
+    this.__startingIndex__ = undefined;
+    this.__columns__ = undefined;
   }).restartable(),
 
   scrollTask: task(function* () {
@@ -880,6 +893,39 @@ export default Component.extend({
     });
 
     return scroller || window || FAKE_WINDOW;
+  },
+
+  scrollToIndex(idx) {
+    let parent = this.scrollingParent();
+    let element = get(this, 'element');
+    let columns = get(this, 'columns');
+    let itemHeight = get(this, 'sampleItem.element.clientHeight');
+    let row = Math.floor(idx / columns);
+    let top = row * itemHeight;
+    let anchor = document.createElement("div");
+    let id = `anchor-${uuid()}`;
+    let delta = get(this, 'scrollTop') - get(this, 'topDelta');
+
+    anchor.id = id;
+    anchor.style.position = 'absolute';
+    anchor.style.top = `${top}px`;
+    anchor.style.width = `1px`;
+    anchor.style.height = `1px`;
+    anchor.style.zIndex = -999;
+
+    element.appendChild(anchor);
+
+    let scrollTo = get(anchor, 'offsetTop');
+
+    if (typeof parent.scrollTo === 'function') {
+      parent.scrollTo(parent.scrollX, scrollTo + delta);
+    } else {
+      parent.scrollTop = scrollTo;
+    }
+
+    element.removeChild(anchor);
+
+    return this;
   },
 
   /**
@@ -989,7 +1035,6 @@ export default Component.extend({
 
   _rafWatcherPerform() {
     let parent = this.scrollingParent();
-
     let scrollTop = parent ? (parent.scrollTop || parent.scrollY) : 0;
     let scrollChanged = false;
 
