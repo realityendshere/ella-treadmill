@@ -459,6 +459,77 @@ test('it triggers an "on-resize-end" action', function(assert) {
   });
 });
 
+test('its "data-first-visible-index" updates when columns', function(assert) {
+  let testElement = document.getElementById('ember-testing');
+
+  testElement.style.height = '500px';
+
+  this.set('model', LARGE_ARRAY);
+
+  this.render(hbs`{{ella-treadmill content=model row='100px' minColumnWidth='100px'}}`);
+
+  let element = document.querySelector('ella-treadmill');
+
+  run(() => {
+    testElement.scrollTop = 3000;
+    testElement.style.width = '1000px';
+  });
+
+  return wait().then(() => {
+    assert.equal(element.attributes['data-first-visible-index'].value, '300');
+  });
+});
+
+test('"anchor=false" allows updates to the first visible index on resize', function(assert) {
+  let testElement = document.getElementById('ember-testing');
+
+  testElement.style.height = '500px';
+
+  this.set('model', LARGE_ARRAY);
+
+  this.render(hbs`{{ella-treadmill content=model row='100px' minColumnWidth='100px' anchor=false}}`);
+
+  let element = document.querySelector('ella-treadmill');
+
+  run(() => {
+    testElement.scrollTop = 3000;
+    testElement.style.width = '1000px';
+  });
+
+  run.later(() => {
+    testElement.style.width = '500px';
+  }, 21);
+
+  return wait().then(() => {
+    assert.equal(element.attributes['data-first-visible-index'].value, '150');
+  });
+});
+
+test('"anchor=true" prevents updates to the first visible index on resize', function(assert) {
+  let testElement = document.getElementById('ember-testing');
+
+  testElement.style.height = '500px';
+
+  this.set('model', LARGE_ARRAY);
+
+  this.render(hbs`{{ella-treadmill content=model row='100px' minColumnWidth='100px' anchor=true}}`);
+
+  let element = document.querySelector('ella-treadmill');
+
+  run(() => {
+    testElement.scrollTop = 3000;
+    testElement.style.width = '1000px';
+  });
+
+  run.later(() => {
+    testElement.style.width = '500px';
+  }, 21);
+
+  return wait().then(() => {
+    assert.equal(element.attributes['data-first-visible-index'].value, '300');
+  });
+});
+
 test('it adds an "is-scrolling" class while scrolling', function(assert) {
   let testElement = document.getElementById('ember-testing');
 
