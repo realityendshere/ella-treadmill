@@ -194,6 +194,18 @@ wide.
 {{/ella-treadmill}}
 ```
 
+####moveTo
+
+The Emberella Treadmill will scroll to the item with the numeric index provided
+to the `moveTo` property. For example, the following would scroll to the 300th
+item in the list.
+
+```
+{{#ella-treadmill content=model moveTo=300 as |item| }}
+  // ITEM CONTENT
+{{/ella-treadmill}}
+```
+
 #### overdraw
 
 Emberella Treadmill will typically render only enough rows to fill the currently
