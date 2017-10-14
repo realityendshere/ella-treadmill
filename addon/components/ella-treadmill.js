@@ -463,6 +463,34 @@ export default Component.extend({
   }).readOnly(),
 
   /**
+   * The Emberella Treadmill will scroll to the item with the numeric index
+   * provided to the `moveTo` property. For example, the following would scroll
+   * to the 300th item in the list.
+   *
+   * ```
+   * {{#ella-treadmill content=model moveTo=300 as |item| }}
+   *   // ITEM CONTENT
+   * {{/ella-treadmill}}
+   * ```
+   *
+   * @property moveTo
+   * @type {Number}
+   * @default undefined
+   * @public
+   */
+  moveTo: computed('_moveTo', {
+    get() {
+      return get(this, '_moveTo');
+    },
+
+    set(key, value) {
+      value = parseInt(value, 10);
+
+      return value ? set(this, '_moveTo', value) : set(this, '_moveTo', undefined);
+    }
+  }),
+
+  /**
    * The computed number of items to render.
    *
    * @property numberOfVisibleItems
@@ -852,20 +880,66 @@ export default Component.extend({
     this.sendStateUpdate('on-scroll').sendStateUpdate('on-scroll-end');
   }).restartable(),
 
+  moveToTask: task(function* () {
+    let moveTo = get(this, 'moveTo');
+
+    if (moveTo) {
+      yield this.scrollToIndex(moveTo);
+      set(this, 'moveTo', null);
+    }
+  }),
+
   /**
-   * Take a sizing style like `100px` or `22.56rem` and find its unit of
-   * measure (e.g. `px` or `rem`).
+   * Find the scrolling parent of the component. This may be an HTML element,
+   * the window (in a browser) or a fake window object for Node.
    *
-   * @method unitString
-   * @param measure A CSS measurement
-   * @param {String} instead A unit of measurement to send if no matches
-   * @return {String}
+   * @method scrollingParent
+   * @return {HtmlElement|window|Object}
    * @public
    */
-  unitString(measure = '', instead = 'px') {
-    let unit = `${measure}`.match(/[^-\d.]+$/g);
+  scrollingParent() {
+    let element = get(this, 'element');
 
-    return unit ? unit[0] : instead;
+    if (!element) {
+      return window || FAKE_WINDOW;
+    }
+
+    let overflowProperties = function(node) {
+      return [
+        getComputedStyle(node, null).getPropertyValue('overflow'),
+        getComputedStyle(node, null).getPropertyValue('overflow-x'),
+        getComputedStyle(node, null).getPropertyValue('overflow-y')
+      ].join(' ');
+    };
+
+    let scroller = A(ancestors(element.parentNode)).find((parent) => {
+      return /(auto|scroll)/.test(overflowProperties(parent));
+    });
+
+    return scroller || window || FAKE_WINDOW;
+  },
+
+  scrollToIndex(idx) {
+    let parent = this.scrollingParent();
+    let element = get(this, 'element');
+
+    if (!parent || !element) {
+      return this;
+    }
+
+    let columns = get(this, 'columns');
+    let itemHeight = get(this, 'sampleItem.element.clientHeight');
+    let row = Math.floor(idx / columns);
+    let top = row * itemHeight;
+    let delta = get(this, 'scrollTop') - get(this, 'topDelta');
+
+    if (typeof parent.scrollTo === 'function') {
+      parent.scrollTo(parent.scrollX, top + delta);
+    } else {
+      parent.scrollTop = top;
+    }
+
+    return this;
   },
 
   /**
@@ -910,6 +984,22 @@ export default Component.extend({
   },
 
   /**
+   * Take a sizing style like `100px` or `22.56rem` and find its unit of
+   * measure (e.g. `px` or `rem`).
+   *
+   * @method unitString
+   * @param measure A CSS measurement
+   * @param {String} instead A unit of measurement to send if no matches
+   * @return {String}
+   * @public
+   */
+  unitString(measure = '', instead = 'px') {
+    let unit = `${measure}`.match(/[^-\d.]+$/g);
+
+    return unit ? unit[0] : instead;
+  },
+
+  /**
    * Updates properties regarding scroll position and parent dimensions.
    *
    * @method updateGeometry
@@ -929,36 +1019,6 @@ export default Component.extend({
     });
 
     return this;
-  },
-
-  /**
-   * Find the scrolling parent of the component. This may be an HTML element,
-   * the window (in a browser) or a fake window object for Node.
-   *
-   * @method scrollingParent
-   * @return {HtmlElement|window|Object}
-   * @public
-   */
-  scrollingParent() {
-    let element = get(this, 'element');
-
-    if (!element) {
-      return window || FAKE_WINDOW;
-    }
-
-    let overflowProperties = function(node) {
-      return [
-        getComputedStyle(node, null).getPropertyValue('overflow'),
-        getComputedStyle(node, null).getPropertyValue('overflow-x'),
-        getComputedStyle(node, null).getPropertyValue('overflow-y')
-      ].join(' ');
-    };
-
-    let scroller = A(ancestors(element.parentNode)).find((parent) => {
-      return /(auto|scroll)/.test(overflowProperties(parent));
-    });
-
-    return scroller || window || FAKE_WINDOW;
   },
 
   _rafWatcherBegin() {
@@ -989,7 +1049,6 @@ export default Component.extend({
 
   _rafWatcherPerform() {
     let parent = this.scrollingParent();
-
     let scrollTop = parent ? (parent.scrollTop || parent.scrollY) : 0;
     let scrollChanged = false;
 
@@ -1028,9 +1087,11 @@ export default Component.extend({
       if (sizeChanged) {
         resizeHandler();
       }
+
+      get(this, 'moveToTask').perform();
     }
 
-    if (scrollChanged || sizeChanged) {
+    if (scrollChanged || sizeChanged || get(this, '_moveTo')) {
       run(callHandlers);
     }
   },

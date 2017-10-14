@@ -459,6 +459,73 @@ test('it triggers an "on-resize-end" action', function(assert) {
   });
 });
 
+test('its "data-first-visible-index" updates when columns', function(assert) {
+  let testElement = document.getElementById('ember-testing');
+
+  testElement.style.height = '500px';
+
+  this.set('model', LARGE_ARRAY);
+
+  this.render(hbs`{{ella-treadmill content=model row='100px' minColumnWidth='100px'}}`);
+
+  let element = document.querySelector('ella-treadmill');
+
+  run(() => {
+    testElement.scrollTop = 3030;
+    testElement.style.width = '1000px';
+  });
+
+  return wait().then(() => {
+    assert.equal(element.attributes['data-first-visible-index'].value, '300');
+  });
+});
+
+test('"moveTo=" scrolls that index into view', function(assert) {
+  let testElement = document.getElementById('ember-testing');
+
+  testElement.style.height = '500px';
+
+  this.set('model', LARGE_ARRAY);
+  this.set('moveTo', 300);
+
+  this.render(hbs`
+    {{ella-treadmill moveTo=moveTo content=model row='100px' minColumnWidth='100px'}}
+  `);
+
+  return wait().then(() => {
+    let element = document.querySelector('ella-treadmill');
+    let result = parseInt(element.attributes['data-first-visible-index'].value, 10);
+
+    // Firefox behaves slightly differently
+    assert.ok(A([290, 300]).includes(result));
+  });
+});
+
+test('setting "moveTo" scrolls that index into view', function(assert) {
+  let testElement = document.getElementById('ember-testing');
+
+  testElement.style.height = '500px';
+
+  this.set('model', LARGE_ARRAY);
+  this.set('moveTo', 0);
+
+  this.render(hbs`
+    {{ella-treadmill moveTo=moveTo content=model row='100px' minColumnWidth='100px'}}
+  `);
+
+  run(() => {
+    this.set('moveTo', 300);
+  })
+
+  return wait().then(() => {
+    let element = document.querySelector('ella-treadmill');
+    let result = parseInt(element.attributes['data-first-visible-index'].value, 10);
+
+    // Firefox behaves slightly differently
+    assert.ok(A([290, 300]).includes(result));
+  });
+});
+
 test('it adds an "is-scrolling" class while scrolling', function(assert) {
   let testElement = document.getElementById('ember-testing');
 

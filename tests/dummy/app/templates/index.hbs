@@ -1,5 +1,11 @@
 <nav style="position: fixed; top: 0; width: 100%; height: 30px; background-color: lightblue; z-index: 100;">
-  {{input type="checkbox" checked=(mut small) change=(action 'toggleSmall')}}
+  <label>
+    Item Size: {{input type="range" value=(mut rowHeight) min="100" max="500"}}
+  </label>
+
+  <label>
+    Demo Resize: {{input type="checkbox" checked=(mut small) change=(action 'toggleSmall')}}
+  </label>
 </nav>
 
 {{!outlet}}
@@ -16,9 +22,11 @@
     content=numbers
     row=(if rowHeight rowHeight 200)
     minColumnWidth=(if rowHeight rowHeight 200)
+    moveTo=moveTo
     on-scroll-start=(action "handleScrollStart")
     on-scroll-end=(action "handleScrollEnd")
     on-resize-start=(action "handleResizeStart")
+    on-resize=(action "handleResize")
     on-resize-end=(action "handleResizeEnd")
     as |item index|
   }}
