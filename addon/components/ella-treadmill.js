@@ -1,17 +1,9 @@
-import Ember from 'ember';
+import Component from '@ember/component';
+import { computed, get, set, getProperties, setProperties } from '@ember/object';
+import { A } from '@ember/array';
+import { run } from '@ember/runloop';
 import { task, timeout } from 'ember-concurrency';
 import layout from '../templates/components/ella-treadmill';
-
-const {
-  Component,
-  computed,
-  get,
-  getProperties,
-  set,
-  setProperties,
-  A,
-  run
-} = Ember;
 
 const RECALC_INTERVAL = 50;
 const NO_WINDOW_HEIGHT = 1024;

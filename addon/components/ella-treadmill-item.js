@@ -1,7 +1,6 @@
-import Ember from 'ember';
+import Component from '@ember/component';
+import { computed, get, getProperties } from '@ember/object';
 import layout from '../templates/components/ella-treadmill-item';
-
-const { Component, computed, get, getProperties } = Ember;
 
 /**
  *

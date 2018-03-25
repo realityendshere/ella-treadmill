@@ -1,8 +1,7 @@
 import { moduleForComponent, test } from 'ember-qunit';
-import Ember from 'ember';
+import { get } from '@ember/object';
+import { run } from '@ember/runloop';
 import hbs from 'htmlbars-inline-precompile';
-
-const { get, run } = Ember;
 
 moduleForComponent('ella-treadmill-item', 'Integration | Component | ella treadmill item', {
   integration: true

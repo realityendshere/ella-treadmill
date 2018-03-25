@@ -1,7 +1,8 @@
 /* eslint ember/named-functions-in-promises: 0 */
 
 import { moduleForComponent, test } from 'ember-qunit';
-import Ember from 'ember';
+import { run } from '@ember/runloop';
+import { A } from '@ember/array';
 import hbs from 'htmlbars-inline-precompile';
 import wait from 'ember-test-helpers/wait';
 
@@ -14,9 +15,6 @@ moduleForComponent('ella-treadmill', 'Integration | Component | ella treadmill',
     testElement.style.overflow = 'auto';
   }
 });
-
-const { run, A } = Ember;
-// const { getComputedStyle } = window;
 
 const DEFAULT_HEIGHT = 50;
 
