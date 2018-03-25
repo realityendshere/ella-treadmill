@@ -17,7 +17,7 @@ element takes a new position below the scrolling area and updates to read
 
 ## Requirements
 
-Ember Try tells me that Emberella Treadmill will work with Ember 2.4 LTS or
+Ember Try tells me that Emberella Treadmill will work with Ember 2.12 LTS or
 newer. It also passes all tests in the latest versions of Chrome, Firefox, and
 Safari (macOS and iOS).
 
