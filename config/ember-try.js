@@ -45,6 +45,24 @@ module.exports = {
       }
     },
     {
+      name: 'ember-lts-2.16',
+      npm: {
+        devDependencies: {
+          'ember-source': '~2.16.0',
+          'ember-native-dom-event-dispatcher': null
+        }
+      }
+    },
+    {
+      name: 'ember-lts-2.18',
+      npm: {
+        devDependencies: {
+          'ember-source': '~2.18.0',
+          'ember-native-dom-event-dispatcher': null
+        }
+      }
+    },
+    {
       name: 'ember-release',
       bower: {
         dependencies: {
