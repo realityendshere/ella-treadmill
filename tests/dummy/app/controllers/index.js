@@ -1,8 +1,8 @@
 /* eslint no-console: 0 */
 
-import Ember from 'ember';
-
-const { Controller, computed: { alias }, set } = Ember;
+import Controller from '@ember/controller';
+import { alias } from '@ember/object/computed';
+import { set } from '@ember/object';
 
 export default Controller.extend({
   small: false,
