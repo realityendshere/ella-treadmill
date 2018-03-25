@@ -30,7 +30,9 @@
     on-resize-end=(action "handleResizeEnd")
     as |item index|
   }}
-    [{{{index}}}]: {{item.note}}
+    <div class="demo">
+      [{{{index}}}]: {{item.note}}
+    </div>
   {{else}}
     <p>Nothing to see here.</p>
   {{/ella-treadmill}}
