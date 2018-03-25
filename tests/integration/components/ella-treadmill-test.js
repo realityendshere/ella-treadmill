@@ -1020,10 +1020,15 @@ test('it renders items in a grid when "minColumnWidth" set as percentage', funct
     <div id="resize3" style="height: 60px; width: 400px; position: absolute; top: 60px; left: 0;">&nbsp;</div>
     <div id="resize4" style="height: 60px; width: 400px; position: absolute; top: 60px; left: 400px;">&nbsp;</div>
     <div id="resize5" style="height: 60px; width: 400px; position: absolute; top: 60px; left: 800px;">&nbsp;</div>
+
+    <div id="testTotal" style="height: 200040px;">&nbsp;</div>
   `);
 
+  let element = document.querySelector('ella-treadmill');
   let items = document.querySelectorAll('ella-treadmill > ella-treadmill-item');
+  let expectedTotal = document.getElementById('testTotal');
 
+  assert.equal(element.clientHeight, expectedTotal.clientHeight);
   assert.equal(items.length, 33, 'renders 11 rows of 3 columns');
 
   for (let i = 0; i < 6; i++) {
