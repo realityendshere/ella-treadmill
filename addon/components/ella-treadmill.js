@@ -574,7 +574,7 @@ export default Component.extend({
     let columns = parseFloat(get(this, 'columns'), 10);
     let len = get(this, 'content.length');
 
-    return row * len / columns;
+    return row * Math.ceil(len / columns);
   }).readOnly(),
 
   /**
