@@ -1,3 +1,4 @@
+import { lt } from '@ember/object/computed';
 import Component from '@ember/component';
 import { computed, get, getProperties } from '@ember/object';
 import layout from '../templates/components/ella-treadmill-item';
@@ -184,7 +185,7 @@ export default Component.extend({
    * @public
    * @readOnly
    */
-  'aria-hidden': computed.lt('index', 0).readOnly(),
+  'aria-hidden': lt('index', 0).readOnly(),
 
   /**
    * The class name to apply to this component's element to indicate row

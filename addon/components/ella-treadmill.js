@@ -1,5 +1,11 @@
 import Component from '@ember/component';
-import { computed, get, set, getProperties, setProperties } from '@ember/object';
+import {
+  computed,
+  get,
+  set,
+  getProperties,
+  setProperties
+} from '@ember/object';
 import { A } from '@ember/array';
 import { run } from '@ember/runloop';
 import { task, timeout } from 'ember-concurrency';
