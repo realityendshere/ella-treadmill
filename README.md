@@ -17,11 +17,14 @@ element takes a new position below the scrolling area and updates to read
 
 ## Requirements
 
-Ember Try tells me that Emberella Treadmill will work with Ember 2.12 LTS or
-newer. It also passes all tests in the latest versions of Chrome, Firefox, and
-Safari (macOS and iOS).
+* Ember.js v3.4 or above
+* Ember CLI v2.13 or above
+* Node.js v8 or above
 
-It uses "flexbox" and CSS transforms. So, any browser that doesn't support those
+Passes all tests in the latest versions of Chrome, Firefox, and Safari
+(macOS and iOS).
+
+It uses "flexbox" and CSS transforms. Any browser that doesn't support those
 features will likely not work correctly.
 
 ## Installation
