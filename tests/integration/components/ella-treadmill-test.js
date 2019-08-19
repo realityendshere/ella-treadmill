@@ -2,7 +2,7 @@ import { module, test } from 'qunit';
 /* eslint ember/named-functions-in-promises: 0 */
 
 import { setupRenderingTest } from 'ember-qunit';
-import { render, settled, waitUntil } from '@ember/test-helpers';
+import { render, waitUntil } from '@ember/test-helpers';
 import { run } from '@ember/runloop';
 import { A } from '@ember/array';
 import hbs from 'htmlbars-inline-precompile';
@@ -365,7 +365,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
     let element = document.querySelector('ella-treadmill');
     let itemCountAttr = parseInt(element.attributes['data-visible-items'].value, 10);
     let itemCount = document.querySelectorAll('ella-treadmill > ella-treadmill-item').length;
-    let assertionComplete = false;
+    let stopWait = false;
 
     assert.equal(itemCount, 6);
     assert.equal(itemCount, itemCountAttr);
@@ -375,18 +375,18 @@ module('Integration | Component | ella treadmill', function(hooks) {
     });
 
     run.later(() => {
+      stopWait = true;
+    }, 100);
+
+    return waitUntil(() => {
+      return stopWait;
+    }).then(() => {
       let element = document.querySelector('ella-treadmill');
       let itemCountAttr = parseInt(element.attributes['data-visible-items'].value, 10);
       let itemCount = document.querySelectorAll('ella-treadmill > ella-treadmill-item').length;
 
       assert.equal(itemCount, 6);
       assert.equal(itemCount, itemCountAttr);
-
-      assertionComplete = true;
-    }, 100);
-
-    return waitUntil(() => {
-      return assertionComplete;
     });
   });
 
@@ -413,12 +413,16 @@ module('Integration | Component | ella treadmill', function(hooks) {
       testElement.style.height = '620px';
     });
 
-    run.later(() => {
+    return waitUntil(() => {
+      return document.querySelector('ella-treadmill.is-resizing');
+    }).then(() => {
       assert.ok(document.querySelector('ella-treadmill.is-resizing'), 'adds class for event');
-    }, 20);
 
-    return settled().then(() => {
-      assert.ok(document.querySelector('ella-treadmill.not-resizing'), 'removes class when events stop');
+      return waitUntil(() => {
+        return document.querySelector('ella-treadmill.not-resizing');
+      }).then(() => {
+        assert.ok(document.querySelector('ella-treadmill.not-resizing'), 'removes class when events stop');
+      });
     });
   });
 
@@ -585,12 +589,16 @@ module('Integration | Component | ella treadmill', function(hooks) {
       testElement.scrollTop = 105;
     });
 
-    run.later(() => {
+    return waitUntil(() => {
+      return document.querySelector('ella-treadmill.is-scrolling');
+    }).then(() => {
       assert.ok(document.querySelector('ella-treadmill.is-scrolling'), 'adds class for event');
-    }, 20);
 
-    return settled().then(() => {
-      assert.ok(document.querySelector('ella-treadmill.not-scrolling'), 'removes class when events stop');
+      return waitUntil(() => {
+        return document.querySelector('ella-treadmill.not-scrolling');
+      }).then(() => {
+        assert.ok(document.querySelector('ella-treadmill.not-scrolling'), 'removes class when events stop');
+      });
     });
   });
 

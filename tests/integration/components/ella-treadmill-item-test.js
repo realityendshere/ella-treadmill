@@ -14,14 +14,14 @@ module('Integration | Component | ella treadmill item', function(hooks) {
   });
 
   test('it renders', async function(assert) {
-    await render(hbs`{{ella-treadmill-item}}`);
+    await render(hbs`<EllaTreadmillItem />`);
 
     assert.equal(document.querySelectorAll('ella-treadmill-item').length, 1);
 
     await render(hbs`
-      {{#ella-treadmill-item}}
+      <EllaTreadmillItem>
         I am a block.
-      {{/ella-treadmill-item}}
+      </EllaTreadmillItem>
     `);
 
     let element = document.querySelector('ella-treadmill-item');
@@ -30,7 +30,7 @@ module('Integration | Component | ella treadmill item', function(hooks) {
   });
 
   test('it has the aria role of "listitem"', async function(assert) {
-    await render(hbs`{{ella-treadmill-item}}`);
+    await render(hbs`<EllaTreadmillItem />`);
 
     let element = document.querySelector('ella-treadmill-item');
 
@@ -40,7 +40,7 @@ module('Integration | Component | ella treadmill item', function(hooks) {
   test('it has default dimensions and position', async function(assert) {
     await render(hbs`
       <div id="measurement" style="height: 0; width: 100%;">&nbsp;</div>
-      {{ella-treadmill-item}}
+      <EllaTreadmillItem />
     `);
 
     let comparison = document.getElementById('measurement').getBoundingClientRect();
@@ -55,7 +55,7 @@ module('Integration | Component | ella treadmill item', function(hooks) {
   test('its dimensions can be modified', async function(assert) {
     await render(hbs`
       <div id="measurement" style="height: 50px; width: 50%;">&nbsp;</div>
-      {{ella-treadmill-item height=50 width=50}}
+      <EllaTreadmillItem @height="50" @columns="2" />
     `);
 
     let comparison = document.getElementById('measurement').getBoundingClientRect();
@@ -68,7 +68,7 @@ module('Integration | Component | ella treadmill item', function(hooks) {
   test('it has a default "index" of -1', async function(assert) {
     await render(hbs`
       <div id="measurement" style="height: 50px; width: 100%; position: absolute; top: 0; left: 0;">&nbsp;</div>
-      {{ella-treadmill-item height=50 width=50}}
+      <EllaTreadmillItem @height="50" />
     `);
 
     let comparison = document.getElementById('measurement').getBoundingClientRect();
@@ -83,7 +83,7 @@ module('Integration | Component | ella treadmill item', function(hooks) {
 
     await render(hbs`
       <div id="measurement" style="height: 50px; width: 100%; position: absolute; top: 0; left: 0;">&nbsp;</div>
-      {{ella-treadmill-item height=50 index=index}}
+      <EllaTreadmillItem @height="50" @index={{index}} />
     `);
 
     let comparison = document.getElementById('measurement').getBoundingClientRect();
@@ -110,7 +110,7 @@ module('Integration | Component | ella treadmill item', function(hooks) {
     };
 
     await render(hbs`
-      {{ella-treadmill-item height=50 on-insert=(action "addedToDOM")}}
+      <EllaTreadmillItem @height="50" @on-insert={{action "addedToDOM"}} />
     `);
 
     let element = document.querySelector('ella-treadmill-item');
@@ -128,7 +128,7 @@ module('Integration | Component | ella treadmill item', function(hooks) {
 
     await render(hbs`
       {{#if showTest}}
-        {{ella-treadmill-item height=50 on-destroy=(action "aboutToDestroy")}}
+        <EllaTreadmillItem @height="50" @on-destroy={{action "aboutToDestroy"}} />
       {{/if}}
     `);
 
@@ -151,7 +151,7 @@ module('Integration | Component | ella treadmill item', function(hooks) {
     };
 
     await render(hbs`
-      {{ella-treadmill-item height=height isSampleItem=isSampleItem on-update=(action "updateHandler")}}
+      <EllaTreadmillItem @height={{height}} @isSampleItem={{isSampleItem}} @on-update={{action "updateHandler"}} />
     `);
 
     assert.equal(actionTriggered, false);
@@ -177,7 +177,7 @@ module('Integration | Component | ella treadmill item', function(hooks) {
 
     await render(hbs`
       <div id="measurement" style="height: 50px; width: 100%; position: absolute; top: 0; left: 0;">&nbsp;</div>
-      {{ella-treadmill-item height=50 index=index columns=columns pageSize=pageSize}}
+      <EllaTreadmillItem @height="50" @index={{index}} @columns={{columns}} @pageSize={{pageSize}} />
     `);
 
     let comparison = document.getElementById('measurement').getBoundingClientRect();
@@ -208,7 +208,7 @@ module('Integration | Component | ella treadmill item', function(hooks) {
     this.set('index', 0);
 
     await render(hbs`
-      {{ella-treadmill-item fluctuate=fluctuate columns=columns index=index}}
+      <EllaTreadmillItem @fluctuate={{fluctuate}} @columns={{columns}} @index={{index}} />
     `);
 
     for (let i = 0; i < 6; ++i) {
@@ -248,7 +248,7 @@ module('Integration | Component | ella treadmill item', function(hooks) {
     this.set('fluctuateColumn', 2);
 
     await render(hbs`
-      {{ella-treadmill-item columns=columns index=index fluctuateColumn=fluctuateColumn}}
+      <EllaTreadmillItem @columns={{columns}} @index={{index}} @fluctuateColumn={{fluctuateColumn}} />
     `);
 
     for (let i = 0; i < 6; ++i) {
