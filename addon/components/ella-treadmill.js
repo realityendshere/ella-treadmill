@@ -51,7 +51,7 @@ let ancestors = function(node, parents = []) {
  * @element ella-treadmill
  */
 
-export default Component.extend({
+const EllaTreadmill = Component.extend({
   layout,
 
   /**
@@ -412,41 +412,6 @@ export default Component.extend({
   }).readOnly(),
 
   /**
-   * The plain object obtained by calling `.getBoundingClientRect()` on the
-   * component's element.
-   *
-   * @property geometryElement
-   * @type {Object}
-   * @public
-   * @readOnly
-   */
-  get geometryElement() {
-    let element = get(this, 'element');
-
-    if (!element) {
-      return {};
-    }
-
-    return element.getBoundingClientRect();
-  },
-
-  /**
-   * The plain object obtained by calling `.getBoundingClientRect()` on the
-   * component's scrolling parent element (if applicable).
-   *
-   * @property geometryParent
-   * @type {Object}
-   * @public
-   * @readOnly
-   */
-  get geometryParent() {
-    let parent = this.scrollingParent();
-
-    return (parent && typeof parent.getBoundingClientRect === 'function') ?
-      parent.getBoundingClientRect() : {};
-  },
-
-  /**
    * An array with a length equal to the number of items to display. The
    * component's template iterates over this array to render the appropriate
    * number of child elements.
@@ -667,31 +632,6 @@ export default Component.extend({
 
     return content;
   }).readOnly(),
-
-  /**
-   * Provide a scrolling parent height if no scrolling parent can be detected.
-   *
-   * @property _defaultHeight
-   * @type {Number}
-   * @private
-   * @readOnly
-   */
-  _defaultHeight: computed(function() {
-    return (window) ? window.innerHeight : NO_WINDOW_HEIGHT;
-  }).volatile().readOnly(),
-
-  /**
-   * Provide an element or parent element width if no rendered width can
-   * be determined.
-   *
-   * @property _defaultWidth
-   * @type {Number}
-   * @private
-   * @readOnly
-   */
-  _defaultWidth: computed(function() {
-    return (window) ? window.innerWidth : NO_WINDOW_WIDTH;
-  }).volatile().readOnly(),
 
   /**
    * The number of additional rows to render above and below the visible area.
@@ -1108,3 +1048,73 @@ export default Component.extend({
     return this;
   }
 });
+
+/**
+ * The plain object obtained by calling `.getBoundingClientRect()` on the
+ * component's element.
+ *
+ * @property geometryElement
+ * @type {Object}
+ * @public
+ * @readOnly
+ */
+Object.defineProperty(EllaTreadmill.prototype, 'geometryElement', {
+  get() {
+    let element = get(this, 'element');
+
+    if (!element) {
+      return {};
+    }
+
+    return element.getBoundingClientRect();
+  }
+});
+
+/**
+ * The plain object obtained by calling `.getBoundingClientRect()` on the
+ * component's scrolling parent element (if applicable).
+ *
+ * @property geometryParent
+ * @type {Object}
+ * @public
+ * @readOnly
+ */
+Object.defineProperty(EllaTreadmill.prototype, 'geometryParent', {
+  get() {
+    let parent = this.scrollingParent();
+
+    return (parent && typeof parent.getBoundingClientRect === 'function') ?
+      parent.getBoundingClientRect() : {};
+  }
+});
+
+/**
+ * Provide a scrolling parent height if no scrolling parent can be detected.
+ *
+ * @property _defaultHeight
+ * @type {Number}
+ * @private
+ * @readOnly
+ */
+Object.defineProperty(EllaTreadmill.prototype, '_defaultHeight', {
+  get() {
+    return (window) ? window.innerHeight : NO_WINDOW_HEIGHT;
+  }
+});
+
+/**
+ * Provide an element or parent element width if no rendered width can
+ * be determined.
+ *
+ * @property _defaultWidth
+ * @type {Number}
+ * @private
+ * @readOnly
+ */
+Object.defineProperty(EllaTreadmill.prototype, '_defaultWidth', {
+  get() {
+    return (window) ? window.innerWidth : NO_WINDOW_WIDTH;
+  }
+});
+
+export default EllaTreadmill;
