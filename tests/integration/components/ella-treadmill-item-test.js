@@ -89,7 +89,10 @@ module('Integration | Component | ella treadmill item', function(hooks) {
     let comparison = document.getElementById('measurement').getBoundingClientRect();
     let geometry = document.querySelector('ella-treadmill-item').getBoundingClientRect();
 
-    assert.equal(geometry.top, comparison.top + (this.get('index') * comparison.height));
+    assert.equal(
+      Math.round(geometry.top),
+      Math.round(comparison.top + (this.get('index') * comparison.height))
+    );
 
     this.set('index', 17);
 
