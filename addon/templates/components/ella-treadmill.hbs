@@ -1,15 +1,14 @@
 <style type="text/css">
   #{{elementId}} {
-    position: relative;
-    {{#if totalHeight}}
-      height: {{totalHeight}}{{_rowUnit}};
-    {{/if}}
-
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    align-content: flex-start;
-    box-sizing: border-box;
+  position: relative;
+  {{#if totalHeight}}
+    height: {{totalHeight}}{{_rowUnit}};
+  {{/if}}
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  box-sizing: border-box;
   }
 
   #{{elementId}} .ella-treadmill-item {
@@ -22,27 +21,27 @@
 </style>
 
 {{#each indices as |_ idx|}}
-  {{#ella-treadmill-item
-    parent=this
-    index=(get visibleIndexes (concat '' idx))
-    item=(get visibleContent (concat '' idx))
-    height=_row
-    heightUnit=_rowUnit
-    columns=columns
-    pageSize=numberOfVisibleItems
-    fluctuate=fluctuate
-    fluctuateColumn=fluctuateColumn
-    on-insert=(action "listItemInserted")
-    on-update=(action "listItemUpdated")
-    on-destroy=(action "listItemDestroyed")
+  <EllaTreadmillItem
+    @parent={{this}}
+    @index={{get visibleIndexes (concat "" idx)}}
+    @item={{get visibleContent (concat "" idx)}}
+    @height={{_row}}
+    @heightUnit={{_rowUnit}}
+    @columns={{columns}}
+    @pageSize={{numberOfVisibleItems}}
+    @fluctuate={{fluctuate}}
+    @fluctuateColumn={{fluctuateColumn}}
+    @on-insert={{action "listItemInserted"}}
+    @on-update={{action "listItemUpdated"}}
+    @on-destroy={{action "listItemDestroyed"}}
     as |item index|
-  }}
+  >
     {{#if hasBlock}}
       {{yield item index}}
     {{else}}
-      {{get visibleContent (concat '' idx)}}
+      {{get visibleContent (concat "" idx)}}
     {{/if}}
-  {{/ella-treadmill-item}}
+  </EllaTreadmillItem>
 {{else}}
   {{yield to="inverse"}}
 {{/each}}
