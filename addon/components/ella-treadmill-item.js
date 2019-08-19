@@ -242,8 +242,14 @@ export default Component.extend({
    * @public
    * @readOnly
    */
-  isSampleItem: computed('parent.sampleItem', function() {
-    return get(this, 'parent.sampleItem') === this;
+  isSampleItem: computed('parent.sampleItem', '_isSampleItem', {
+    get() {
+      return get(this, '_isSampleItem') || (get(this, 'parent.sampleItem') === this);
+    },
+
+    set(key, value) {
+      return this.set('_isSampleItem', value);
+    }
   }),
 
   /**

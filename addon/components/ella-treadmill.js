@@ -420,7 +420,7 @@ export default Component.extend({
    * @public
    * @readOnly
    */
-  geometryElement: computed(function() {
+  get geometryElement() {
     let element = get(this, 'element');
 
     if (!element) {
@@ -428,7 +428,7 @@ export default Component.extend({
     }
 
     return element.getBoundingClientRect();
-  }).volatile().readOnly(),
+  },
 
   /**
    * The plain object obtained by calling `.getBoundingClientRect()` on the
@@ -439,12 +439,12 @@ export default Component.extend({
    * @public
    * @readOnly
    */
-  geometryParent: computed(function() {
+  get geometryParent() {
     let parent = this.scrollingParent();
 
     return (parent && typeof parent.getBoundingClientRect === 'function') ?
       parent.getBoundingClientRect() : {};
-  }).volatile().readOnly(),
+  },
 
   /**
    * An array with a length equal to the number of items to display. The
