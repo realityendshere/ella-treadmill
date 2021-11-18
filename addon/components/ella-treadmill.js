@@ -523,11 +523,11 @@ const EllaTreadmill = Component.extend({
    * The numeric height of the component's element.
    *
    * For example, if the row height is `50px`, the `minColumnWidth` is `50%`
-   * and the content contains 1000 items, the `totalHeight` would be 25,000
+   * and the content contains 1000 items, the `this.totalHeight` would be 25,000
    * pixels (`25000px`). That's 500 rows each `50px` tall with two
    * items each.
    *
-   * @property totalHeight
+   * @property this.totalHeight
    * @type {Number}
    * @public
    * @readOnly

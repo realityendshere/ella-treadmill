@@ -1,8 +1,8 @@
 <style type="text/css">
-  #{{elementId}} {
+  #{{this.elementId}} {
   position: relative;
-  {{#if totalHeight}}
-    height: {{totalHeight}}{{_rowUnit}};
+  {{#if this.totalHeight}}
+    height: {{this.totalHeight}}{{_rowUnit}};
   {{/if}}
   width: 100%;
   display: flex;
@@ -11,16 +11,20 @@
   box-sizing: border-box;
   }
 
-  #{{elementId}} .ella-treadmill-item {
+  #{{
+    this.elementId
+  }} .ella-treadmill-item {
     -webkit-overflow-scrolling: 'touch';
   }
 
-  #{{elementId}}.is-scrolling .ella-treadmill-item {
+  #{{
+    this.elementId
+  }}.is-scrolling .ella-treadmill-item {
     pointer-events: none;
   }
 </style>
 
-{{#each indices as |_ idx|}}
+{{#each this.indices as |_ idx|}}
   <EllaTreadmillItem
     @parent={{this}}
     @index={{get visibleIndexes (concat "" idx)}}
@@ -33,10 +37,9 @@
     @fluctuateColumn={{fluctuateColumn}}
     @on-insert={{action "listItemInserted"}}
     @on-update={{action "listItemUpdated"}}
-    @on-destroy={{action "listItemDestroyed"}}
-    as |item index|
+    @on-destroy={{action "listItemDestroyed"}} as |item index|
   >
-    {{#if hasBlock}}
+    {{#if has-block}}
       {{yield item index}}
     {{else}}
       {{get visibleContent (concat "" idx)}}
