@@ -2,7 +2,7 @@
   #{{this.elementId}} {
   position: relative;
   {{#if this.totalHeight}}
-    height: {{this.totalHeight}}{{_rowUnit}};
+    height: {{this.totalHeight}}{{this._rowUnit}};
   {{/if}}
   width: 100%;
   display: flex;
@@ -27,22 +27,22 @@
 {{#each this.indices as |_ idx|}}
   <EllaTreadmillItem
     @parent={{this}}
-    @index={{get visibleIndexes (concat "" idx)}}
-    @item={{get visibleContent (concat "" idx)}}
-    @height={{_row}}
-    @heightUnit={{_rowUnit}}
-    @columns={{columns}}
-    @pageSize={{numberOfVisibleItems}}
-    @fluctuate={{fluctuate}}
-    @fluctuateColumn={{fluctuateColumn}}
+    @index={{get this.visibleIndexes (concat "" idx)}}
+    @item={{get this.visibleContent (concat "" idx)}}
+    @height={{this._row}}
+    @heightUnit={{this._rowUnit}}
+    @columns={{this.columns}}
+    @pageSize={{this.numberOfVisibleItems}}
+    @fluctuate={{this.fluctuate}}
+    @fluctuateColumn={{this.fluctuateColumn}}
     @on-insert={{action "listItemInserted"}}
     @on-update={{action "listItemUpdated"}}
     @on-destroy={{action "listItemDestroyed"}} as |item index|
   >
-    {{#if has-block}}
+    {{#if this.has-block}}
       {{yield item index}}
     {{else}}
-      {{get visibleContent (concat "" idx)}}
+      {{get this.visibleContent (concat "" idx)}}
     {{/if}}
   </EllaTreadmillItem>
 {{else}}

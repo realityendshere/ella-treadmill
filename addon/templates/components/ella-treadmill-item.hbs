@@ -1,51 +1,51 @@
 <style type="text/css">
   #{{this.elementId}} {
     position: relative;
-    height: {{height}}{{
-    heightUnit
+    height: {{@height}}{{
+    @heightUnit
   }};
-    width: {{width}}{{
-    widthUnit
+    width: {{this.width}}{{
+    this.widthUnit
   }};
     box-sizing: border-box;
     display: block;
-    flex: 0 0 {{width}}{{
-    widthUnit
-  }};
+    flex: 0 0 {{
+    this.width
+  }}{{this.widthUnit}};
 
     -o-transform: translateY({{
-    translateY
+    this.translateY
   }});
     -o-transform: translate3d(0, {{
-    translateY
+    this.translateY
   }}, 0);
 
     -ms-transform: translateY({{
-    translateY
+    this.translateY
   }});
     -ms-transform: translate3d(0, {{
-    translateY
+    this.translateY
   }}, 0);
 
     -moz-transform: translateY({{
-    translateY
+    this.translateY
   }});
     -moz-transform: translate3d(0, {{
-    translateY
+    this.translateY
   }}, 0);
 
     -webkit-transform: translateY({{
-    translateY
+    this.translateY
   }});
     -webkit-transform: translate3d(0, {{
-    translateY
+    this.translateY
   }}, 0);
 
     transform: translateY({{
-    translateY
+    this.translateY
   }});
-    transform: translate3d(0, {{translateY}}, 0);
+    transform: translate3d(0, {{this.translateY}}, 0);
   }
 </style>
 
-{{yield item index}}
+{{yield @item @index}}
