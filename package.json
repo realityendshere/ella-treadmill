@@ -64,7 +64,7 @@
     "hoek": "^6.1.3",
     "loader.js": "^4.7.0",
     "qunit-dom": "^0.9.0",
-    "sass": "^1.22.10"
+    "sass": "^1.43.4"
   },
   "engines": {
     "node": "8.* || >= 10.*"
@@ -73,6 +73,6 @@
     "configPath": "tests/dummy/config"
   },
   "resolutions": {
-    "ember-cli/portfinder": "1.0.21"
+    "ember-cli/portfinder": "1.0.28"
   }
 }
