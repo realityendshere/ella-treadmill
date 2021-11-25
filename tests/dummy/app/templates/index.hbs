@@ -1,10 +1,10 @@
 <nav class="demo-controls">
   <label>
-    Item Size: {{input type="range" value=(mut rowHeight) min="100" max="500"}}
+    Item Size: <Input @type="range" @value={{mut rowHeight}} @min="100" @max="500" />
   </label>
 
   <label>
-    Demo Resize: {{input type="checkbox" checked=(mut small) change=(action "toggleSmall")}}
+    Demo Resize: <Input @type="checkbox" @checked={{mut small}} @change={{action "toggleSmall"}} />
   </label>
 </nav>
 
