@@ -55,11 +55,11 @@ module('Integration | Component | ella treadmill item', function(hooks) {
   test('its dimensions can be modified', async function(assert) {
     await render(hbs`
       <div id="measurement" style="height: 50px; width: 50%;">&nbsp;</div>
-      <EllaTreadmillItem @height="50" @columns="2" />
+      <EllaTreadmillItem @height="50" @heightUnit="px" @columns="2" />
     `);
 
     let comparison = document.getElementById('measurement').getBoundingClientRect();
-    let geometry = document.querySelector('ella-treadmill-item').getBoundingClientRect();
+    let geometry = document.querySelector('.ella-treadmill-item').getBoundingClientRect();
 
     assert.equal(geometry.width, comparison.width);
     assert.equal(geometry.height, comparison.height);

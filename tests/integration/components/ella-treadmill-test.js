@@ -941,7 +941,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
     this.set('model', LARGE_ARRAY);
 
     await render(hbs`
-      <EllaTreadmill @content={{model}} @row="100" as |item index|>
+      <EllaTreadmill @content={{this.model}} @row="100" as |item index|>
         [{{{index}}}]: I am item #{{item}}
       </EllaTreadmill>
     `);

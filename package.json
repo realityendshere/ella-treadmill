@@ -74,5 +74,8 @@
   },
   "resolutions": {
     "ember-cli/portfinder": "1.0.28"
+  },
+  "volta": {
+    "node": "12.22.7"
   }
 }

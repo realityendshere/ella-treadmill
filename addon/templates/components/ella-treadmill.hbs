@@ -39,7 +39,7 @@
     @on-update={{action "listItemUpdated"}}
     @on-destroy={{action "listItemDestroyed"}} as |item index|
   >
-    {{#if this.has-block}}
+    {{#if (has-block)}}
       {{yield item index}}
     {{else}}
       {{get this.visibleContent (concat "" idx)}}
