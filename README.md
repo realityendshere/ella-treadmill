@@ -17,7 +17,7 @@ element takes a new position below the scrolling area and updates to read
 
 ## Requirements
 
-* Ember.js v3.4 or above
+* Ember.js v3.8 or above
 * Ember CLI v2.13 or above
 * Node.js v8 or above
 
