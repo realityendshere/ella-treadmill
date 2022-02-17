@@ -41,7 +41,7 @@
     "ember-cli/portfinder": "1.0.28"
   },
   "dependencies": {
-    "ember-classic-decorator": "^2.0.1",
+    "ember-classic-decorator": "^3.0.0",
     "ember-cli-babel": "^7.26.6",
     "ember-cli-htmlbars": "^5.7.1",
     "ember-concurrency": "^2.2.0"
