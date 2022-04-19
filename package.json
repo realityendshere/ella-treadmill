@@ -1,6 +1,6 @@
 {
   "name": "ember-ella-treadmill",
-  "version": "0.21.0",
+  "version": "0.21.1",
   "description": "A listing component that recycles list item instances to create the illusion of displaying a massive number of items.",
   "keywords": [
     "ember-addon",
@@ -54,7 +54,7 @@
     "@glimmer/tracking": "^1.0.4",
     "babel-eslint": "^10.1.0",
     "broccoli-asset-rev": "^3.0.0",
-    "ember-auto-import": "^1.11.3",
+    "ember-auto-import": "^2.4.1",
     "ember-cli": "~3.28.4",
     "ember-cli-dependency-checker": "^3.2.0",
     "ember-cli-inject-live-reload": "^2.1.0",
