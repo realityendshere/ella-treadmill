@@ -20,20 +20,6 @@
   data-visible-items={{this.numberOfVisibleItems}}
 
 >
-<style type="text/css">
-  #{{
-    this.elementId
-  }} .ella-treadmill-item {
-    -webkit-overflow-scrolling: 'touch';
-  }
-
-  #{{
-    this.elementId
-  }}.is-scrolling .ella-treadmill-item {
-    pointer-events: none;
-  }
-</style>
-
 {{#each this.indices as |_ idx|}}
   <EllaTreadmillItem
     @parent={{this}}
@@ -48,6 +34,10 @@
     @on-insert={{action "listItemInserted"}}
     @on-update={{action "listItemUpdated"}}
     @on-destroy={{action "listItemDestroyed"}}
+    {{!-- I don't think this is need. --}}
+    {{!-- {{style webkit-overflow-scrolling="touch"}} --}}
+    {{style pointer-events=(if this.scrolling "none" "inherit")}}
+
     as |item index|
   >
     {{#if (has-block)}}
