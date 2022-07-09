@@ -1,9 +1,6 @@
 import classic from 'ember-classic-decorator';
 
 import {
-  classNames,
-  attributeBindings,
-  classNameBindings,
   tagName,
   layout as templateLayout,
 } from '@ember-decorators/component';
@@ -58,17 +55,6 @@ let ancestors = function(node, parents = []) {
 @classic
 @templateLayout(layout)
 @tagName('ella-treadmill')
-@attributeBindings(
-  'data-scroll-top',
-  'topDelta:data-scroll-delta',
-  'startingIndex:data-first-visible-index',
-  'numberOfVisibleItems:data-visible-items'
-)
-@classNames('ella-treadmill')
-@classNameBindings(
-  'resizing:is-resizing:not-resizing',
-  'scrolling:is-scrolling:not-scrolling'
-)
 class EllaTreadmill extends Component {
   /**
    * Applied as the `role` attribute on the component's element.

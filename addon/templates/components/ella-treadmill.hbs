@@ -1,16 +1,26 @@
-<style type="text/css">
-  #{{this.elementId}} {
-  position: relative;
-  {{#if this.totalHeight}}
-    height: {{this.totalHeight}}{{this._rowUnit}};
-  {{/if}}
-  width: 100%;
-  display: flex;
-  flex-wrap: wrap;
-  align-content: flex-start;
-  box-sizing: border-box;
-  }
+<div
+  class="
+    ella-treadmill
+    {{if this.resizing "is-resizing" "not-resizing"}}
+    {{if this.scrolling "is-scrolling" "not-scrolling"}}
+  "
+  {{style
+    position="relative"
+    width="100%"
+    display="flex"
+    flex-wrap="wrap"
+    align-content="flex-start"
+    box-sizing="border-box"
+    height=(if this.totalHeight (concat this.totalHeight this._rowUnit))
+  }}
 
+  data-scroll-top
+  data-scroll-delta={{this.topDelta}}
+  data-first-visible-index={{this.startingIndex}}
+  data-visible-items={{this.numberOfVisibleItems}}
+
+>
+<style type="text/css">
   #{{
     this.elementId
   }} .ella-treadmill-item {
@@ -37,7 +47,8 @@
     @fluctuateColumn={{this.fluctuateColumn}}
     @on-insert={{action "listItemInserted"}}
     @on-update={{action "listItemUpdated"}}
-    @on-destroy={{action "listItemDestroyed"}} as |item index|
+    @on-destroy={{action "listItemDestroyed"}}
+    as |item index|
   >
     {{#if (has-block)}}
       {{yield item index}}
@@ -48,3 +59,4 @@
 {{else}}
   {{yield to="inverse"}}
 {{/each}}
+</div>
