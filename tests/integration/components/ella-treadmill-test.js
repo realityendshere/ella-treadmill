@@ -587,7 +587,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
       hbs`<EllaTreadmill @row="100" @content={{this.model}} @on-resize-end={{action "handleResizeEnd"}} />`
     );
 
-    assert.equal(actionTriggered, false, 'action not yet called');
+    assert.false(actionTriggered, 'action not yet called');
 
     run(() => {
       testElement.style.height = '600px';
@@ -792,7 +792,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
       </div>
     `);
 
-    assert.equal(actionTriggered, false, 'action not yet called');
+    assert.false(actionTriggered, 'action not yet called');
 
     run(() => {
       document.getElementById('scroller').scrollTop = 100;
@@ -841,7 +841,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
       <EllaTreadmill @content={{this.model}} @row="100" @on-scroll={{action "handleListingStateChanged"}} />
     `);
 
-    assert.equal(actionTriggered, false, 'action not yet called');
+    assert.false(actionTriggered, 'action not yet called');
 
     run(() => {
       testElement.scrollTop = 30010;
@@ -889,7 +889,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
       <EllaTreadmill @content={{this.model}} @row="100" @on-resize={{action "handleListingStateChanged"}} />
     `);
 
-    assert.equal(actionTriggered, false, 'action not yet called');
+    assert.false(actionTriggered, 'action not yet called');
 
     run(() => {
       testElement.style.height = '1200px';

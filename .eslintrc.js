@@ -17,13 +17,16 @@ module.exports = {
     'plugin:prettier/recommended',
   ],
   env: {
-    browser: true
+    browser: true,
   },
   rules: {
     'ember/no-jquery': 'error',
-    'ember/named-functions-in-promises': [2, {
-      allowSimpleArrowFunction: true
-    }]
+    'ember/named-functions-in-promises': [
+      2,
+      {
+        allowSimpleArrowFunction: true,
+      },
+    ],
   },
   rules: {},
   overrides: [

@@ -1,0 +1,22 @@
+<div
+  {{!-- {{did-insert this.didInsert}} --}}
+  {{!-- {{did-update this.didRender @height}} --}}
+
+  class="ella-treadmill-item {{this.classRow}} {{this.classColumn}}"
+  aria-hidden={{get this 'aria-hidden'}}
+  arial-role="listitem"
+  {{style
+    position="relative"
+    height=(concat @height @heightUnit)
+    width=(concat this.width this.widthUnit)
+    box-sizing="border-box"
+    display="block"
+    flex=(concat "0 0 " this.width this.widthUnit)
+    transform=(concat "translateY(" this.translateY ")")
+    transform=(concat "translate3d(0," this.translateY ", 0)")
+  }}
+  ...attributes
+>
+  T: {{@index}}, Z: {{this.translateY}}
+  {{yield @item @index}}
+</div>

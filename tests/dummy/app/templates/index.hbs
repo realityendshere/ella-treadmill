@@ -1,15 +1,14 @@
 <nav class="demo-controls">
   <label>
     Item Size:
-    <Input @type="range" @value={{mut this.rowHeight}} @min="100" @max="500" />
+    <Input @type="range" @value={{mut this.rowHeight}} min="100" max="500" />
   </label>
 
   <label>
     Demo Resize:
     <Input
       @type="checkbox"
-      @checked={{mut this.small}}
-      @change={{this.toggleSmall}}
+      @checked={{mut this.small}} {{on "change" this.toggleSmall}}
     />
   </label>
 </nav>
@@ -44,14 +43,14 @@
     @on-resize={{this.handleResize}}
     @on-resize-end={{this.handleResizeEnd}} as |item index|
   >
-    {{#if (has-block)}}
+    {{!-- {{#if (has-block)}} --}}
       <div class="demo">
         [{{if index index "0"}}]: {{item.note}}
       </div>
-    {{else}}
-      <p>
-        Nothing to see here.
-      </p>
-    {{/if}}
+    {{!-- {{else}} --}}
+      {{!-- <p> --}}
+        {{!-- Nothing to see here. --}}
+      {{!-- </p> --}}
+    {{!-- {{/if}} --}}
   </EllaTreadmill>
 </div>

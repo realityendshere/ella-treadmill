@@ -137,7 +137,7 @@ module('Integration | Component | ella treadmill item', function (hooks) {
 
     let element = document.querySelector('ella-treadmill-item');
 
-    assert.equal(get(actionTriggered, 'element'), element);
+    assert.equal(actionTriggered.element, element);
   });
 
   test('it triggers an "on-destroy" action before removed from the DOM', async function (assert) {
@@ -154,7 +154,7 @@ module('Integration | Component | ella treadmill item', function (hooks) {
       {{/if}}
     `);
 
-    assert.equal(actionTriggered, false);
+    assert.false(actionTriggered);
 
     run(() => {
       this.set('showTest', false);
@@ -176,13 +176,13 @@ module('Integration | Component | ella treadmill item', function (hooks) {
       <EllaTreadmillItem @height={{this.height}} @isSampleItem={{this.isSampleItem}} @on-update={{action "updateHandler"}} />
     `);
 
-    assert.equal(actionTriggered, false);
+    assert.false(actionTriggered);
 
     run(() => {
       this.set('height', 51);
     });
 
-    assert.equal(actionTriggered, false);
+    assert.false(actionTriggered);
 
     run(() => {
       this.set('isSampleItem', true);
