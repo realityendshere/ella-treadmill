@@ -1,18 +1,19 @@
 /* eslint no-console: 0 */
 
 import Controller from '@ember/controller';
-import { alias } from '@ember/object/computed';
-import { set, action } from '@ember/object';
+import { action } from '@ember/object';
 
 export default class IndexController extends Controller {
   small = false;
   moveTo = null;
 
-  numbers = alias('model');
+  get numbers() {
+    return this.model;
+  }
 
   @action
   toggleSmall() {
-    this.toggleProperty('small');
+    this.small = !!this.small;
   }
 
   @action
@@ -33,12 +34,12 @@ export default class IndexController extends Controller {
 
   @action
   handleResize() {
-    set(this, 'moveTo', this.__indexAtStart__);
+    this.moveTo = this.__indexAtStart__;
   }
 
   @action
   handleResizeEnd() {
-    set(this, 'moveTo', this.__indexAtStart__);
+    this.moveTo = this.__indexAtStart__;
     console.log('RESIZE END ::', Date.now());
   }
 }

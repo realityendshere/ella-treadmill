@@ -126,7 +126,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
   test('it renders with a default row height', async function (assert) {
     let model = A(range(1, 1));
 
-    this.set('model', model);
+    this.model = model;
 
     await render(hbs`<EllaTreadmill @content={{this.model}} />`);
 
@@ -148,7 +148,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
       'height multiplies by 2'
     );
 
-    this.set('model', LARGE_ARRAY);
+    this.model = LARGE_ARRAY;
 
     assert.equal(
       element.clientHeight,
@@ -158,7 +158,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
   });
 
   test('it renders with a default width of 100%', async function (assert) {
-    this.set('model', ONE_ITEM_ARRAY);
+    this.model = ONE_ITEM_ARRAY;
 
     await render(hbs`
       <EllaTreadmill @content={{this.model}} />
@@ -174,7 +174,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
       'default width is 100%, the same width as the comparison element'
     );
 
-    this.set('model', LARGE_ARRAY);
+    this.model = LARGE_ARRAY;
 
     assert.equal(
       element.clientWidth,
@@ -186,8 +186,8 @@ module('Integration | Component | ella treadmill', function (hooks) {
   test('it renders with a custom row height (in px)', async function (assert) {
     let rowHeight = 24;
 
-    this.set('model', ONE_ITEM_ARRAY);
-    this.set('rowHeight', rowHeight);
+    this.model = ONE_ITEM_ARRAY;
+    this.rowHeight = rowHeight;
 
     await render(hbs`
       <EllaTreadmill @row={{this.rowHeight}} @content={{this.model}} />
@@ -200,14 +200,14 @@ module('Integration | Component | ella treadmill', function (hooks) {
 
     assert.equal(element.clientHeight, expected.clientHeight);
 
-    this.set('model', LARGE_ARRAY);
+    this.model = LARGE_ARRAY;
 
     assert.equal(
       element.clientHeight,
       expected.clientHeight * LARGE_ARRAY.length
     );
 
-    this.set('rowHeight', (rowHeight = 100));
+    this.rowHeight = rowHeight = 100;
 
     expected = document.getElementById('test2');
 
@@ -218,8 +218,8 @@ module('Integration | Component | ella treadmill', function (hooks) {
   });
 
   test('it renders with a custom row height unit (rem)', async function (assert) {
-    this.set('model', LARGE_ARRAY);
-    this.set('expectedHeight', LARGE_ARRAY.length * 5.35 + 'rem');
+    this.model = LARGE_ARRAY;
+    this.expectedHeight = LARGE_ARRAY.length * 5.35 + 'rem';
 
     await render(hbs`
       <EllaTreadmill @row="5.35rem" @content={{this.model}} />
@@ -238,7 +238,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
   });
 
   test('it renders with a custom row height unit (%)', async function (assert) {
-    this.set('model', LARGE_ARRAY);
+    this.model = LARGE_ARRAY;
 
     await render(hbs`
       <div style="height: 500px; overflow: auto;">
@@ -256,7 +256,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
 
     testElement.style.height = 10 * DEFAULT_HEIGHT + 'px';
 
-    this.set('model', LARGE_ARRAY);
+    this.model = LARGE_ARRAY;
 
     await render(hbs`<EllaTreadmill @content={{this.model}} />`);
 
@@ -305,8 +305,8 @@ module('Integration | Component | ella treadmill', function (hooks) {
 
     testElement.style.height = '600px';
 
-    this.set('model', LARGE_ARRAY);
-    this.set('rowHeight', 30);
+    this.model = LARGE_ARRAY;
+    this.rowHeight = 30;
 
     await render(
       hbs`<EllaTreadmill @row={{this.rowHeight}} @content={{this.model}} />`
@@ -324,7 +324,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
     assert.equal(itemCount, itemCountAttr);
     assert.equal(itemCount, 21, 'enough rows rendered to fill 600px height');
 
-    this.set('rowHeight', 60);
+    this.rowHeight = 60;
 
     itemCountAttr = parseInt(
       element.attributes['data-visible-items'].value,
@@ -343,7 +343,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
 
     testElement.style.height = '500px';
 
-    this.set('model', LARGE_ARRAY);
+    this.model = LARGE_ARRAY;
 
     await render(hbs`
       <EllaTreadmill @row="2.35em" @content={{this.model}} />
@@ -394,7 +394,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
 
     testElement.style.height = '500px';
 
-    this.set('model', LARGE_ARRAY);
+    this.model = LARGE_ARRAY;
 
     await render(hbs`
       <EllaTreadmill @row="3.1rem" @content={{this.model}} />
@@ -1537,7 +1537,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
     testElement.style.height = '900px';
     testElement.style.width = '900px';
 
-    this.set('model', LARGE_ARRAY);
+    this.model = LARGE_ARRAY;
 
     await render(hbs`
       <div id="bumper" style="height: 372px;">&nbsp;</div>
@@ -1606,9 +1606,9 @@ module('Integration | Component | ella treadmill', function (hooks) {
   });
 
   test('it renders items with a class name that indicates row membership', async function (assert) {
-    this.set('model', LARGE_ARRAY);
-    this.set('fluctuate', 2);
-    this.set('minColumnWidth', '100%');
+    this.model = LARGE_ARRAY;
+    this.fluctuate = 2;
+    this.minColumnWidth = '100%';
 
     await render(hbs`
       <EllaTreadmill @content={{this.model}} @fluctuate={{this.fluctuate}} @minColumnWidth={{this.minColumnWidth}} />

@@ -1,7 +1,6 @@
 import Route from '@ember/routing/route';
-import { set } from '@ember/object';
 
-export default Route.extend({
+export default class IndexRoute extends Route {
   model() {
     let range = function (start, end) {
       return Array(end - start + 1)
@@ -12,9 +11,9 @@ export default Route.extend({
     };
 
     return range(1, 1000);
-  },
+  }
 
   setupController(controller, model) {
-    set(controller, 'numbers', model);
-  },
-});
+    controller.numbers = model;
+  }
+}

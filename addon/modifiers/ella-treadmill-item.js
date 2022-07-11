@@ -17,7 +17,7 @@ export default class EllaTreadmillItemModifier extends Modifier {
 
   modify(element, [args], defaultArgs) {
     this.resizeObserver = new ResizeObserver(() => {
-      defaultArgs["on-update"](element.getBoundingClientRect());
+      defaultArgs['on-update'](element.getBoundingClientRect());
     });
 
     this.resizeObserver.observe(element);

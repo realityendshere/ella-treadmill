@@ -391,7 +391,7 @@ export default class EllaTreadmill extends Component {
 
   set moveTo(value) {
     value = parseInt(value, 10);
-    return value ? (this._moveTo = value) : (this._moveTo = undefined);
+    value ? (this._moveTo = value) : (this._moveTo = undefined);
   }
 
   /**
