@@ -1,0 +1,56 @@
+<nav class="demo-controls">
+  <label>
+    Item Size:
+    <Input @type="range" @value={{mut this.rowHeight}} min="100" max="500" />
+  </label>
+
+  <label>
+    Demo Resize:
+    <Input
+      @type="checkbox"
+      @checked={{mut this.small}} {{on "change" this.toggleSmall}}
+    />
+  </label>
+</nav>
+
+{{!outlet}}
+
+<p>
+  &nbsp;
+</p>
+<p>
+  &nbsp;
+</p>
+<p>
+  &nbsp;
+</p>
+<p>
+  &nbsp;
+</p>
+<p>
+  &nbsp;
+</p>
+
+<div class="containment {{if this.small "is-small" "expanded"}}">
+  <EllaTreadmill
+    @content={{this.numbers}}
+    @row={{if this.rowHeight this.rowHeight 200}}
+    @minColumnWidth={{if this.rowHeight this.rowHeight 200}}
+    @moveTo={{this.moveTo}}
+    @on-scroll-start={{this.handleScrollStart}}
+    @on-scroll-end={{this.handleScrollEnd}}
+    @on-resize-start={{this.handleResizeStart}}
+    @on-resize={{this.handleResize}}
+    @on-resize-end={{this.handleResizeEnd}} as |item index|
+  >
+    {{!-- {{#if (has-block)}} --}}
+      <div class="demo">
+        [{{if index index "0"}}]: {{item.note}}
+      </div>
+    {{!-- {{else}} --}}
+      {{!-- <p> --}}
+        {{!-- Nothing to see here. --}}
+      {{!-- </p> --}}
+    {{!-- {{/if}} --}}
+  </EllaTreadmill>
+</div>

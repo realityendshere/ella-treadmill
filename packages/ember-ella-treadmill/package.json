@@ -1,0 +1,80 @@
+{
+  "name": "ember-ella-treadmill",
+  "version": "0.3.0",
+  "description": "A listing component that recycles list item instances to create the illusion of displaying a massive number of items.",
+  "keywords": [
+    "ember-addon"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/realityendshere/ella-treadmill.git"
+  },
+  "license": "MIT",
+  "author": "Dana Franklin",
+  "exports": {
+    "./*": "./dist/*",
+    "./addon-main.js": "./addon-main.js"
+  },
+  "files": [
+    "dist",
+    "addon-main.js",
+    "CHANGELOG.md",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "rollup --config",
+    "lint": "npm-run-all --aggregate-output --continue-on-error --parallel \"lint:!(fix)\"",
+    "lint:fix": "npm-run-all --aggregate-output --continue-on-error --parallel lint:*:fix",
+    "lint:hbs": "ember-template-lint .",
+    "lint:hbs:fix": "ember-template-lint . --fix",
+    "lint:js": "eslint . --cache",
+    "lint:js:fix": "eslint . --fix",
+    "start": "rollup --config --watch",
+    "test": "echo 'Addon does not have tests, run tests in test-app'",
+    "prepare": "yarn build"
+  },
+  "dependencies": {
+    "@ember/render-modifiers": "^2.0.0",
+    "@embroider/addon-shim": "1.8.3",
+    "@glimmer/component": "^1.1.2",
+    "ember-concurrency": "^2.2.0",
+    "ember-modifier": "^3.2.7",
+    "ember-style-modifier": "^0.8.0"
+  },
+  "devDependencies": {
+    "@babel/core": "7.18.6",
+    "@babel/plugin-proposal-class-properties": "7.18.6",
+    "@babel/plugin-proposal-decorators": "7.18.6",
+    "@embroider/addon-dev": "1.8.3",
+    "@rollup/plugin-babel": "^5.3.1",
+    "babel-eslint": "10.1.0",
+    "eslint": "^7.0.0",
+    "eslint-config-prettier": "8.5.0",
+    "eslint-plugin-ember": "10.6.1",
+    "eslint-plugin-import": "2.26.0",
+    "eslint-plugin-json": "3.1.0",
+    "eslint-plugin-node": "11.1.0",
+    "eslint-plugin-prettier": "4.2.1",
+    "eslint-plugin-simple-import-sort": "7.0.0",
+    "rollup": "2.76.0"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "ember": {
+    "edition": "octane"
+  },
+  "ember-addon": {
+    "version": 2,
+    "type": "addon",
+    "main": "addon-main.js",
+    "app-js": {
+      "./components/ella-treadmill-item.js": "./dist/_app_/components/ella-treadmill-item.js",
+      "./components/ella-treadmill.js": "./dist/_app_/components/ella-treadmill.js",
+      "./modifiers/ella-treadmill-item.js": "./dist/_app_/modifiers/ella-treadmill-item.js"
+    }
+  },
+  "engines": {
+    "node": "14.* || >= 16"
+  }
+}
