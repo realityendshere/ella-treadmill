@@ -83,7 +83,7 @@ module('Integration | Component | ella treadmill item', function(hooks) {
 
     await render(hbs`
       <div id="measurement" style="height: 50px; width: 100%; position: absolute; top: 0; left: 0;">&nbsp;</div>
-      <EllaTreadmillItem @height="50" @index={{index}} />
+      <EllaTreadmillItem @height="50" @index={{this.index}} />
     `);
 
     let comparison = document.getElementById('measurement').getBoundingClientRect();
@@ -130,7 +130,7 @@ module('Integration | Component | ella treadmill item', function(hooks) {
     };
 
     await render(hbs`
-      {{#if showTest}}
+      {{#if this.showTest}}
         <EllaTreadmillItem @height="50" @on-destroy={{action "aboutToDestroy"}} />
       {{/if}}
     `);
@@ -154,7 +154,7 @@ module('Integration | Component | ella treadmill item', function(hooks) {
     };
 
     await render(hbs`
-      <EllaTreadmillItem @height={{height}} @isSampleItem={{isSampleItem}} @on-update={{action "updateHandler"}} />
+      <EllaTreadmillItem @height={{this.height}} @isSampleItem={{this.isSampleItem}} @on-update={{action "updateHandler"}} />
     `);
 
     assert.equal(actionTriggered, false);
@@ -180,7 +180,7 @@ module('Integration | Component | ella treadmill item', function(hooks) {
 
     await render(hbs`
       <div id="measurement" style="height: 50px; width: 100%; position: absolute; top: 0; left: 0;">&nbsp;</div>
-      <EllaTreadmillItem @height="50" @index={{index}} @columns={{columns}} @pageSize={{pageSize}} />
+      <EllaTreadmillItem @height="50" @index={{this.index}} @columns={{this.columns}} @pageSize={{this.pageSize}} />
     `);
 
     let comparison = document.getElementById('measurement').getBoundingClientRect();
@@ -211,7 +211,7 @@ module('Integration | Component | ella treadmill item', function(hooks) {
     this.set('index', 0);
 
     await render(hbs`
-      <EllaTreadmillItem @fluctuate={{fluctuate}} @columns={{columns}} @index={{index}} />
+      <EllaTreadmillItem @fluctuate={{this.fluctuate}} @columns={{this.columns}} @index={{this.index}} />
     `);
 
     for (let i = 0; i < 6; ++i) {
@@ -251,7 +251,7 @@ module('Integration | Component | ella treadmill item', function(hooks) {
     this.set('fluctuateColumn', 2);
 
     await render(hbs`
-      <EllaTreadmillItem @columns={{columns}} @index={{index}} @fluctuateColumn={{fluctuateColumn}} />
+      <EllaTreadmillItem @columns={{this.columns}} @index={{this.index}} @fluctuateColumn={{this.fluctuateColumn}} />
     `);
 
     for (let i = 0; i < 6; ++i) {

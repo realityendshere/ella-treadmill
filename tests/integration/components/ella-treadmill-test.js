@@ -3,7 +3,7 @@ import { module, test } from 'qunit';
 
 import { setupRenderingTest } from 'ember-qunit';
 import { render, waitUntil } from '@ember/test-helpers';
-import { run } from '@ember/runloop';
+import { run, later } from '@ember/runloop';
 import { A } from '@ember/array';
 import hbs from 'htmlbars-inline-precompile';
 
@@ -91,7 +91,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
     this.set('model', []);
 
     await render(hbs`
-      {{#ella-treadmill content=model as |item index|}}
+      {{#ella-treadmill content=this.model as |item index|}}
         I am a listing.
       {{else}}
         Nothing to see here.
@@ -109,7 +109,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
 
     this.set('model', model);
 
-    await render(hbs`<EllaTreadmill @content={{model}} />`);
+    await render(hbs`<EllaTreadmill @content={{this.model}} />`);
 
     let element = document.querySelector('ella-treadmill');
 
@@ -134,7 +134,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
     this.set('model', ONE_ITEM_ARRAY);
 
     await render(hbs`
-      <EllaTreadmill @content={{model}} />
+      <EllaTreadmill @content={{this.model}} />
       <div id="measurement" style="width: 100%;">&nbsp;</div>
     `);
 
@@ -163,7 +163,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
     this.set('rowHeight', rowHeight);
 
     await render(hbs`
-      <EllaTreadmill @row={{rowHeight}} @content={{model}} />
+      <EllaTreadmill @row={{this.rowHeight}} @content={{this.model}} />
       <div id="test1" style="height: 24px;">&nbsp;</div>
       <div id="test2" style="height: 100px;">&nbsp;</div>
     `);
@@ -189,10 +189,10 @@ module('Integration | Component | ella treadmill', function(hooks) {
     this.set('expectedHeight', (LARGE_ARRAY.length * 5.35) + 'rem');
 
     await render(hbs`
-      <EllaTreadmill @row="5.35rem" @content={{model}} />
+      <EllaTreadmill @row="5.35rem" @content={{this.model}} />
       <style type="text/css">
         #measurement {
-          height: {{expectedHeight}};
+          height: {{this.expectedHeight}};
         }
       </style>
       <div id="measurement">&nbsp;</div>
@@ -209,7 +209,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
 
     await render(hbs`
       <div style="height: 500px; overflow: auto;">
-        <EllaTreadmill @row="20%" @content={{model}} />
+        <EllaTreadmill @row="20%" @content={{this.model}} />
       </div>
     `);
 
@@ -225,7 +225,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
 
     this.set('model', LARGE_ARRAY);
 
-    await render(hbs`<EllaTreadmill @content={{model}} />`);
+    await render(hbs`<EllaTreadmill @content={{this.model}} />`);
 
     let element = document.querySelector('ella-treadmill');
     let itemCountAttr = parseInt(element.attributes['data-visible-items'].value, 10);
@@ -257,7 +257,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
     this.set('model', LARGE_ARRAY);
     this.set('rowHeight', 30);
 
-    await render(hbs`<EllaTreadmill @row={{rowHeight}} @content={{model}} />`);
+    await render(hbs`<EllaTreadmill @row={{this.rowHeight}} @content={{this.model}} />`);
 
     let element = document.querySelector('ella-treadmill');
     let itemCountAttr = parseInt(element.attributes['data-visible-items'].value, 10);
@@ -283,7 +283,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
     this.set('model', LARGE_ARRAY);
 
     await render(hbs`
-      <EllaTreadmill @row="2.35em" @content={{model}} />
+      <EllaTreadmill @row="2.35em" @content={{this.model}} />
       <div id="measurement" style="height: 2.35em;">&nbsp;</div>
     `);
 
@@ -321,7 +321,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
     this.set('model', LARGE_ARRAY);
 
     await render(hbs`
-      <EllaTreadmill @row="3.1rem" @content={{model}} />
+      <EllaTreadmill @row="3.1rem" @content={{this.model}} />
       <div id="measurement" style="height: 3.1rem;">&nbsp;</div>
     `);
 
@@ -359,7 +359,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
     this.set('model', LARGE_ARRAY);
 
     await render(hbs`
-      <EllaTreadmill @row="20%" @content={{model}} />
+      <EllaTreadmill @row="20%" @content={{this.model}} />
     `);
 
     let element = document.querySelector('ella-treadmill');
@@ -374,7 +374,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
       testElement.style.height = '600px';
     });
 
-    run.later(() => {
+    later(() => {
       stopWait = true;
     }, 100);
 
@@ -393,7 +393,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
   test('it renders fewer list items when content fits in visible space', async function(assert) {
     this.set('model', ONE_ITEM_ARRAY);
 
-    await render(hbs`<EllaTreadmill @content={{model}} />`);
+    await render(hbs`<EllaTreadmill @content={{this.model}} />`);
 
     let element = document.querySelector('ella-treadmill');
     let itemCountAttr = parseInt(element.attributes['data-visible-items'].value, 10);
@@ -438,7 +438,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
       actionTriggered = actionTriggered + 1;
     };
 
-    await render(hbs`<EllaTreadmill @row="100" @content={{model}} @on-resize-start={{action "handleResizeStart"}} />`);
+    await render(hbs`<EllaTreadmill @row="100" @content={{this.model}} @on-resize-start={{action "handleResizeStart"}} />`);
 
     assert.equal(actionTriggered, 0, 'action not yet called');
 
@@ -467,7 +467,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
       actionTriggered = true;
     };
 
-    await render(hbs`<EllaTreadmill @row="100" @content={{model}} @on-resize-end={{action "handleResizeEnd"}} />`);
+    await render(hbs`<EllaTreadmill @row="100" @content={{this.model}} @on-resize-end={{action "handleResizeEnd"}} />`);
 
     assert.equal(actionTriggered, false, 'action not yet called');
 
@@ -491,7 +491,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
 
     this.set('model', LARGE_ARRAY);
 
-    await render(hbs`<EllaTreadmill @row="100px" @content={{model}} @minColumnWidth="100px" />`);
+    await render(hbs`<EllaTreadmill @row="100px" @content={{this.model}} @minColumnWidth="100px" />`);
 
     let element = document.querySelector('ella-treadmill');
 
@@ -500,7 +500,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
       testElement.style.width = '1000px';
     });
 
-    run.later(() => {
+    later(() => {
       stopWait = true;
     }, 100);
 
@@ -521,10 +521,10 @@ module('Integration | Component | ella treadmill', function(hooks) {
     this.set('moveTo', 300);
 
     await render(hbs`
-      <EllaTreadmill @moveTo={{moveTo}} @content={{model}} @row="100px" @minColumnWidth="100px" />
+      <EllaTreadmill @moveTo={{this.moveTo}} @content={{this.model}} @row="100px" @minColumnWidth="100px" />
     `);
 
-    run.later(() => {
+    later(() => {
       stopWait = true;
     }, 100);
 
@@ -549,14 +549,14 @@ module('Integration | Component | ella treadmill', function(hooks) {
     this.set('moveTo', 0);
 
     await render(hbs`
-      <EllaTreadmill @moveTo={{moveTo}} @content={{model}} @row="100px" @minColumnWidth="100px" />
+      <EllaTreadmill @moveTo={{this.moveTo}} @content={{this.model}} @row="100px" @minColumnWidth="100px" />
     `);
 
     run(() => {
       this.set('moveTo', 300);
     });
 
-    run.later(() => {
+    later(() => {
       stopWait = true;
     }, 100);
 
@@ -578,7 +578,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
 
     this.set('model', LARGE_ARRAY);
 
-    await render(hbs`<EllaTreadmill @content={{model}} @row="100" />`);
+    await render(hbs`<EllaTreadmill @content={{this.model}} @row="100" />`);
 
     run(() => {
       testElement.scrollTop = 100;
@@ -615,7 +615,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
 
     await render(hbs`
       <div style="overflow: auto; height: 500px;" id="scroller">
-        <EllaTreadmill @content={{model}} @row="100" @on-scroll-start={{action "handleScrollStart"}} />
+        <EllaTreadmill @content={{this.model}} @row="100" @on-scroll-start={{action "handleScrollStart"}} />
       </div>
     `);
 
@@ -650,7 +650,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
 
     await render(hbs`
       <div style="overflow: auto; height: 500px;" id="scroller">
-        <EllaTreadmill @content={{model}} @row="100" @on-scroll-end={{action "handleScrollEnd"}} />
+        <EllaTreadmill @content={{this.model}} @row="100" @on-scroll-end={{action "handleScrollEnd"}} />
       </div>
     `);
 
@@ -692,7 +692,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
 
     await render(hbs`
       <div id="bumper" style="height: 300px;">&nbsp;</div>
-      <EllaTreadmill @content={{model}} @row="100" @on-scroll={{action "handleListingStateChanged"}} />
+      <EllaTreadmill @content={{this.model}} @row="100" @on-scroll={{action "handleListingStateChanged"}} />
     `);
 
     assert.equal(actionTriggered, false, 'action not yet called');
@@ -732,7 +732,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
     };
 
     await render(hbs`
-      <EllaTreadmill @content={{model}} @row="100" @on-resize={{action "handleListingStateChanged"}} />
+      <EllaTreadmill @content={{this.model}} @row="100" @on-resize={{action "handleListingStateChanged"}} />
     `);
 
     assert.equal(actionTriggered, false, 'action not yet called');
@@ -766,7 +766,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
 
     await render(hbs`
       <div style="overflow: auto; height: 500px;" id="scroller">
-        <EllaTreadmill @content={{model}} @row="100" />
+        <EllaTreadmill @content={{this.model}} @row="100" />
       </div>
     `);
 
@@ -774,7 +774,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
       document.getElementById('scroller').scrollTop = 100;
     });
 
-    run.later(() => {
+    later(() => {
       stopWait = true;
     }, 100);
 
@@ -793,7 +793,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
 
     await render(hbs`
       <div style="overflow: auto; height: 500px;" id="scroller">
-        <EllaTreadmill @content={{model}} @row="100" />
+        <EllaTreadmill @content={{this.model}} @row="100" />
       </div>
       <div id="measurement" style="height: 100px;">&nbsp;</div>
     `);
@@ -808,7 +808,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
       document.getElementById('scroller').scrollTop = 100;
     });
 
-    run.later(() => {
+    later(() => {
       stopWait = true;
     }, 100);
 
@@ -828,7 +828,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
     await render(hbs`
       <div style="overflow: auto; height: 500px;" id="scroller">
         <div id="bumper" style="height: 300px;">&nbsp;</div>
-        <EllaTreadmill @content={{model}} @row="100" />
+        <EllaTreadmill @content={{this.model}} @row="100" />
       </div>
       <div id="measurement" style="height: 100px;">&nbsp;</div>
     `);
@@ -844,7 +844,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
       document.getElementById('scroller').scrollTop = 1000;
     });
 
-    run.later(() => {
+    later(() => {
       stopWait = true;
     }, 100);
 
@@ -863,7 +863,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
 
     await render(hbs`
       <div style="overflow: auto; height: 500px;" id="scroller">
-        <EllaTreadmill @content={{model}} @row="100" />
+        <EllaTreadmill @content={{this.model}} @row="100" />
       </div>
     `);
 
@@ -871,7 +871,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
       document.getElementById('scroller').scrollTop = 30010;
     });
 
-    run.later(() => {
+    later(() => {
       stopWait = true;
     }, 100);
 
@@ -893,7 +893,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
     await render(hbs`
       <div style="overflow: auto; height: 500px;" id="scroller">
         <div id="bumper" style="height: 300px;">&nbsp;</div>
-        <EllaTreadmill @content={{model}} @row="100" />
+        <EllaTreadmill @content={{this.model}} @row="100" />
       </div>
     `);
 
@@ -901,7 +901,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
       document.getElementById('scroller').scrollTop = 30010;
     });
 
-    run.later(() => {
+    later(() => {
       stopWait = true;
     }, 100);
 
@@ -923,7 +923,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
     this.set('model', LARGE_ARRAY);
 
     await render(hbs`
-      <EllaTreadmill @content={{model}} @row="100" />
+      <EllaTreadmill @content={{this.model}} @row="100" />
     `);
 
     document.querySelectorAll('ella-treadmill > ella-treadmill-item').forEach((node, index) => {
@@ -941,7 +941,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
     this.set('model', LARGE_ARRAY);
 
     await render(hbs`
-      <EllaTreadmill @content={{model}} @row="100" as |item index|>
+      <EllaTreadmill @content={{this.model}} @row="100" as |item index|>
         [{{{index}}}]: I am item #{{item}}
       </EllaTreadmill>
     `);
@@ -959,7 +959,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
     await render(hbs`
       <div style="overflow: auto; height: 500px;" id="scroller">
         <div id="bumper" style="height: 300px;">&nbsp;</div>
-        <EllaTreadmill @content={{model}} @row="100" />
+        <EllaTreadmill @content={{this.model}} @row="100" />
       </div>
     `);
 
@@ -975,7 +975,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
 
     await render(hbs`
       <div style="overflow: auto; height: 500px;" id="scroller">
-        <EllaTreadmill @content={{model}} @row="100" />
+        <EllaTreadmill @content={{this.model}} @row="100" />
       </div>
     `);
 
@@ -985,7 +985,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
 
     let stopWait = false;
 
-    run.later(() => {
+    later(() => {
       stopWait = true;
     }, 100);
 
@@ -1006,7 +1006,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
     await render(hbs`
       <div style="overflow: auto; height: 500px;" id="scroller">
         <div id="bumper" style="height: 300px;">&nbsp;</div>
-        <EllaTreadmill @content={{model}} @row="100" />
+        <EllaTreadmill @content={{this.model}} @row="100" />
       </div>
     `);
 
@@ -1016,7 +1016,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
 
     let stopWait = false;
 
-    run.later(() => {
+    later(() => {
       stopWait = true;
     }, 100);
 
@@ -1041,7 +1041,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
     await render(hbs`
       <div style="overflow: auto; height: 768px;" id="scroller">
         <div id="bumper" style="height: 300px;">&nbsp;</div>
-        <EllaTreadmill @content={{model}} @row={{rowHeight}} />
+        <EllaTreadmill @content={{this.model}} @row={{this.rowHeight}} />
       </div>
     `);
 
@@ -1051,7 +1051,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
 
     let stopWait = false;
 
-    run.later(() => {
+    later(() => {
       stopWait = true;
     }, 100);
 
@@ -1077,7 +1077,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
 
     await render(hbs`
       <div style="overflow: auto; height: 600px;" id="scroller">
-        <EllaTreadmill @content={{model}} @row="30" @overdraw={{overdraw}} />
+        <EllaTreadmill @content={{this.model}} @row="30" @overdraw={{this.overdraw}} />
       </div>
     `);
 
@@ -1111,7 +1111,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
 
     let stopWait = false;
 
-    run.later(() => {
+    later(() => {
       stopWait = true;
     }, 100);
 
@@ -1134,7 +1134,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
     this.set('model', LARGE_ARRAY);
 
     await render(hbs`
-      <EllaTreadmill @content={{model}} @row="60" @minColumnWidth="33%" />
+      <EllaTreadmill @content={{this.model}} @row="60" @minColumnWidth="33%" />
 
       <div id="test0" style="height: 60px; width: 200px; position: absolute; top: 0; left: 0;">&nbsp;</div>
       <div id="test1" style="height: 60px; width: 200px; position: absolute; top: 0; left: 200px;">&nbsp;</div>
@@ -1175,7 +1175,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
 
     let stopWait = false;
 
-    run.later(() => {
+    later(() => {
       stopWait = true;
     }, 100);
 
@@ -1203,7 +1203,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
     this.set('model', LARGE_ARRAY);
 
     await render(hbs`
-      <EllaTreadmill @content={{model}} @row="60" @minColumnWidth="180px" />
+      <EllaTreadmill @content={{this.model}} @row="60" @minColumnWidth="180px" />
 
       <div id="test0" style="height: 60px; width: 200px; position: absolute; top: 0; left: 0;">&nbsp;</div>
       <div id="test1" style="height: 60px; width: 200px; position: absolute; top: 0; left: 200px;">&nbsp;</div>
@@ -1239,7 +1239,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
 
     let stopWait = false;
 
-    run.later(() => {
+    later(() => {
       stopWait = true;
     }, 100);
 
@@ -1271,7 +1271,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
     await render(hbs`
       <div id="bumper" style="height: 372px;">&nbsp;</div>
 
-      <EllaTreadmill @content={{model}} @row="150" @minColumnWidth="300px" />
+      <EllaTreadmill @content={{this.model}} @row="150" @minColumnWidth="300px" />
 
       <div id="test0" style="height: 150px; width: 300px; position: absolute; top: 35022px; left: 0;">&nbsp;</div>
       <div id="test1" style="height: 150px; width: 300px; position: absolute; top: 35022px; left: 300px;">&nbsp;</div>
@@ -1291,7 +1291,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
 
     let stopWait = false;
 
-    run.later(() => {
+    later(() => {
       stopWait = true;
     }, 100);
 
@@ -1334,7 +1334,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
     this.set('minColumnWidth', '100%');
 
     await render(hbs`
-      <EllaTreadmill @content={{model}} @fluctuate={{fluctuate}} @minColumnWidth={{minColumnWidth}} />
+      <EllaTreadmill @content={{this.model}} @fluctuate={{this.fluctuate}} @minColumnWidth={{this.minColumnWidth}} />
     `);
 
     document.querySelectorAll('ella-treadmill > ella-treadmill-item').forEach((node, index) => {
@@ -1368,7 +1368,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
     this.set('minColumnWidth', '33%');
 
     await render(hbs`
-      <EllaTreadmill @content={{model}} @fluctuateColumn={{fluctuateColumn}} @minColumnWidth={{minColumnWidth}} />
+      <EllaTreadmill @content={{this.model}} @fluctuateColumn={{this.fluctuateColumn}} @minColumnWidth={{this.minColumnWidth}} />
     `);
 
     document.querySelectorAll('ella-treadmill > ella-treadmill-item').forEach((node, index) => {
