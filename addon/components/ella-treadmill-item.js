@@ -244,7 +244,7 @@ export default Component.extend({
    */
   isSampleItem: computed('parent.sampleItem', '_isSampleItem', {
     get() {
-      return get(this, '_isSampleItem') || (get(this, 'parent.sampleItem') === this);
+      return this._isSampleItem || (get(this, 'parent.sampleItem') === this);
     },
 
     set(key, value) {
@@ -284,7 +284,7 @@ export default Component.extend({
    * @readOnly
    */
   width: computed('columns', function() {
-    let columns = parseInt(get(this, 'columns'), 10) || 1;
+    let columns = parseInt(this.columns, 10) || 1;
 
     return 100 / columns;
   }),
@@ -304,7 +304,7 @@ export default Component.extend({
   }).readOnly(),
 
   didInsertElement() {
-    let fn = get(this, 'on-insert');
+    let fn = this['on-insert'];
 
     if (typeof fn === 'function') {
       fn(this);
@@ -312,12 +312,12 @@ export default Component.extend({
   },
 
   didRender() {
-    if (!get(this, 'isSampleItem')) {
+    if (!this.isSampleItem) {
       return;
     }
 
-    let element = get(this, 'element');
-    let fn = get(this, 'on-update');
+    let element = this.element;
+    let fn = this['on-update'];
 
     if (element && typeof element.getBoundingClientRect === 'function' && typeof fn === 'function') {
       fn(element.getBoundingClientRect());
@@ -325,7 +325,7 @@ export default Component.extend({
   },
 
   willDestroyElement() {
-    let fn = get(this, 'on-destroy');
+    let fn = this['on-destroy'];
 
     if (typeof fn === 'function') {
       fn(this);

@@ -91,7 +91,7 @@ module('Integration | Component | ella treadmill item', function(hooks) {
 
     assert.equal(
       Math.round(geometry.top),
-      Math.round(comparison.top + (this.get('index') * comparison.height))
+      Math.round(comparison.top + (this.index * comparison.height))
     );
 
     this.set('index', 17);
@@ -101,7 +101,7 @@ module('Integration | Component | ella treadmill item', function(hooks) {
 
     assert.equal(
       Math.round(geometry.top),
-      Math.round(comparison.top + (this.get('index') * comparison.height))
+      Math.round(comparison.top + (this.index * comparison.height))
     );
   });
 

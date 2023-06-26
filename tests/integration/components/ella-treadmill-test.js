@@ -116,7 +116,7 @@ module('Integration | Component | ella treadmill', function(hooks) {
     assert.equal(element.clientHeight, DEFAULT_HEIGHT, 'height multiplies by 1');
 
     run(() => {
-      this.get('model').pushObject('b');
+      this.model.pushObject('b');
     });
 
     assert.equal(element.clientHeight, DEFAULT_HEIGHT * 2, 'height multiplies by 2');
