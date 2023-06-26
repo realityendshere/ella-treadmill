@@ -36,7 +36,7 @@
     @on-destroy={{action "listItemDestroyed"}}
     as |item index|
   >
-    {{#if hasBlock}}
+    {{#if (has-block)}}
       {{yield item index}}
     {{else}}
       {{get this.visibleContent (concat "" idx)}}
