@@ -36,6 +36,6 @@ export default Controller.extend({
     handleResizeEnd() {
       set(this, 'moveTo', this.__indexAtStart__);
       console.log('RESIZE END ::', Date.now());
-    }
-  }
+    },
+  },
 });

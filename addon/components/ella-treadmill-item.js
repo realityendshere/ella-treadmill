@@ -35,9 +35,7 @@ export default Component.extend({
    * ]
    * @public
    */
-  attributeBindings: [
-    'aria-hidden'
-  ],
+  attributeBindings: ['aria-hidden'],
 
   /**
    * An array of additional CSS class names to add to the component's element.
@@ -197,12 +195,13 @@ export default Component.extend({
    * @public
    * @readOnly
    */
-  classRow: computed('fluctuate', 'index', 'columns', function() {
-    let {
-      fluctuate,
-      index,
-      columns
-    } = getProperties(this, 'fluctuate', 'index', 'columns');
+  classRow: computed('fluctuate', 'index', 'columns', function () {
+    let { fluctuate, index, columns } = getProperties(
+      this,
+      'fluctuate',
+      'index',
+      'columns'
+    );
 
     let row = Math.floor((index % (fluctuate * columns)) / columns) + 1;
 
@@ -220,12 +219,13 @@ export default Component.extend({
    * @public
    * @readOnly
    */
-  classColumn: computed('index', 'columns', 'fluctuateColumn', function() {
-    let {
-      index,
-      columns,
-      fluctuateColumn
-    } = getProperties(this, 'index', 'columns', 'fluctuateColumn');
+  classColumn: computed('index', 'columns', 'fluctuateColumn', function () {
+    let { index, columns, fluctuateColumn } = getProperties(
+      this,
+      'index',
+      'columns',
+      'fluctuateColumn'
+    );
 
     let col = ((index % columns) % fluctuateColumn) + 1;
 
@@ -244,12 +244,12 @@ export default Component.extend({
    */
   isSampleItem: computed('parent.sampleItem', '_isSampleItem', {
     get() {
-      return this._isSampleItem || (get(this, 'parent.sampleItem') === this);
+      return this._isSampleItem || get(this, 'parent.sampleItem') === this;
     },
 
     set(key, value) {
       return this.set('_isSampleItem', value);
-    }
+    },
   }),
 
   /**
@@ -260,19 +260,29 @@ export default Component.extend({
    * @public
    * @readOnly
    */
-  translateY: computed('height', 'index', 'pageSize', 'columns', 'heightUnit', function() {
-    let {
-      index,
-      height,
-      pageSize,
-      columns,
-      heightUnit
-    } = getProperties(this, 'height', 'index', 'pageSize', 'columns', 'heightUnit');
+  translateY: computed(
+    'height',
+    'index',
+    'pageSize',
+    'columns',
+    'heightUnit',
+    function () {
+      let { index, height, pageSize, columns, heightUnit } = getProperties(
+        this,
+        'height',
+        'index',
+        'pageSize',
+        'columns',
+        'heightUnit'
+      );
 
-    let pageRows = Math.ceil(pageSize / columns);
+      let pageRows = Math.ceil(pageSize / columns);
 
-    return ((Math.floor(index / pageSize) * pageRows * height) || 0) + heightUnit;
-  }).readOnly(),
+      return (
+        (Math.floor(index / pageSize) * pageRows * height || 0) + heightUnit
+      );
+    }
+  ).readOnly(),
 
   /**
    * The computed `width` style as a percentage.
@@ -283,7 +293,7 @@ export default Component.extend({
    * @public
    * @readOnly
    */
-  width: computed('columns', function() {
+  width: computed('columns', function () {
     let columns = parseInt(this.columns, 10) || 1;
 
     return 100 / columns;
@@ -299,11 +309,12 @@ export default Component.extend({
    * @readOnly
    * @final
    */
-  widthUnit: computed(function() {
+  widthUnit: computed(function () {
     return '%';
   }).readOnly(),
 
   didInsertElement() {
+    this._super(...arguments);
     let fn = this['on-insert'];
 
     if (typeof fn === 'function') {
@@ -312,6 +323,7 @@ export default Component.extend({
   },
 
   didRender() {
+    this._super(...arguments);
     if (!this.isSampleItem) {
       return;
     }
@@ -319,16 +331,21 @@ export default Component.extend({
     let element = this.element;
     let fn = this['on-update'];
 
-    if (element && typeof element.getBoundingClientRect === 'function' && typeof fn === 'function') {
+    if (
+      element &&
+      typeof element.getBoundingClientRect === 'function' &&
+      typeof fn === 'function'
+    ) {
       fn(element.getBoundingClientRect());
     }
   },
 
   willDestroyElement() {
+    this._super(...arguments);
     let fn = this['on-destroy'];
 
     if (typeof fn === 'function') {
       fn(this);
     }
-  }
+  },
 });
