@@ -17,14 +17,14 @@ module('Integration | Component | ella treadmill', function (hooks) {
   });
 
   hooks.beforeEach(function () {
-    let testElement = document.getElementById('ember-testing');
+    const testElement = document.getElementById('ember-testing');
 
     testElement.style.overflow = 'auto';
   });
 
   const DEFAULT_HEIGHT = 50;
 
-  let range = function (start, end) {
+  const range = function (start, end) {
     return Array(end - start + 1)
       .fill()
       .map((_, idx) => start + idx);
@@ -65,7 +65,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
 
     await render(hbs`<EllaTreadmill />`);
 
-    let element = document.querySelector('ella-treadmill');
+    const element = document.querySelector('ella-treadmill');
 
     assert.strictEqual(element.attributes.role.value, 'list');
   });
@@ -75,7 +75,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
 
     await render(hbs`<EllaTreadmill />`);
 
-    let element = document.querySelector('ella-treadmill');
+    const element = document.querySelector('ella-treadmill');
 
     assert.strictEqual(element.attributes['data-visible-items'].value, '0');
   });
@@ -85,7 +85,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
 
     await render(hbs`<EllaTreadmill />`);
 
-    let element = document.querySelector('ella-treadmill');
+    const element = document.querySelector('ella-treadmill');
 
     assert.strictEqual(
       element.attributes['data-first-visible-index'].value,
@@ -98,7 +98,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
 
     await render(hbs`<EllaTreadmill />`);
 
-    let element = document.querySelector('ella-treadmill');
+    const element = document.querySelector('ella-treadmill');
 
     assert.ok(element.attributes['data-scroll-delta'].value);
   });
@@ -108,7 +108,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
 
     await render(hbs`<EllaTreadmill />`);
 
-    let element = document.querySelector('ella-treadmill');
+    const element = document.querySelector('ella-treadmill');
 
     assert.strictEqual(element.attributes['data-scroll-top'].value, '0');
   });
@@ -118,7 +118,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
 
     await render(hbs`<EllaTreadmill />`);
 
-    let element = document.querySelector('ella-treadmill');
+    const element = document.querySelector('ella-treadmill');
 
     assert.strictEqual(element.clientHeight, 0);
   });
@@ -136,7 +136,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
       {{/ella-treadmill}}
     `);
 
-    let element = document.querySelector('ella-treadmill');
+    const element = document.querySelector('ella-treadmill');
 
     assert.strictEqual(
       element.querySelectorAll('ella-treadmill-item').length,
@@ -148,13 +148,13 @@ module('Integration | Component | ella treadmill', function (hooks) {
   test('it renders with a default row height', async function (assert) {
     assert.expect(3);
 
-    let model = A(range(1, 1));
+    const model = A(range(1, 1));
 
     this.set('model', model);
 
     await render(hbs`<EllaTreadmill @content={{this.model}} />`);
 
-    let element = document.querySelector('ella-treadmill');
+    const element = document.querySelector('ella-treadmill');
 
     assert.strictEqual(
       element.clientHeight,
@@ -182,6 +182,8 @@ module('Integration | Component | ella treadmill', function (hooks) {
   });
 
   test('it renders with a default width of 100%', async function (assert) {
+    assert.expect(2);
+
     this.set('model', ONE_ITEM_ARRAY);
 
     await render(hbs`
@@ -189,8 +191,8 @@ module('Integration | Component | ella treadmill', function (hooks) {
       <div id="measurement" style="width: 100%;">&nbsp;</div>
     `);
 
-    let element = document.querySelector('ella-treadmill');
-    let expected = document.getElementById('measurement');
+    const element = document.querySelector('ella-treadmill');
+    const expected = document.getElementById('measurement');
 
     assert.strictEqual(
       element.clientWidth,
@@ -208,6 +210,8 @@ module('Integration | Component | ella treadmill', function (hooks) {
   });
 
   test('it renders with a custom row height (in px)', async function (assert) {
+    assert.expect(3);
+
     let rowHeight = 24;
 
     this.set('model', ONE_ITEM_ARRAY);
@@ -219,7 +223,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
       <div id="test2" style="height: 100px;">&nbsp;</div>
     `);
 
-    let element = document.querySelector('ella-treadmill');
+    const element = document.querySelector('ella-treadmill');
     let expected = document.getElementById('test1');
 
     assert.strictEqual(element.clientHeight, expected.clientHeight);
@@ -242,6 +246,8 @@ module('Integration | Component | ella treadmill', function (hooks) {
   });
 
   test('it renders with a custom row height unit (rem)', async function (assert) {
+    assert.expect(1);
+
     this.set('model', LARGE_ARRAY);
     this.set('expectedHeight', LARGE_ARRAY.length * 5.35 + 'rem');
 
@@ -255,13 +261,15 @@ module('Integration | Component | ella treadmill', function (hooks) {
       <div id="measurement">&nbsp;</div>
     `);
 
-    let element = document.querySelector('ella-treadmill');
-    let expected = document.getElementById('measurement');
+    const element = document.querySelector('ella-treadmill');
+    const expected = document.getElementById('measurement');
 
     assert.strictEqual(element.clientHeight, expected.clientHeight);
   });
 
   test('it renders with a custom row height unit (%)', async function (assert) {
+    assert.expect(1);
+
     this.set('model', LARGE_ARRAY);
 
     await render(hbs`
@@ -270,13 +278,15 @@ module('Integration | Component | ella treadmill', function (hooks) {
       </div>
     `);
 
-    let element = document.querySelector('ella-treadmill');
+    const element = document.querySelector('ella-treadmill');
 
     assert.strictEqual(element.clientHeight, 100 * LARGE_ARRAY.length);
   });
 
   test('it renders enough list items to fill the available vertical space (default px)', async function (assert) {
-    let testElement = document.getElementById('ember-testing');
+    assert.expect(4);
+
+    const testElement = document.getElementById('ember-testing');
 
     testElement.style.height = 10 * DEFAULT_HEIGHT + 'px';
 
@@ -284,12 +294,12 @@ module('Integration | Component | ella treadmill', function (hooks) {
 
     await render(hbs`<EllaTreadmill @content={{this.model}} />`);
 
-    let element = document.querySelector('ella-treadmill');
-    let itemCountAttr = parseInt(
+    const element = document.querySelector('ella-treadmill');
+    const itemCountAttr = parseInt(
       element.attributes['data-visible-items'].value,
       10
     );
-    let itemCount = document.querySelectorAll(
+    const itemCount = document.querySelectorAll(
       'ella-treadmill > ella-treadmill-item'
     ).length;
 
@@ -314,8 +324,8 @@ module('Integration | Component | ella treadmill', function (hooks) {
           .length !== itemCount
       );
     }).then(() => {
-      let itemCountAttr = element.attributes['data-visible-items'].value;
-      let itemCount = document.querySelectorAll(
+      const itemCountAttr = element.attributes['data-visible-items'].value;
+      const itemCount = document.querySelectorAll(
         'ella-treadmill > ella-treadmill-item'
       ).length;
 
@@ -333,7 +343,9 @@ module('Integration | Component | ella treadmill', function (hooks) {
   });
 
   test('it renders enough list items to fill the available vertical space (dynamic px)', async function (assert) {
-    let testElement = document.getElementById('ember-testing');
+    assert.expect(4);
+
+    const testElement = document.getElementById('ember-testing');
 
     testElement.style.height = '600px';
 
@@ -344,7 +356,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
       hbs`<EllaTreadmill @row={{this.rowHeight}} @content={{this.model}} />`
     );
 
-    let element = document.querySelector('ella-treadmill');
+    const element = document.querySelector('ella-treadmill');
     let itemCountAttr = parseInt(
       element.attributes['data-visible-items'].value,
       10
@@ -379,7 +391,9 @@ module('Integration | Component | ella treadmill', function (hooks) {
   });
 
   test('it renders enough list items to fill the available vertical space (em)', async function (assert) {
-    let testElement = document.getElementById('ember-testing');
+    assert.expect(6);
+
+    const testElement = document.getElementById('ember-testing');
 
     testElement.style.height = '500px';
 
@@ -390,13 +404,13 @@ module('Integration | Component | ella treadmill', function (hooks) {
       <div id="measurement" style="height: 2.35em;">&nbsp;</div>
     `);
 
-    let element = document.querySelector('ella-treadmill');
-    let expected = document.getElementById('measurement');
-    let itemCountAttr = parseInt(
+    const element = document.querySelector('ella-treadmill');
+    const expected = document.getElementById('measurement');
+    const itemCountAttr = parseInt(
       element.attributes['data-visible-items'].value,
       10
     );
-    let itemCount = document.querySelectorAll(
+    const itemCount = document.querySelectorAll(
       'ella-treadmill > ella-treadmill-item'
     ).length;
 
@@ -414,12 +428,12 @@ module('Integration | Component | ella treadmill', function (hooks) {
           .length !== itemCount
       );
     }).then(() => {
-      let element = document.querySelector('ella-treadmill');
-      let itemCountAttr = parseInt(
+      const element = document.querySelector('ella-treadmill');
+      const itemCountAttr = parseInt(
         element.attributes['data-visible-items'].value,
         10
       );
-      let itemCount = document.querySelectorAll(
+      const itemCount = document.querySelectorAll(
         'ella-treadmill > ella-treadmill-item'
       ).length;
 
@@ -430,7 +444,9 @@ module('Integration | Component | ella treadmill', function (hooks) {
   });
 
   test('it renders enough list items to fill the available vertical space (rem)', async function (assert) {
-    let testElement = document.getElementById('ember-testing');
+    assert.expect(6);
+
+    const testElement = document.getElementById('ember-testing');
 
     testElement.style.height = '500px';
 
@@ -441,13 +457,13 @@ module('Integration | Component | ella treadmill', function (hooks) {
       <div id="measurement" style="height: 3.1rem;">&nbsp;</div>
     `);
 
-    let element = document.querySelector('ella-treadmill');
-    let expected = document.getElementById('measurement');
-    let itemCountAttr = parseInt(
+    const element = document.querySelector('ella-treadmill');
+    const expected = document.getElementById('measurement');
+    const itemCountAttr = parseInt(
       element.attributes['data-visible-items'].value,
       10
     );
-    let itemCount = document.querySelectorAll(
+    const itemCount = document.querySelectorAll(
       'ella-treadmill > ella-treadmill-item'
     ).length;
 
@@ -465,12 +481,12 @@ module('Integration | Component | ella treadmill', function (hooks) {
           .length !== itemCount
       );
     }).then(() => {
-      let element = document.querySelector('ella-treadmill');
-      let itemCountAttr = parseInt(
+      const element = document.querySelector('ella-treadmill');
+      const itemCountAttr = parseInt(
         element.attributes['data-visible-items'].value,
         10
       );
-      let itemCount = document.querySelectorAll(
+      const itemCount = document.querySelectorAll(
         'ella-treadmill > ella-treadmill-item'
       ).length;
 
@@ -481,7 +497,9 @@ module('Integration | Component | ella treadmill', function (hooks) {
   });
 
   test('it renders enough list items to fill the available vertical space (%)', async function (assert) {
-    let testElement = document.getElementById('ember-testing');
+    assert.expect(4);
+
+    const testElement = document.getElementById('ember-testing');
 
     testElement.style.height = '500px';
 
@@ -491,12 +509,12 @@ module('Integration | Component | ella treadmill', function (hooks) {
       <EllaTreadmill @row="20%" @content={{this.model}} />
     `);
 
-    let element = document.querySelector('ella-treadmill');
-    let itemCountAttr = parseInt(
+    const element = document.querySelector('ella-treadmill');
+    const itemCountAttr = parseInt(
       element.attributes['data-visible-items'].value,
       10
     );
-    let itemCount = document.querySelectorAll(
+    const itemCount = document.querySelectorAll(
       'ella-treadmill > ella-treadmill-item'
     ).length;
     let stopWait = false;
@@ -515,12 +533,12 @@ module('Integration | Component | ella treadmill', function (hooks) {
     return waitUntil(() => {
       return stopWait;
     }).then(() => {
-      let element = document.querySelector('ella-treadmill');
-      let itemCountAttr = parseInt(
+      const element = document.querySelector('ella-treadmill');
+      const itemCountAttr = parseInt(
         element.attributes['data-visible-items'].value,
         10
       );
-      let itemCount = document.querySelectorAll(
+      const itemCount = document.querySelectorAll(
         'ella-treadmill > ella-treadmill-item'
       ).length;
 
@@ -530,16 +548,18 @@ module('Integration | Component | ella treadmill', function (hooks) {
   });
 
   test('it renders fewer list items when content fits in visible space', async function (assert) {
+    assert.expect(2);
+
     this.set('model', ONE_ITEM_ARRAY);
 
     await render(hbs`<EllaTreadmill @content={{this.model}} />`);
 
-    let element = document.querySelector('ella-treadmill');
-    let itemCountAttr = parseInt(
+    const element = document.querySelector('ella-treadmill');
+    const itemCountAttr = parseInt(
       element.attributes['data-visible-items'].value,
       10
     );
-    let itemCount = document.querySelectorAll(
+    const itemCount = document.querySelectorAll(
       'ella-treadmill > ella-treadmill-item'
     ).length;
 
@@ -552,7 +572,9 @@ module('Integration | Component | ella treadmill', function (hooks) {
   });
 
   test('it adds an "is-resizing" class while resizing', async function (assert) {
-    let testElement = document.getElementById('ember-testing');
+    assert.expect(2);
+
+    const testElement = document.getElementById('ember-testing');
 
     await render(hbs`<EllaTreadmill />`);
 
@@ -581,7 +603,9 @@ module('Integration | Component | ella treadmill', function (hooks) {
   });
 
   test('it triggers an "on-resize-start" action', async function (assert) {
-    let testElement = document.getElementById('ember-testing');
+    assert.expect(2);
+
+    const testElement = document.getElementById('ember-testing');
     let actionTriggered = 0;
 
     testElement.style.height = '500px';
@@ -612,7 +636,9 @@ module('Integration | Component | ella treadmill', function (hooks) {
   });
 
   test('it triggers an "on-resize-end" action', async function (assert) {
-    let testElement = document.getElementById('ember-testing');
+    assert.expect(2);
+
+    const testElement = document.getElementById('ember-testing');
     let actionTriggered = false;
 
     testElement.style.height = '500px';
@@ -642,7 +668,9 @@ module('Integration | Component | ella treadmill', function (hooks) {
   });
 
   test('its "data-first-visible-index" updates when columns', async function (assert) {
-    let testElement = document.getElementById('ember-testing');
+    assert.expect(1);
+
+    const testElement = document.getElementById('ember-testing');
     let stopWait = false;
 
     testElement.style.height = '500px';
@@ -653,7 +681,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
       hbs`<EllaTreadmill @row="100px" @content={{this.model}} @minColumnWidth="100px" />`
     );
 
-    let element = document.querySelector('ella-treadmill');
+    const element = document.querySelector('ella-treadmill');
 
     run(() => {
       testElement.scrollTop = 3030;
@@ -675,7 +703,9 @@ module('Integration | Component | ella treadmill', function (hooks) {
   });
 
   test('"moveTo=" scrolls that index into view', async function (assert) {
-    let testElement = document.getElementById('ember-testing');
+    assert.expect(2);
+
+    const testElement = document.getElementById('ember-testing');
     let stopWait = false;
 
     testElement.style.height = '500px';
@@ -694,22 +724,22 @@ module('Integration | Component | ella treadmill', function (hooks) {
     return waitUntil(() => {
       return stopWait;
     }).then(() => {
-      let element = document.querySelector('ella-treadmill');
-      let result = parseInt(
+      const element = document.querySelector('ella-treadmill');
+      const result = parseInt(
         element.attributes['data-first-visible-index'].value,
         10
       );
 
       // Firefox behaves slightly differently
-      assert.ok(
-        result > 285 && result < 305,
-        'Firefox behaves slightly differently'
-      );
+      assert.ok(result > 285, 'Firefox behaves slightly differently');
+      assert.ok(result < 305, 'Firefox behaves slightly differently');
     });
   });
 
   test('setting "moveTo" scrolls that index into view', async function (assert) {
-    let testElement = document.getElementById('ember-testing');
+    assert.expect(2);
+
+    const testElement = document.getElementById('ember-testing');
     let stopWait = false;
 
     testElement.style.height = '500px';
@@ -732,22 +762,22 @@ module('Integration | Component | ella treadmill', function (hooks) {
     return waitUntil(() => {
       return stopWait;
     }).then(() => {
-      let element = document.querySelector('ella-treadmill');
-      let result = parseInt(
+      const element = document.querySelector('ella-treadmill');
+      const result = parseInt(
         element.attributes['data-first-visible-index'].value,
         10
       );
 
       // Firefox behaves slightly differently
-      assert.ok(
-        result > 285 && result < 305,
-        'Firefox behaves slightly differently'
-      );
+      assert.ok(result > 285, 'Firefox behaves slightly differently');
+      assert.ok(result < 305, 'Firefox behaves slightly differently');
     });
   });
 
   test('it adds an "is-scrolling" class while scrolling', async function (assert) {
-    let testElement = document.getElementById('ember-testing');
+    assert.expect(2);
+
+    const testElement = document.getElementById('ember-testing');
 
     testElement.style.height = '500px';
 
@@ -784,7 +814,9 @@ module('Integration | Component | ella treadmill', function (hooks) {
   });
 
   test('it triggers an "on-scroll-start" action', async function (assert) {
-    let testElement = document.getElementById('ember-testing');
+    assert.expect(2);
+
+    const testElement = document.getElementById('ember-testing');
     let actionTriggered = 0;
 
     testElement.style.height = '500px';
@@ -819,7 +851,9 @@ module('Integration | Component | ella treadmill', function (hooks) {
   });
 
   test('it triggers an "on-scroll-end" action', async function (assert) {
-    let testElement = document.getElementById('ember-testing');
+    assert.expect(5);
+
+    const testElement = document.getElementById('ember-testing');
     let actionTriggered = false;
 
     testElement.style.height = '500px';
@@ -868,7 +902,9 @@ module('Integration | Component | ella treadmill', function (hooks) {
   });
 
   test('it triggers "on-scroll" action', async function (assert) {
-    let testElement = document.getElementById('ember-testing');
+    assert.expect(5);
+
+    const testElement = document.getElementById('ember-testing');
     let actionTriggered = false;
 
     testElement.style.height = '600px';
@@ -917,7 +953,9 @@ module('Integration | Component | ella treadmill', function (hooks) {
   });
 
   test('it triggers "on-resize" action', async function (assert) {
-    let testElement = document.getElementById('ember-testing');
+    assert.expect(5);
+
+    const testElement = document.getElementById('ember-testing');
     let actionTriggered = false;
 
     testElement.style.height = '600px';
@@ -964,6 +1002,8 @@ module('Integration | Component | ella treadmill', function (hooks) {
   });
 
   test('it updates the data-scroll-top attribute', async function (assert) {
+    assert.expect(1);
+
     let stopWait = false;
 
     this.set('model', LARGE_ARRAY);
@@ -985,14 +1025,16 @@ module('Integration | Component | ella treadmill', function (hooks) {
     return waitUntil(() => {
       return stopWait;
     }).then(() => {
-      let element = document.querySelector('ella-treadmill');
-      let attr = element.attributes['data-scroll-top'].value;
+      const element = document.querySelector('ella-treadmill');
+      const attr = element.attributes['data-scroll-top'].value;
 
       assert.strictEqual(attr, '100');
     });
   });
 
   test('it updates the data-scroll-delta attribute', async function (assert) {
+    assert.expect(2);
+
     this.set('model', LARGE_ARRAY);
 
     await render(hbs`
@@ -1002,7 +1044,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
       <div id="measurement" style="height: 100px;">&nbsp;</div>
     `);
 
-    let element = document.querySelector('ella-treadmill');
+    const element = document.querySelector('ella-treadmill');
     let attr = element.attributes['data-scroll-delta'].value;
     let stopWait = false;
 
@@ -1019,7 +1061,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
     return waitUntil(() => {
       return stopWait;
     }).then(() => {
-      let testHeight = document
+      const testHeight = document
         .getElementById('measurement')
         .getBoundingClientRect().height;
 
@@ -1029,6 +1071,8 @@ module('Integration | Component | ella treadmill', function (hooks) {
   });
 
   test('its data-scroll-delta attribute can be a negative number', async function (assert) {
+    assert.expect(2);
+
     this.set('model', LARGE_ARRAY);
 
     await render(hbs`
@@ -1039,11 +1083,11 @@ module('Integration | Component | ella treadmill', function (hooks) {
       <div id="measurement" style="height: 100px;">&nbsp;</div>
     `);
 
-    let element = document.querySelector('ella-treadmill');
-    let attr = element.attributes['data-scroll-delta'].value;
-    let testHeight = document
+    const element = document.querySelector('ella-treadmill');
+    const testHeight = document
       .getElementById('measurement')
       .getBoundingClientRect().height;
+    let attr = element.attributes['data-scroll-delta'].value;
     let stopWait = false;
 
     assert.strictEqual(
@@ -1069,6 +1113,8 @@ module('Integration | Component | ella treadmill', function (hooks) {
   });
 
   test('its data-first-visible-index attribute updates on scroll', async function (assert) {
+    assert.expect(1);
+
     let stopWait = false;
 
     this.set('model', LARGE_ARRAY);
@@ -1090,14 +1136,16 @@ module('Integration | Component | ella treadmill', function (hooks) {
     return waitUntil(() => {
       return stopWait;
     }).then(() => {
-      let element = document.querySelector('ella-treadmill');
-      let attr = element.attributes['data-first-visible-index'].value;
+      const element = document.querySelector('ella-treadmill');
+      const attr = element.attributes['data-first-visible-index'].value;
 
       assert.strictEqual(attr, '300');
     });
   });
 
   test('its data-first-visible-index attribute updates on scroll when below other content', async function (assert) {
+    assert.expect(1);
+
     let stopWait = false;
 
     this.set('model', LARGE_ARRAY);
@@ -1120,15 +1168,17 @@ module('Integration | Component | ella treadmill', function (hooks) {
     return waitUntil(() => {
       return stopWait;
     }).then(() => {
-      let element = document.querySelector('ella-treadmill');
-      let attr = element.attributes['data-first-visible-index'].value;
+      const element = document.querySelector('ella-treadmill');
+      const attr = element.attributes['data-first-visible-index'].value;
 
       assert.strictEqual(attr, '297');
     });
   });
 
   test('it displays the correct content item in each listing', async function (assert) {
-    let testElement = document.getElementById('ember-testing');
+    assert.expect(6);
+
+    const testElement = document.getElementById('ember-testing');
 
     testElement.style.height = '500px';
 
@@ -1141,14 +1191,16 @@ module('Integration | Component | ella treadmill', function (hooks) {
     document
       .querySelectorAll('ella-treadmill > ella-treadmill-item')
       .forEach((node, index) => {
-        let expected = `${index + 1}`;
+        const expected = `${index + 1}`;
 
         assert.strictEqual(node.innerText, expected);
       });
   });
 
   test('it displays the correct content item in each listing (block usage)', async function (assert) {
-    let testElement = document.getElementById('ember-testing');
+    assert.expect(6);
+
+    const testElement = document.getElementById('ember-testing');
 
     testElement.style.height = '500px';
 
@@ -1163,13 +1215,15 @@ module('Integration | Component | ella treadmill', function (hooks) {
     document
       .querySelectorAll('ella-treadmill > ella-treadmill-item')
       .forEach((node, index) => {
-        let expected = `[${index}]: I am item #${index + 1}`;
+        const expected = `[${index}]: I am item #${index + 1}`;
 
         assert.strictEqual(node.innerText, expected);
       });
   });
 
   test('it displays the correct content item in each listing when rendered below other content', async function (assert) {
+    assert.expect(6);
+
     this.set('model', LARGE_ARRAY);
 
     await render(hbs`
@@ -1182,13 +1236,15 @@ module('Integration | Component | ella treadmill', function (hooks) {
     document
       .querySelectorAll('ella-treadmill > ella-treadmill-item')
       .forEach((node, index) => {
-        let expected = `${index + 1}`;
+        const expected = `${index + 1}`;
 
         assert.strictEqual(node.innerText, expected);
       });
   });
 
   test('it updates the content in each listing on scroll', async function (assert) {
+    assert.expect(6);
+
     this.set('model', LARGE_ARRAY);
 
     await render(hbs`
@@ -1213,7 +1269,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
       document
         .querySelectorAll('ella-treadmill > ella-treadmill-item')
         .forEach((node, index, list) => {
-          let expected =
+          const expected =
             index >= 1
               ? `${index + 1 + 2 * list.length}`
               : `${index + 1 + 3 * list.length}`;
@@ -1224,6 +1280,8 @@ module('Integration | Component | ella treadmill', function (hooks) {
   });
 
   test('it does not update the content in each listing until items scroll out of view', async function (assert) {
+    assert.expect(6);
+
     this.set('model', LARGE_ARRAY);
 
     await render(hbs`
@@ -1249,7 +1307,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
       document
         .querySelectorAll('ella-treadmill > ella-treadmill-item')
         .forEach((node, index) => {
-          let expected = `${index + 1}`;
+          const expected = `${index + 1}`;
 
           assert.strictEqual(node.innerText, expected);
         });
@@ -1257,8 +1315,10 @@ module('Integration | Component | ella treadmill', function (hooks) {
   });
 
   test('it updates the content in each listing on scroll after items scroll out of view', async function (assert) {
-    let scrollPx = 65350;
-    let rowHeight = 72;
+    assert.expect(12);
+
+    const scrollPx = 65350;
+    const rowHeight = 72;
 
     this.set('model', LARGE_ARRAY);
     this.set('rowHeight', rowHeight);
@@ -1286,13 +1346,13 @@ module('Integration | Component | ella treadmill', function (hooks) {
       document
         .querySelectorAll('ella-treadmill > ella-treadmill-item')
         .forEach((node, index, list) => {
-          let scrollDelta = scrollPx - 300;
-          let multiplier = Math.floor(scrollDelta / list.length / rowHeight);
-          let mod = Math.floor(
+          const scrollDelta = scrollPx - 300;
+          const multiplier = Math.floor(scrollDelta / list.length / rowHeight);
+          const mod = Math.floor(
             (scrollDelta % (list.length * rowHeight)) / rowHeight
           );
 
-          let expected =
+          const expected =
             index >= mod
               ? `${multiplier * list.length + (index + 1)}`
               : `${(multiplier + 1) * list.length + (index + 1)}`;
@@ -1303,6 +1363,8 @@ module('Integration | Component | ella treadmill', function (hooks) {
   });
 
   test('it has an "overdraw" attribute that enables a few extra items to be rendered', async function (assert) {
+    assert.expect(5);
+
     this.set('model', LARGE_ARRAY);
 
     await render(hbs`
@@ -1336,8 +1398,8 @@ module('Integration | Component | ella treadmill', function (hooks) {
 
     assert.strictEqual(itemCount, 61);
 
-    let element = document.querySelector('ella-treadmill');
-    let attr = element.attributes['data-first-visible-index'].value;
+    const element = document.querySelector('ella-treadmill');
+    const attr = element.attributes['data-first-visible-index'].value;
 
     assert.strictEqual(
       attr,
@@ -1358,8 +1420,8 @@ module('Integration | Component | ella treadmill', function (hooks) {
     return waitUntil(() => {
       return stopWait;
     }).then(() => {
-      let element = document.querySelector('ella-treadmill');
-      let attr = element.attributes['data-first-visible-index'].value;
+      const element = document.querySelector('ella-treadmill');
+      const attr = element.attributes['data-first-visible-index'].value;
 
       assert.strictEqual(
         attr,
@@ -1370,7 +1432,9 @@ module('Integration | Component | ella treadmill', function (hooks) {
   });
 
   test('it renders items in a grid when "minColumnWidth" set as percentage', async function (assert) {
-    let testElement = document.getElementById('ember-testing');
+    assert.expect(50);
+
+    const testElement = document.getElementById('ember-testing');
 
     testElement.style.height = '600px';
     testElement.style.width = '600px';
@@ -1396,18 +1460,18 @@ module('Integration | Component | ella treadmill', function (hooks) {
       <div id="testTotal" style="height: 200040px;">&nbsp;</div>
     `);
 
-    let element = document.querySelector('ella-treadmill');
-    let items = document.querySelectorAll(
+    const element = document.querySelector('ella-treadmill');
+    const items = document.querySelectorAll(
       'ella-treadmill > ella-treadmill-item'
     );
-    let expectedTotal = document.getElementById('testTotal');
+    const expectedTotal = document.getElementById('testTotal');
 
     assert.strictEqual(element.clientHeight, expectedTotal.clientHeight);
     assert.strictEqual(items.length, 33, 'renders 11 rows of 3 columns');
 
     for (let i = 0; i < 6; i++) {
-      let geom = items.item(i).getBoundingClientRect();
-      let expected = document
+      const geom = items.item(i).getBoundingClientRect();
+      const expected = document
         .getElementById(`test${i}`)
         .getBoundingClientRect();
 
@@ -1447,8 +1511,8 @@ module('Integration | Component | ella treadmill', function (hooks) {
       return stopWait;
     }).then(() => {
       for (let i = 0; i < 6; i++) {
-        let geom = items.item(i).getBoundingClientRect();
-        let expected = document
+        const geom = items.item(i).getBoundingClientRect();
+        const expected = document
           .getElementById(`resize${i}`)
           .getBoundingClientRect();
 
@@ -1477,7 +1541,9 @@ module('Integration | Component | ella treadmill', function (hooks) {
   });
 
   test('it renders items in a grid when "minColumnWidth" set in pixels', async function (assert) {
-    let testElement = document.getElementById('ember-testing');
+    assert.expect(49);
+
+    const testElement = document.getElementById('ember-testing');
 
     testElement.style.height = '600px';
     testElement.style.width = '600px';
@@ -1501,15 +1567,15 @@ module('Integration | Component | ella treadmill', function (hooks) {
       <div id="resize5" style="height: 60px; width: 180px; position: absolute; top: 60px; left: 0;">&nbsp;</div>
     `);
 
-    let items = document.querySelectorAll(
+    const items = document.querySelectorAll(
       'ella-treadmill > ella-treadmill-item'
     );
 
     assert.strictEqual(items.length, 33, 'renders 11 rows of 3 columns');
 
     for (let i = 0; i < 6; i++) {
-      let geom = items.item(i).getBoundingClientRect();
-      let expected = document
+      const geom = items.item(i).getBoundingClientRect();
+      const expected = document
         .getElementById(`test${i}`)
         .getBoundingClientRect();
 
@@ -1548,13 +1614,13 @@ module('Integration | Component | ella treadmill', function (hooks) {
     return waitUntil(() => {
       return stopWait;
     }).then(() => {
-      let items = document.querySelectorAll(
+      const items = document.querySelectorAll(
         'ella-treadmill > ella-treadmill-item'
       );
 
       for (let i = 0; i < 6; i++) {
-        let geom = items.item(i).getBoundingClientRect();
-        let expected = document
+        const geom = items.item(i).getBoundingClientRect();
+        const expected = document
           .getElementById(`resize${i}`)
           .getBoundingClientRect();
 
@@ -1583,7 +1649,9 @@ module('Integration | Component | ella treadmill', function (hooks) {
   });
 
   test('it repositions grid items after scroll', async function (assert) {
-    let testElement = document.getElementById('ember-testing');
+    assert.expect(25);
+
+    const testElement = document.getElementById('ember-testing');
 
     testElement.style.height = '900px';
     testElement.style.width = '900px';
@@ -1603,7 +1671,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
       <div id="test5" style="height: 150px; width: 300px; position: absolute; top: 34122px; left: 600px;">&nbsp;</div>
     `);
 
-    let items = document.querySelectorAll(
+    const items = document.querySelectorAll(
       'ella-treadmill > ella-treadmill-item'
     );
 
@@ -1622,13 +1690,13 @@ module('Integration | Component | ella treadmill', function (hooks) {
     return waitUntil(() => {
       return stopWait;
     }).then(() => {
-      let items = document.querySelectorAll(
+      const items = document.querySelectorAll(
         'ella-treadmill > ella-treadmill-item'
       );
 
       for (let i = 0; i < 6; i++) {
-        let geom = items.item(i).getBoundingClientRect();
-        let expected = document
+        const geom = items.item(i).getBoundingClientRect();
+        const expected = document
           .getElementById(`test${i}`)
           .getBoundingClientRect();
 
@@ -1657,6 +1725,8 @@ module('Integration | Component | ella treadmill', function (hooks) {
   });
 
   test('it renders items with a class name that indicates row membership', async function (assert) {
+    assert.expect(39);
+
     this.set('model', LARGE_ARRAY);
     this.set('fluctuate', 2);
     this.set('minColumnWidth', '100%');
@@ -1668,7 +1738,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
     document
       .querySelectorAll('ella-treadmill > ella-treadmill-item')
       .forEach((node, index) => {
-        let expected = `ella-treadmill-item-row-${(index % 2) + 1}`;
+        const expected = `ella-treadmill-item-row-${(index % 2) + 1}`;
 
         assert.dom(node).hasClass(expected);
       });
@@ -1678,7 +1748,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
     document
       .querySelectorAll('ella-treadmill > ella-treadmill-item')
       .forEach((node, index) => {
-        let expected = `ella-treadmill-item-row-${(index % 5) + 1}`;
+        const expected = `ella-treadmill-item-row-${(index % 5) + 1}`;
 
         assert.dom(node).hasClass(expected);
       });
@@ -1697,6 +1767,8 @@ module('Integration | Component | ella treadmill', function (hooks) {
   });
 
   test('it renders items with a class name that indicates column membership', async function (assert) {
+    assert.expect(221);
+
     this.set('model', LARGE_ARRAY);
     this.set('fluctuateColumn', 2);
     this.set('minColumnWidth', '33%');
@@ -1708,7 +1780,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
     document
       .querySelectorAll('ella-treadmill > ella-treadmill-item')
       .forEach((node, index) => {
-        let expected = `ella-treadmill-item-column-${((index % 3) % 2) + 1}`;
+        const expected = `ella-treadmill-item-column-${((index % 3) % 2) + 1}`;
 
         assert.dom(node).hasClass(expected);
       });
@@ -1718,7 +1790,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
     document
       .querySelectorAll('ella-treadmill > ella-treadmill-item')
       .forEach((node, index) => {
-        let expected = `ella-treadmill-item-column-${((index % 5) % 2) + 1}`;
+        const expected = `ella-treadmill-item-column-${((index % 5) % 2) + 1}`;
 
         assert.dom(node).hasClass(expected);
       });
@@ -1728,7 +1800,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
     document
       .querySelectorAll('ella-treadmill > ella-treadmill-item')
       .forEach((node, index) => {
-        let expected = `ella-treadmill-item-column-${((index % 5) % 3) + 1}`;
+        const expected = `ella-treadmill-item-column-${((index % 5) % 3) + 1}`;
 
         assert.dom(node).hasClass(expected);
       });
