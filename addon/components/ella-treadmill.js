@@ -48,7 +48,7 @@ let ancestors = function (node, parents = []) {
  * @element ella-treadmill
  */
 
-class EllaTreadmill extends Component {
+class EllaTreadmillComponent extends Component {
   elementId = guidFor(this);
 
   @tracked _moveTo = null;
@@ -1008,75 +1008,65 @@ class EllaTreadmill extends Component {
 
     return this;
   }
-}
 
-/**
- * The plain object obtained by calling `.getBoundingClientRect()` on the
- * component's element.
- *
- * @property geometryElement
- * @type {Object}
- * @public
- * @readOnly
- */
-Object.defineProperty(EllaTreadmill.prototype, 'geometryElement', {
-  get() {
-    let element = this.element;
+  /**
+   * The plain object obtained by calling `.getBoundingClientRect()` on the
+   * component's element.
+   *
+   * @property geometryElement
+   * @type {Object}
+   * @public
+   * @readOnly
+   */
+  get geometryElement() {
+    const { element } = this;
 
-    if (!element) {
-      return {};
-    }
+    return typeof element?.getBoundingClientRect === 'function'
+      ? element.getBoundingClientRect()
+      : {};
+  }
 
-    return element.getBoundingClientRect();
-  },
-});
+  /**
+   * The plain object obtained by calling `.getBoundingClientRect()` on the
+   * component's scrolling parent element (if applicable).
+   *
+   * @property geometryParent
+   * @type {Object}
+   * @public
+   * @readOnly
+   */
+  get geometryParent() {
+    const parent = this.scrollingParent();
 
-/**
- * The plain object obtained by calling `.getBoundingClientRect()` on the
- * component's scrolling parent element (if applicable).
- *
- * @property geometryParent
- * @type {Object}
- * @public
- * @readOnly
- */
-Object.defineProperty(EllaTreadmill.prototype, 'geometryParent', {
-  get() {
-    let parent = this.scrollingParent();
-
-    return parent && typeof parent.getBoundingClientRect === 'function'
+    return typeof parent?.getBoundingClientRect === 'function'
       ? parent.getBoundingClientRect()
       : {};
-  },
-});
+  }
 
-/**
- * Provide a scrolling parent height if no scrolling parent can be detected.
- *
- * @property _defaultHeight
- * @type {Number}
- * @private
- * @readOnly
- */
-Object.defineProperty(EllaTreadmill.prototype, '_defaultHeight', {
-  get() {
+  /**
+   * Provide a scrolling parent height if no scrolling parent can be detected.
+   *
+   * @property _defaultHeight
+   * @type {Number}
+   * @private
+   * @readOnly
+   */
+  get _defaultHeight() {
     return window ? window.innerHeight : NO_WINDOW_HEIGHT;
-  },
-});
+  }
 
-/**
- * Provide an element or parent element width if no rendered width can
- * be determined.
- *
- * @property _defaultWidth
- * @type {Number}
- * @private
- * @readOnly
- */
-Object.defineProperty(EllaTreadmill.prototype, '_defaultWidth', {
-  get() {
+  /**
+   * Provide an element or parent element width if no rendered width can
+   * be determined.
+   *
+   * @property _defaultWidth
+   * @type {Number}
+   * @private
+   * @readOnly
+   */
+  get _defaultWidth() {
     return window ? window.innerWidth : NO_WINDOW_WIDTH;
-  },
-});
+  }
+}
 
-export default EllaTreadmill;
+export default EllaTreadmillComponent;

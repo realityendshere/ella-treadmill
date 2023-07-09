@@ -8,7 +8,10 @@
   data-scroll-delta={{this.topDelta}}
   data-first-visible-index={{this.startingIndex}}
   data-visible-items={{this.numberOfVisibleItems}}
+  ...attributes
 >
+  {{!-- Fix dynamic positioning styles! --}}
+  {{! template-lint-disable no-forbidden-elements }}
   <style type="text/css">
     #{{this.elementId}} {
     position: relative;
@@ -30,6 +33,7 @@
       pointer-events: none;
     }
   </style>
+  {{! template-lint-enable no-forbidden-elements }}
 
   {{#each this.indices as |_ idx|}}
     <EllaTreadmillItem
@@ -42,9 +46,9 @@
       @pageSize={{this.numberOfVisibleItems}}
       @fluctuate={{this.fluctuate}}
       @fluctuateColumn={{this.fluctuateColumn}}
-      @on-insert=this.listItemInserted
-      @on-update=this.listItemUpdated
-      @on-destroy=this.listItemDestroyed
+      @on-insert={{this.listItemInserted}}
+      @on-update={{this.listItemUpdated}}
+      @on-destroy={{this.listItemDestroyed}}
       as |item index|
     >
       {{#if (has-block)}}
