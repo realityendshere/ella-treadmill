@@ -58,6 +58,8 @@
       {{/if}}
     </EllaTreadmillItem>
   {{else}}
-    {{yield to="inverse"}}
+    {{#if (has-block "inverse")}}
+      {{yield to="inverse"}}
+    {{/if}}
   {{/each}}
 </ella-treadmill>

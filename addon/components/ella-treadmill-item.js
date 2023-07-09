@@ -196,10 +196,6 @@ class EllaTreadmillItemComponent extends Component {
     return this._isSampleItem || this.parent?.sampleItem === this;
   }
 
-  // set isSampleItem(value) {
-  //   this._isSampleItem = value;
-  // }
-
   /**
    * The computed `translateY` style.
    *
@@ -246,11 +242,13 @@ class EllaTreadmillItemComponent extends Component {
 
   @action
   handleInsertElement() {
-    const fn = this['on-insert'];
+    const fn = this.args['on-insert'];
 
     if (typeof fn === 'function') {
       fn(this);
     }
+
+    this.handleUpdateElement();
   }
 
   @action
@@ -259,7 +257,7 @@ class EllaTreadmillItemComponent extends Component {
 
     if (!isSampleItem) return;
 
-    const fn = this['on-update'];
+    const fn = this.args['on-update'];
 
     if (
       typeof element?.getBoundingClientRect === 'function' &&
@@ -272,7 +270,7 @@ class EllaTreadmillItemComponent extends Component {
   willDestroy() {
     super.willDestroy(...arguments);
 
-    const fn = this['on-destroy'];
+    const fn = this.args['on-destroy'];
 
     if (typeof fn === 'function') {
       fn(this);

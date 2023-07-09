@@ -2,7 +2,7 @@ import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { A } from '@ember/array';
 import { action } from '@ember/object';
-import { get, set } from '@ember/object';
+import { set } from '@ember/object';
 import { guidFor } from '@ember/object/internals';
 import { run } from '@ember/runloop';
 import { task, timeout } from 'ember-concurrency';
@@ -839,7 +839,7 @@ class EllaTreadmillComponent extends Component {
    * @public
    */
   sendClosureAction(action, ...args) {
-    let fn = get(this, action);
+    const fn = this.args[action];
 
     if (typeof fn === 'function') {
       fn(...args);
