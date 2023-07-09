@@ -1,72 +1,14 @@
-import { lt } from '@ember/object/computed';
-import Component from '@ember/component';
-import { computed, get, getProperties } from '@ember/object';
-import layout from '../templates/components/ella-treadmill-item';
+import Component from '@glimmer/component';
+import { action } from '@ember/object';
+import { guidFor } from '@ember/object/internals';
+// import { tracked } from '@glimmer/tracking';
 
-/**
- *
- * Acts as a child of an `{{ella-treadmill}}` component. Each item computes
- * the necessary styling to position itself as a customer scrolls up or down
- * its parent `{{ella-treadmill}}` instance.
- *
- * @element ella-treadmill-item
- */
+class EllaTreadmillItemComponent extends Component {
+  elementId = guidFor(this);
 
-export default Component.extend({
-  layout,
-
-  /**
-   * Tag name for the component's element.
-   *
-   * @property tagName
-   * @type String
-   * @default 'ella-treadmill-item'
-   * @public
-   */
-  tagName: 'ella-treadmill-item',
-
-  /**
-   * An array of properties to apply as attributes on the component's element.
-   *
-   * @property attributeBindings
-   * @type {Array|String}
-   * @default [
-   *   'aria-hidden'
-   * ]
-   * @public
-   */
-  attributeBindings: ['aria-hidden'],
-
-  /**
-   * An array of additional CSS class names to add to the component's element.
-   *
-   * @property classNames
-   * @type {Array|String}
-   * @default ['ella-treadmill-item']
-   * @public
-   */
-  classNames: ['ella-treadmill-item'],
-
-  /**
-   * An array of additional CSS class names to conditionally add to the
-   * component's element.
-   *
-   * @property classNameBindings
-   * @type {Array|String}
-   * @default ['classRow', 'classColumn']
-   * @public
-   */
-  classNameBindings: ['classRow', 'classColumn'],
-
-  /**
-   * Applied as the `role` attribute on the component's element.
-   *
-   * @property ariaRole
-   * @type {String}
-   * @default 'listitem'
-   * @public
-   */
-  ariaRole: 'listitem',
+  get element() {
+    return document.getElementById(this.elementId);
+  }
 
   /**
    * The number of items per row the parent component expects to render.
@@ -77,7 +19,9 @@ export default Component.extend({
    * @default 1
    * @public
    */
-  columns: 1,
+  get columns() {
+    return this.args.columns || 1;
+  }
 
   /**
    * How frequently to cycle through class names that indicate membership in a
@@ -91,7 +35,9 @@ export default Component.extend({
    * @default 2
    * @public
    */
-  fluctuate: 2,
+  get fluctuate() {
+    return this.args.fluctuate || 2;
+  }
 
   /**
    * How frequently to cycle through class names that indicate membership in a
@@ -105,7 +51,9 @@ export default Component.extend({
    * @default 2
    * @public
    */
-  fluctuateColumn: 2,
+  get fluctuateColumn() {
+    return this.args.fluctuateColumn || 2;
+  }
 
   /**
    * The numeric portion of the height style for this item. This component
@@ -117,7 +65,9 @@ export default Component.extend({
    * @default 0
    * @public
    */
-  height: 0,
+  get height() {
+    return this.args.height || 0;
+  }
 
   /**
    * The unit of measurement to use when computing and size and positioning
@@ -128,7 +78,9 @@ export default Component.extend({
    * @default 'px'
    * @public
    */
-  heightUnit: 'px',
+  get heightUnit() {
+    return this.args.heightUnit || 'px';
+  }
 
   /**
    * The index of the content item wrapped in this component. This value helps
@@ -140,7 +92,9 @@ export default Component.extend({
    * @default -1
    * @public
    */
-  index: -1,
+  get index() {
+    return this.args.index ?? -1;
+  }
 
   /**
    * The single item of content wrapped by this component instance. This value
@@ -150,7 +104,9 @@ export default Component.extend({
    * @default null
    * @public
    */
-  item: null,
+  get item() {
+    return this.args.item || null;
+  }
 
   /**
    * The parent `{{ella-treadmill}}`.
@@ -159,7 +115,9 @@ export default Component.extend({
    * @default null
    * @public
    */
-  parent: null,
+  get parent() {
+    return this.args.parent || null;
+  }
 
   /**
    * The number of visible items rendered by the parent `{{ella-treadmill}}`
@@ -171,7 +129,9 @@ export default Component.extend({
    * @default 1
    * @public
    */
-  pageSize: 1,
+  get pageSize() {
+    return this.args.pageSize || 1;
+  }
 
   /**
    * Toggle the aria-hidden attribute to hide this component's element from
@@ -183,7 +143,9 @@ export default Component.extend({
    * @public
    * @readOnly
    */
-  'aria-hidden': lt('index', 0).readOnly(),
+  get 'aria-hidden'() {
+    return this.index < 0;
+  }
 
   /**
    * The class name to apply to this component's element to indicate row
@@ -195,18 +157,12 @@ export default Component.extend({
    * @public
    * @readOnly
    */
-  classRow: computed('fluctuate', 'index', 'columns', function () {
-    let { fluctuate, index, columns } = getProperties(
-      this,
-      'fluctuate',
-      'index',
-      'columns'
-    );
-
-    let row = Math.floor((index % (fluctuate * columns)) / columns) + 1;
+  get classRow() {
+    const { fluctuate, index, columns } = this;
+    const row = Math.floor((index % (fluctuate * columns)) / columns) + 1;
 
     return `ella-treadmill-item-row-${row}`;
-  }).readOnly(),
+  }
 
   /**
    * The class name to apply to this component's element to indicate column
@@ -219,18 +175,12 @@ export default Component.extend({
    * @public
    * @readOnly
    */
-  classColumn: computed('index', 'columns', 'fluctuateColumn', function () {
-    let { index, columns, fluctuateColumn } = getProperties(
-      this,
-      'index',
-      'columns',
-      'fluctuateColumn'
-    );
-
-    let col = ((index % columns) % fluctuateColumn) + 1;
+  get classColumn() {
+    const { index, columns, fluctuateColumn } = this;
+    const col = ((index % columns) % fluctuateColumn) + 1;
 
     return `ella-treadmill-item-column-${col}`;
-  }).readOnly(),
+  }
 
   /**
    * Determine if this instance is the reference child for computing item
@@ -242,15 +192,13 @@ export default Component.extend({
    * @public
    * @readOnly
    */
-  isSampleItem: computed('parent.sampleItem', '_isSampleItem', {
-    get() {
-      return this._isSampleItem || get(this, 'parent.sampleItem') === this;
-    },
+  get isSampleItem() {
+    return this._isSampleItem || this.parent?.sampleItem === this;
+  }
 
-    set(key, value) {
-      return this.set('_isSampleItem', value);
-    },
-  }),
+  // set isSampleItem(value) {
+  //   this._isSampleItem = value;
+  // }
 
   /**
    * The computed `translateY` style.
@@ -260,29 +208,12 @@ export default Component.extend({
    * @public
    * @readOnly
    */
-  translateY: computed(
-    'height',
-    'index',
-    'pageSize',
-    'columns',
-    'heightUnit',
-    function () {
-      let { index, height, pageSize, columns, heightUnit } = getProperties(
-        this,
-        'height',
-        'index',
-        'pageSize',
-        'columns',
-        'heightUnit'
-      );
+  get translateY() {
+    const { index, height, pageSize, columns, heightUnit } = this;
+    const pageRows = Math.ceil(pageSize / columns);
 
-      let pageRows = Math.ceil(pageSize / columns);
-
-      return (
-        (Math.floor(index / pageSize) * pageRows * height || 0) + heightUnit
-      );
-    }
-  ).readOnly(),
+    return (Math.floor(index / pageSize) * pageRows * height || 0) + heightUnit;
+  }
 
   /**
    * The computed `width` style as a percentage.
@@ -293,11 +224,11 @@ export default Component.extend({
    * @public
    * @readOnly
    */
-  width: computed('columns', function () {
-    let columns = parseInt(this.columns, 10) || 1;
+  get width() {
+    const columns = parseInt(this.columns, 10) || 1;
 
     return 100 / columns;
-  }),
+  }
 
   /**
    * The unit of measurement to use in the width style.
@@ -309,43 +240,44 @@ export default Component.extend({
    * @readOnly
    * @final
    */
-  widthUnit: computed(function () {
+  get widthUnit() {
     return '%';
-  }).readOnly(),
+  }
 
-  didInsertElement() {
-    this._super(...arguments);
-    let fn = this['on-insert'];
+  @action
+  handleInsertElement() {
+    const fn = this['on-insert'];
 
     if (typeof fn === 'function') {
       fn(this);
     }
-  },
+  }
 
-  didRender() {
-    this._super(...arguments);
-    if (!this.isSampleItem) {
-      return;
-    }
+  @action
+  handleUpdateElement() {
+    const { isSampleItem, element } = this;
 
-    let element = this.element;
-    let fn = this['on-update'];
+    if (!isSampleItem) return;
+
+    const fn = this['on-update'];
 
     if (
-      element &&
-      typeof element.getBoundingClientRect === 'function' &&
+      typeof element?.getBoundingClientRect === 'function' &&
       typeof fn === 'function'
     ) {
       fn(element.getBoundingClientRect());
     }
-  },
+  }
 
-  willDestroyElement() {
-    this._super(...arguments);
-    let fn = this['on-destroy'];
+  willDestroy() {
+    super.willDestroy(...arguments);
+
+    const fn = this['on-destroy'];
 
     if (typeof fn === 'function') {
       fn(this);
     }
-  },
-});
+  }
+}
+
+export default EllaTreadmillItemComponent;
