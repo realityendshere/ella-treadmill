@@ -16,23 +16,23 @@
 <p>&nbsp;</p>
 <p>&nbsp;</p>
 
+{{!-- <h1>Showing {{this.model.length}} items</h1> --}}
+
 <div class="containment {{if this.small "is-small" "expanded"}}">
-  {{#ella-treadmill
-    content=this.model
-    row=(if this.rowHeight this.rowHeight 200)
-    minColumnWidth=(if this.rowHeight this.rowHeight 200)
-    moveTo=this.moveTo
-    on-scroll-start=this.handleScrollStart
-    on-scroll-end=this.handleScrollEnd
-    on-resize-start=this.handleResizeStart
-    on-resize=this.handleResize
-    on-resize-end=this.handleResizeEnd
+  <EllaTreadmill
+    @content={{this.model}}
+    @row={{if this.rowHeight this.rowHeight 200}}
+    @minColumnWidth={{if this.rowHeight this.rowHeight 200}}
+    @moveTo={{this.moveTo}}
+    @on-scroll-start={{this.handleScrollStart}}
+    @on-scroll-end={{this.handleScrollEnd}}
+    @on-resize-start={{this.handleResizeStart}}
+    @on-resize={{this.handleResize}}
+    @on-resize-end={{this.handleResizeEnd}}
     as |item index|
-  }}
+  >
     <div class="demo">
       [{{if index index "0"}}]: {{item.note}}
     </div>
-  {{else}}
-    <p>Nothing to see here.</p>
-  {{/ella-treadmill}}
+  </EllaTreadmill>
 </div>
