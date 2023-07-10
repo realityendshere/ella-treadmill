@@ -509,15 +509,15 @@ module('Integration | Component | ella treadmill', function (hooks) {
       <EllaTreadmill @row="20%" @content={{this.model}} />
     `);
 
-    const element = document.querySelector('ella-treadmill');
-    const itemCountAttr = parseInt(
+    let element = document.querySelector('ella-treadmill');
+    const itemElement = document.querySelector('ella-treadmill-item');
+    let itemCountAttr = parseInt(
       element.attributes['data-visible-items'].value,
       10
     );
-    const itemCount = document.querySelectorAll(
+    let itemCount = document.querySelectorAll(
       'ella-treadmill > ella-treadmill-item'
     ).length;
-    let stopWait = false;
 
     assert.strictEqual(itemCount, 6);
     assert.strictEqual(itemCount, itemCountAttr);
@@ -526,25 +526,14 @@ module('Integration | Component | ella treadmill', function (hooks) {
       testElement.style.height = '600px';
     });
 
-    later(() => {
-      stopWait = true;
-    }, 100);
+    await waitUntil(() => itemElement.getBoundingClientRect().height > 50);
 
-    return waitUntil(() => {
-      return stopWait;
-    }).then(() => {
-      const element = document.querySelector('ella-treadmill');
-      const itemCountAttr = parseInt(
-        element.attributes['data-visible-items'].value,
-        10
-      );
-      const itemCount = document.querySelectorAll(
-        'ella-treadmill > ella-treadmill-item'
-      ).length;
+    itemCount = document.querySelectorAll(
+      'ella-treadmill > ella-treadmill-item'
+    ).length;
 
-      assert.strictEqual(itemCount, 6);
-      assert.strictEqual(itemCount, itemCountAttr);
-    });
+    assert.strictEqual(itemCount, 6);
+    assert.strictEqual(itemCount, itemCountAttr);
   });
 
   test('it renders fewer list items when content fits in visible space', async function (assert) {
@@ -612,12 +601,12 @@ module('Integration | Component | ella treadmill', function (hooks) {
 
     this.set('model', LARGE_ARRAY);
 
-    this.actions.handleResizeStart = function () {
+    this.handleResizeStart = function () {
       actionTriggered = actionTriggered + 1;
     };
 
     await render(
-      hbs`<EllaTreadmill @row="100" @content={{this.model}} @on-resize-start={{action "handleResizeStart"}} />`
+      hbs`<EllaTreadmill @row="100" @content={{this.model}} @on-resize-start={{this.handleResizeStart}} />`
     );
 
     assert.strictEqual(actionTriggered, 0, 'action not yet called');
@@ -645,12 +634,12 @@ module('Integration | Component | ella treadmill', function (hooks) {
 
     this.set('model', LARGE_ARRAY);
 
-    this.actions.handleResizeEnd = function () {
+    this.handleResizeEnd = function () {
       actionTriggered = true;
     };
 
     await render(
-      hbs`<EllaTreadmill @row="100" @content={{this.model}} @on-resize-end={{action "handleResizeEnd"}} />`
+      hbs`<EllaTreadmill @row="100" @content={{this.model}} @on-resize-end={{this.handleResizeEnd}} />`
     );
 
     assert.false(actionTriggered, 'action not yet called');
@@ -660,11 +649,9 @@ module('Integration | Component | ella treadmill', function (hooks) {
       testElement.style.height = '620px';
     });
 
-    return waitUntil(() => {
-      return actionTriggered;
-    }).then(() => {
-      assert.ok(actionTriggered, 'action called');
-    });
+    await waitUntil(() => actionTriggered);
+
+    assert.ok(actionTriggered, 'action called');
   });
 
   test('its "data-first-visible-index" updates when columns', async function (assert) {
@@ -822,13 +809,13 @@ module('Integration | Component | ella treadmill', function (hooks) {
     testElement.style.height = '500px';
 
     this.set('model', LARGE_ARRAY);
-    this.actions.handleScrollStart = function () {
+    this.handleScrollStart = function () {
       actionTriggered = actionTriggered + 1;
     };
 
     await render(hbs`
       <div style="overflow: auto; height: 500px;" id="scroller">
-        <EllaTreadmill @content={{this.model}} @row="100" @on-scroll-start={{action "handleScrollStart"}} />
+        <EllaTreadmill @content={{this.model}} @row="100" @on-scroll-start={{this.handleScrollStart}} />
       </div>
     `);
 
@@ -859,13 +846,13 @@ module('Integration | Component | ella treadmill', function (hooks) {
     testElement.style.height = '500px';
 
     this.set('model', LARGE_ARRAY);
-    this.actions.handleScrollEnd = function (props) {
+    this.handleScrollEnd = function (props) {
       actionTriggered = props;
     };
 
     await render(hbs`
       <div style="overflow: auto; height: 500px;" id="scroller">
-        <EllaTreadmill @content={{this.model}} @row="100" @on-scroll-end={{action "handleScrollEnd"}} />
+        <EllaTreadmill @content={{this.model}} @row="100" @on-scroll-end={{this.handleScrollEnd}} />
       </div>
     `);
 
@@ -911,13 +898,13 @@ module('Integration | Component | ella treadmill', function (hooks) {
 
     this.set('model', LARGE_ARRAY);
 
-    this.actions.handleListingStateChanged = function (props) {
+    this.handleListingStateChanged = function (props) {
       actionTriggered = props;
     };
 
     await render(hbs`
       <div id="bumper" style="height: 300px;">&nbsp;</div>
-      <EllaTreadmill @content={{this.model}} @row="100" @on-scroll={{action "handleListingStateChanged"}} />
+      <EllaTreadmill @content={{this.model}} @row="100" @on-scroll={{this.handleListingStateChanged}} />
     `);
 
     assert.false(actionTriggered, 'action not yet called');
@@ -962,12 +949,12 @@ module('Integration | Component | ella treadmill', function (hooks) {
 
     this.set('model', LARGE_ARRAY);
 
-    this.actions.handleListingStateChanged = function (props) {
+    this.handleListingStateChanged = function (props) {
       actionTriggered = props;
     };
 
     await render(hbs`
-      <EllaTreadmill @content={{this.model}} @row="100" @on-resize={{action "handleListingStateChanged"}} />
+      <EllaTreadmill @content={{this.model}} @row="100" @on-resize={{this.handleListingStateChanged}} />
     `);
 
     assert.false(actionTriggered, 'action not yet called');

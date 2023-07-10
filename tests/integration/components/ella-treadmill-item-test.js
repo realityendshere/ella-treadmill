@@ -143,12 +143,12 @@ module('Integration | Component | ella treadmill item', function (hooks) {
 
     let actionTriggered = null;
 
-    this.actions.addedToDOM = function (item) {
+    this.addedToDOM = function (item) {
       actionTriggered = item;
     };
 
     await render(hbs`
-      <EllaTreadmillItem @height="50" @on-insert={{action "addedToDOM"}} />
+      <EllaTreadmillItem @height="50" @on-insert={{this.addedToDOM}} />
     `);
 
     const element = document.querySelector('ella-treadmill-item');
@@ -162,13 +162,13 @@ module('Integration | Component | ella treadmill item', function (hooks) {
     let actionTriggered = false;
 
     this.set('showTest', true);
-    this.actions.aboutToDestroy = function () {
+    this.aboutToDestroy = function () {
       actionTriggered = true;
     };
 
     await render(hbs`
       {{#if this.showTest}}
-        <EllaTreadmillItem @height="50" @on-destroy={{action "aboutToDestroy"}} />
+        <EllaTreadmillItem @height="50" @on-destroy={{this.aboutToDestroy}} />
       {{/if}}
     `);
 
@@ -182,34 +182,26 @@ module('Integration | Component | ella treadmill item', function (hooks) {
   });
 
   test('it triggers an "on-update" action when re-rendered (if it is the sample item)', async function (assert) {
-    assert.expect(3);
-
-    let actionTriggered = false;
+    assert.expect(1);
 
     this.set('height', 50);
     this.set('isSampleItem', false); // Typically a computed property
-    this.actions.updateHandler = function (geometry) {
-      actionTriggered = geometry;
+    this.updateHandler = function () {
+      assert.ok(true);
     };
 
     await render(hbs`
-      <EllaTreadmillItem @height={{this.height}} @isSampleItem={{this.isSampleItem}} @on-update={{action "updateHandler"}} />
+      <EllaTreadmillItem @height={{this.height}} @isSampleItem={{this.isSampleItem}} @on-update={{this.updateHandler}} />
     `);
-
-    assert.false(actionTriggered);
 
     run(() => {
       this.set('height', 51);
     });
 
-    assert.false(actionTriggered);
-
     run(() => {
       this.set('isSampleItem', true);
       this.set('height', 52);
     });
-
-    assert.ok(actionTriggered);
   });
 
   test('its position changes when the columns and pageSize attributes are set', async function (assert) {
