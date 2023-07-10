@@ -5,7 +5,18 @@
   role="listitem"
   ...attributes
   {{did-insert this.handleInsertElement}}
-  {{did-update this.handleUpdateElement}}
+  {{did-update
+    this.handleUpdateElement
+    @parent
+    @index
+    @item
+    @height
+    @heightUnit
+    @columns
+    @pageSize
+    @fluctuate
+    @fluctuateColumn
+  }}
 >
   {{!-- Fix dynamic positioning styles! --}}
   {{! template-lint-disable no-forbidden-elements }}
