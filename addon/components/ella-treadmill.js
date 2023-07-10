@@ -2,6 +2,7 @@ import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { A } from '@ember/array';
 import { action } from '@ember/object';
+import { isNone } from '@ember/utils';
 import { set } from '@ember/object';
 import { guidFor } from '@ember/object/internals';
 import { run } from '@ember/runloop';
@@ -50,8 +51,6 @@ let ancestors = function (node, parents = []) {
 
 class EllaTreadmillComponent extends Component {
   elementId = guidFor(this);
-
-  @tracked _moveTo = null;
 
   /**
    * The component element's height captured on first render and on
@@ -321,7 +320,7 @@ class EllaTreadmillComponent extends Component {
   get columns() {
     const { minColumnWidth, elementWidth, unitString } = this;
     const col = parseFloat(minColumnWidth, 10);
-    const colUnit = unitString(col);
+    const colUnit = unitString(minColumnWidth);
     let result;
 
     switch (colUnit) {
@@ -370,9 +369,9 @@ class EllaTreadmillComponent extends Component {
    * to the 300th item in the list.
    *
    * ```
-   * {{#ella-treadmill content=model moveTo=300 as |item| }}
+   * <EllaTreadmill @content=model @moveTo=300 as |item|>
    *   // ITEM CONTENT
-   * {{/ella-treadmill}}
+   * </EllaTreadmill>
    * ```
    *
    * @property moveTo
@@ -381,13 +380,13 @@ class EllaTreadmillComponent extends Component {
    * @public
    */
   get moveTo() {
-    return this._moveTo;
+    const v = parseInt(this.args.moveTo, 10);
+
+    return isNaN(v) ? null : v;
   }
 
-  set moveTo(value) {
-    const v = parseInt(value, 10);
-
-    this._moveTo = isNaN(v) ? null : v;
+  get lastMove() {
+    return this.moveToTask.lastSuccessful?.value ?? null;
   }
 
   /**
@@ -565,7 +564,7 @@ class EllaTreadmillComponent extends Component {
    * @readOnly
    */
   get content() {
-    const { content } = this.args;
+    const { content = [] } = this.args;
 
     return typeof content?.objectsAt !== 'function'
       ? A([].concat(content))
@@ -635,19 +634,21 @@ class EllaTreadmillComponent extends Component {
    * @readOnly
    */
   get _row() {
-    let parent;
-    let parentHeight;
-    let result;
-    let row = this.row || '';
+    const { parentHeight } = this;
+    let { row = '' } = this;
     const rowUnit = this.unitString(row);
+    const { clientHeight } = this.scrollingParent();
+    let rowHeight;
+    let result;
 
     row = parseFloat(row, 10);
 
     switch (rowUnit) {
       case '%':
-        parent = this.scrollingParent();
-        parentHeight = parent.clientHeight || this._defaultHeight;
-        result = (row / 100) * parentHeight;
+        rowHeight =
+          (parentHeight !== clientHeight ? clientHeight : parentHeight) ||
+          this._defaultHeight;
+        result = (row / 100) * rowHeight;
         break;
       default:
         result = row && row > 0 ? row : DEFAULT_ROW_HEIGHT;
@@ -702,10 +703,6 @@ class EllaTreadmillComponent extends Component {
 
   constructor() {
     super(...arguments);
-
-    const { moveTo } = this.args;
-
-    if (moveTo) this.moveTo = moveTo;
 
     this._rafWatcherBegin();
     this.updateGeometry();
@@ -769,12 +766,15 @@ class EllaTreadmillComponent extends Component {
   });
 
   moveToTask = task(async () => {
-    const { moveTo } = this;
+    const { moveTo, lastMove } = this;
 
-    if (moveTo) {
+    if (isNone(moveTo)) return;
+
+    if (moveTo !== lastMove) {
       await this.scrollToIndex(moveTo);
-      this.moveTo = null;
     }
+
+    return moveTo;
   });
 
   /**
@@ -945,28 +945,43 @@ class EllaTreadmillComponent extends Component {
   }
 
   _rafWatcherPerform() {
+    const {
+      element,
+      moveTo,
+      lastMove,
+      __elementWidth__,
+      __elementHeight__,
+      __parentWidth__,
+      __parentHeight__,
+      __scrollTop__,
+    } = this;
     const parent = this.scrollingParent();
     const scrollTop = parent ? parent.scrollTop || parent.scrollY : 0;
     let scrollChanged = false;
 
-    if (scrollTop !== this.__scrollTop__) {
-      scrollChanged = true;
+    if (scrollTop !== __scrollTop__) {
+      scrollChanged = !isNone(scrollTop);
       this.__scrollTop__ = scrollTop;
     }
 
-    const elementWidth = this.element?.clientWidth;
-    const elementHeight = this.element?.clientHeight;
+    const elementWidth = element?.clientWidth;
+    const elementHeight = element?.clientHeight;
     const parentWidth = parent.clientWidth || parent.innerWidth;
     const parentHeight = parent.clientHeight || parent.innerHeight;
+    const isInitialSize =
+      isNone(__elementWidth__) ||
+      isNone(__elementHeight__) ||
+      isNone(__parentWidth__) ||
+      isNone(__parentHeight__);
     let sizeChanged = false;
 
     if (
-      elementWidth !== this.__elementWidth__ ||
-      elementHeight !== this.__elementHeight__ ||
-      parentWidth !== this.__parentWidth__ ||
-      parentHeight !== this.__parentHeight__
+      elementWidth !== __elementWidth__ ||
+      elementHeight !== __elementHeight__ ||
+      parentWidth !== __parentWidth__ ||
+      parentHeight !== __parentHeight__
     ) {
-      sizeChanged = true;
+      sizeChanged = !isInitialSize;
       this.__elementWidth__ = elementWidth;
       this.__elementHeight__ = elementHeight;
       this.__parentWidth__ = parentWidth;
@@ -990,16 +1005,18 @@ class EllaTreadmillComponent extends Component {
       this.moveToTask.perform();
     };
 
-    if (scrollChanged || sizeChanged || this._moveTo) {
+    if (isInitialSize) this.updateGeometry();
+    if (scrollChanged || sizeChanged || moveTo !== lastMove) {
       run(callHandlers);
     }
   }
 
   _rafWatcherSetup() {
+    const { element } = this;
     const parent = this.scrollingParent();
 
-    this.__elementWidth__ = this.element?.clientWidth;
-    this.__elementHeight__ = this.element?.clientHeight;
+    this.__elementWidth__ = element?.clientWidth;
+    this.__elementHeight__ = element?.clientHeight;
 
     this.__parentWidth__ = parent.clientWidth || parent.innerWidth;
     this.__parentHeight__ = parent.clientHeight || parent.innerHeight;
