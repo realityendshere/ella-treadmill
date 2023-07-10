@@ -193,7 +193,11 @@ class EllaTreadmillItemComponent extends Component {
    * @readOnly
    */
   get isSampleItem() {
-    return this._isSampleItem || this.parent?.sampleItem === this;
+    return (
+      this._isSampleItem ||
+      this.parent?.sampleItem === this ||
+      this.args.isSampleItem
+    );
   }
 
   /**
