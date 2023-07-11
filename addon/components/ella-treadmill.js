@@ -309,6 +309,17 @@ class EllaTreadmillComponent extends Component {
   @tracked scrollTop = 0;
 
   /**
+   * The distance in pixels between the top of this component and the top of
+   * the scrollable parent container.
+   *
+   * @property topDelta
+   * @type {Number}
+   * @public
+   * @readOnly
+   */
+  @tracked topDelta = null;
+
+  /**
    * The number of items to render per row.
    *
    * @property columns
@@ -445,23 +456,6 @@ class EllaTreadmillComponent extends Component {
     idx = idx - _overdrawRows * columns;
 
     return Math.min(len - numberOfVisibleItems, Math.max(0, idx)) || 0;
-  }
-
-  /**
-   * The distance in pixels between the top of this component and the top of
-   * the scrollable parent container.
-   *
-   * @property topDelta
-   * @type {Number}
-   * @public
-   * @readOnly
-   */
-  get topDelta() {
-    const { geometryElement, geometryParent } = this;
-    const elementTop = geometryElement?.top || 0;
-    const parentTop = geometryParent?.top || 0;
-
-    return parentTop - elementTop || 0;
   }
 
   /**
@@ -897,6 +891,14 @@ class EllaTreadmillComponent extends Component {
     return unit ? unit[0] : instead;
   }
 
+  computeTopDelta() {
+    const { geometryElement, geometryParent } = this;
+    const elementTop = geometryElement?.top || 0;
+    const parentTop = geometryParent?.top || 0;
+
+    return parentTop - elementTop || 0;
+  }
+
   /**
    * Updates properties regarding scroll position and parent dimensions.
    *
@@ -909,6 +911,7 @@ class EllaTreadmillComponent extends Component {
     const { geometryParent, _defaultHeight, _defaultWidth } = this;
 
     this.scrollTop = (parent ? parent.scrollTop || parent.scrollY : 0) || null;
+    this.topDelta = this.computeTopDelta();
     this.parentHeight = geometryParent.height || _defaultHeight;
     this.parentWidth = geometryParent.width || _defaultWidth;
     this.elementHeight = this.element?.clientHeight || _defaultHeight;

@@ -1033,7 +1033,6 @@ module('Integration | Component | ella treadmill', function (hooks) {
 
     const element = document.querySelector('ella-treadmill');
     let attr = element.attributes['data-scroll-delta'].value;
-    let stopWait = false;
 
     assert.strictEqual(attr, '0', 'starts at 0');
 
@@ -1041,20 +1040,16 @@ module('Integration | Component | ella treadmill', function (hooks) {
       document.getElementById('scroller').scrollTop = 100;
     });
 
-    later(() => {
-      stopWait = true;
-    }, 100);
+    await waitUntil(
+      () => element.attributes['data-scroll-delta'].value !== '0'
+    );
 
-    return waitUntil(() => {
-      return stopWait;
-    }).then(() => {
-      const testHeight = document
-        .getElementById('measurement')
-        .getBoundingClientRect().height;
+    const testHeight = document
+      .getElementById('measurement')
+      .getBoundingClientRect().height;
 
-      attr = element.attributes['data-scroll-delta'].value;
-      assert.strictEqual(attr, `${testHeight}`);
-    });
+    attr = element.attributes['data-scroll-delta'].value;
+    assert.strictEqual(attr, `${testHeight}`);
   });
 
   test('its data-scroll-delta attribute can be a negative number', async function (assert) {
