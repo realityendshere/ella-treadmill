@@ -9,6 +9,7 @@
   data-first-visible-index={{this.startingIndex}}
   data-visible-items={{this.numberOfVisibleItems}}
   ...attributes
+  {{did-insert this.handleInsertElement}}
 >
   {{!-- Fix dynamic positioning styles! --}}
   {{! template-lint-disable no-forbidden-elements }}

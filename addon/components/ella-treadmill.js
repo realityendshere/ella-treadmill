@@ -19,7 +19,7 @@ const FAKE_WINDOW = {
   scrollY: 0,
 };
 
-let ancestors = function (node, parents = []) {
+const ancestors = function (node, parents = []) {
   return node === null || node.parentNode === null
     ? parents
     : ancestors(node.parentNode, parents.concat([node]));
@@ -497,7 +497,7 @@ class EllaTreadmillComponent extends Component {
   get visibleContent() {
     const { visibleIndexes, content } = this;
 
-    return A(content.objectsAt(visibleIndexes));
+    return content.objectsAt(visibleIndexes);
   }
 
   /**
@@ -701,9 +701,8 @@ class EllaTreadmillComponent extends Component {
     return callback;
   }
 
-  constructor() {
-    super(...arguments);
-
+  @action
+  handleInsertElement() {
     this._rafWatcherBegin();
     this.updateGeometry();
   }
