@@ -19,7 +19,7 @@ const FAKE_WINDOW = {
   scrollY: 0,
 };
 
-const ancestors = function (node, parents = []) {
+let ancestors = function (node, parents = []) {
   return node === null || node.parentNode === null
     ? parents
     : ancestors(node.parentNode, parents.concat([node]));
