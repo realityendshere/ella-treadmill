@@ -52,6 +52,10 @@ let ancestors = function (node, parents = []) {
 class EllaTreadmillComponent extends Component {
   elementId = guidFor(this);
 
+  /****************************************************/
+  /* TRACKED PROPERTIES                               */
+  /****************************************************/
+
   /**
    * The component element's height captured on first render and on
    * scroll/resize events.
@@ -83,53 +87,6 @@ class EllaTreadmillComponent extends Component {
   @tracked elementWidth = 0;
 
   /**
-   * How frequently to cycle through class names that indicate membership in a
-   * "row" of listings.
-   *
-   * For example, `fluctuate: 2` would add the class name
-   * `ella-treadmill-item-row-1` to the first row, `ella-treadmill-item-row-2`
-   * to the second row, `ella-treadmill-item-row-1` to the third row,
-   * `ella-treadmill-item-row-2` to the fourth row, and so on.
-   *
-   * A setting of `fluctuate: 5` would add class names
-   * `ella-treadmill-item-row-1` through `ella-treadmill-item-row-5` to each
-   * of the first five rows and then start again with
-   * `ella-treadmill-item-row-1` on row six.
-   *
-   * @property fluctuate
-   * @type {Number}
-   * @default 2
-   * @public
-   */
-  get fluctuate() {
-    return this.args.fluctuate || 2;
-  }
-
-  /**
-   * How frequently to cycle through class names that indicate membership in a
-   * "column" of listings.
-   *
-   * For example, `fluctuateColumn: 2` would add the class name
-   * `ella-treadmill-item-column-1` to items in the first column,
-   * `ella-treadmill-item-column-2` to the second column,
-   * `ella-treadmill-item-column-1` to the third column,
-   * `ella-treadmill-item-column-2` to the fourth column, and so on.
-   *
-   * A setting of `fluctuateColumn: 5` would add class names
-   * `ella-treadmill-item-column-1` through `ella-treadmill-item-column-5` to
-   * items in each of the first five columns and then start again with
-   * `ella-treadmill-item-column-1` on column six.
-   *
-   * @property fluctuateColumn
-   * @type {Number}
-   * @default 2
-   * @public
-   */
-  get fluctuateColumn() {
-    return this.args.fluctuateColumn || 2;
-  }
-
-  /**
    * The element height reported by the first rendered child listing.
    *
    * This property is updated frequently by the component. Setting it has no
@@ -156,52 +113,6 @@ class EllaTreadmillComponent extends Component {
    * @readOnly
    */
   @tracked itemWidth = 0;
-
-  /**
-   * The minimum width of a listing. If `minColumnWidth` is less than 50% of
-   * the component element's width, flexible columns will rendered to fill the
-   * available horizontal space.
-   *
-   * For example, if the component's rendered element is 600px wide and
-   * `minColumnWidth: 180px`, `ella-treadmill` would place items into a grid
-   * with 3 columns of `200px` width. Resizing the viewport to allow the
-   * component's element to be `720px` wide would rearrange the grid into four
-   * columns, each `180px` wide.
-   *
-   * The default behavior is to show a long list of items in a single column.
-   * (`minColumnWidth: '100%'`)
-   *
-   * @property minColumnWidth
-   * @type {Number|String}
-   * @default '100%'
-   * @public
-   */
-  get minColumnWidth() {
-    return this.args.minColumnWidth || '100%';
-  }
-
-  /**
-   * An additional number of rows, indicated by a percentage, to render above
-   * and below the visible scroll area.
-   *
-   * For example, if twenty items is enough to fill the viewport, an `overdraw`
-   * value of `20` would render 8 additional items (four above the viewable
-   * area and four below the viewable area). That's 20% more items in each
-   * scrolling direction.
-   *
-   * This can be useful if data for the listing is computed or fetched
-   * asynchronously. The overdraw allows data for a list item to start being
-   * gathered moments before it scrolls into view. This can boost the perceived
-   * performance of the listing.
-   *
-   * @property overdraw
-   * @type {Number}
-   * @default 0
-   * @public
-   */
-  get overdraw() {
-    return this.args.overdraw || 0;
-  }
 
   /**
    * The scrollable parent's height captured on first render and on
@@ -247,20 +158,6 @@ class EllaTreadmillComponent extends Component {
    * @readOnly
    */
   @tracked resizing = 0;
-
-  /**
-   * The height of each row.
-   *
-   * The default height of each row is `50px`.
-   *
-   * @property row
-   * @type {Number|String}
-   * @default 50
-   * @public
-   */
-  get row() {
-    return this.args.row || DEFAULT_ROW_HEIGHT;
-  }
 
   /**
    * A sample child element to reference when computing how many child elements
@@ -318,6 +215,117 @@ class EllaTreadmillComponent extends Component {
    * @readOnly
    */
   @tracked topDelta = null;
+
+  /****************************************************/
+  /* ARGS & "COMPUTED" PROPERTIES                     */
+  /****************************************************/
+
+  /**
+   * How frequently to cycle through class names that indicate membership in a
+   * "row" of listings.
+   *
+   * For example, `fluctuate: 2` would add the class name
+   * `ella-treadmill-item-row-1` to the first row, `ella-treadmill-item-row-2`
+   * to the second row, `ella-treadmill-item-row-1` to the third row,
+   * `ella-treadmill-item-row-2` to the fourth row, and so on.
+   *
+   * A setting of `fluctuate: 5` would add class names
+   * `ella-treadmill-item-row-1` through `ella-treadmill-item-row-5` to each
+   * of the first five rows and then start again with
+   * `ella-treadmill-item-row-1` on row six.
+   *
+   * @property fluctuate
+   * @type {Number}
+   * @default 2
+   * @public
+   */
+  get fluctuate() {
+    return this.args.fluctuate || 2;
+  }
+
+  /**
+   * How frequently to cycle through class names that indicate membership in a
+   * "column" of listings.
+   *
+   * For example, `fluctuateColumn: 2` would add the class name
+   * `ella-treadmill-item-column-1` to items in the first column,
+   * `ella-treadmill-item-column-2` to the second column,
+   * `ella-treadmill-item-column-1` to the third column,
+   * `ella-treadmill-item-column-2` to the fourth column, and so on.
+   *
+   * A setting of `fluctuateColumn: 5` would add class names
+   * `ella-treadmill-item-column-1` through `ella-treadmill-item-column-5` to
+   * items in each of the first five columns and then start again with
+   * `ella-treadmill-item-column-1` on column six.
+   *
+   * @property fluctuateColumn
+   * @type {Number}
+   * @default 2
+   * @public
+   */
+  get fluctuateColumn() {
+    return this.args.fluctuateColumn || 2;
+  }
+
+  /**
+   * The minimum width of a listing. If `minColumnWidth` is less than 50% of
+   * the component element's width, flexible columns will rendered to fill the
+   * available horizontal space.
+   *
+   * For example, if the component's rendered element is 600px wide and
+   * `minColumnWidth: 180px`, `ella-treadmill` would place items into a grid
+   * with 3 columns of `200px` width. Resizing the viewport to allow the
+   * component's element to be `720px` wide would rearrange the grid into four
+   * columns, each `180px` wide.
+   *
+   * The default behavior is to show a long list of items in a single column.
+   * (`minColumnWidth: '100%'`)
+   *
+   * @property minColumnWidth
+   * @type {Number|String}
+   * @default '100%'
+   * @public
+   */
+  get minColumnWidth() {
+    return this.args.minColumnWidth || '100%';
+  }
+
+  /**
+   * An additional number of rows, indicated by a percentage, to render above
+   * and below the visible scroll area.
+   *
+   * For example, if twenty items is enough to fill the viewport, an `overdraw`
+   * value of `20` would render 8 additional items (four above the viewable
+   * area and four below the viewable area). That's 20% more items in each
+   * scrolling direction.
+   *
+   * This can be useful if data for the listing is computed or fetched
+   * asynchronously. The overdraw allows data for a list item to start being
+   * gathered moments before it scrolls into view. This can boost the perceived
+   * performance of the listing.
+   *
+   * @property overdraw
+   * @type {Number}
+   * @default 0
+   * @public
+   */
+  get overdraw() {
+    return this.args.overdraw || 0;
+  }
+
+  /**
+   * The height of each row.
+   *
+   * The default height of each row is `50px`.
+   *
+   * @property row
+   * @type {Number|String}
+   * @default 50
+   * @public
+   */
+  get row() {
+    return this.args.row || DEFAULT_ROW_HEIGHT;
+  }
 
   /**
    * The number of items to render per row.
@@ -695,80 +703,68 @@ class EllaTreadmillComponent extends Component {
     return callback;
   }
 
-  @action
-  handleInsertElement() {
-    this._rafWatcherBegin();
-    this.updateGeometry();
+  /**
+   * The plain object obtained by calling `.getBoundingClientRect()` on the
+   * component's element.
+   *
+   * @property geometryElement
+   * @type {Object}
+   * @public
+   * @readOnly
+   */
+  get geometryElement() {
+    const { element } = this;
+
+    return typeof element?.getBoundingClientRect === 'function'
+      ? element.getBoundingClientRect()
+      : {};
   }
 
-  willDestroy() {
-    super.willDestroy(...arguments);
-    this._rafWatcherEnd();
+  /**
+   * The plain object obtained by calling `.getBoundingClientRect()` on the
+   * component's scrolling parent element (if applicable).
+   *
+   * @property geometryParent
+   * @type {Object}
+   * @public
+   * @readOnly
+   */
+  get geometryParent() {
+    const parent = this.scrollingParent();
+
+    return typeof parent?.getBoundingClientRect === 'function'
+      ? parent.getBoundingClientRect()
+      : {};
   }
 
-  @action
-  listItemInserted(item) {
-    if (!this.sampleItem) {
-      this.sampleItem = item;
-    }
+  /**
+   * Provide a scrolling parent height if no scrolling parent can be detected.
+   *
+   * @property _defaultHeight
+   * @type {Number}
+   * @private
+   * @readOnly
+   */
+  get _defaultHeight() {
+    return window ? window.innerHeight : NO_WINDOW_HEIGHT;
   }
 
-  @action
-  listItemUpdated(geometry) {
-    this.itemHeight = geometry.height;
-    this.itemWidth = geometry.width;
+  /**
+   * Provide an element or parent element width if no rendered width can
+   * be determined.
+   *
+   * @property _defaultWidth
+   * @type {Number}
+   * @private
+   * @readOnly
+   */
+  get _defaultWidth() {
+    return window ? window.innerWidth : NO_WINDOW_WIDTH;
   }
 
-  @action
-  listItemDestroyed(item) {
-    if (this.sampleItem === item) {
-      set(this, 'sampleItem', null);
-    }
-  }
-
-  resizeTask = task({ restartable: true }, async () => {
-    if (this.resizing === 0) {
-      this.sendStateUpdate('on-resize-start');
-    }
-
-    this.resizing = this.resizing + 1;
-    this.updateGeometry();
-    this.sendStateUpdate('on-resize');
-
-    await timeout(RECALC_INTERVAL);
-
-    this.resizing = 0;
-    this.updateGeometry();
-    this.sendStateUpdate('on-resize').sendStateUpdate('on-resize-end');
-  });
-
-  scrollTask = task({ restartable: true }, async () => {
-    if (this.scrolling === 0) {
-      this.sendStateUpdate('on-scroll-start');
-    }
-
-    this.scrolling = this.scrolling + 1;
-    this.updateGeometry();
-    this.sendStateUpdate('on-scroll');
-
-    await timeout(RECALC_INTERVAL);
-
-    this.scrolling = 0;
-    this.updateGeometry();
-    this.sendStateUpdate('on-scroll').sendStateUpdate('on-scroll-end');
-  });
-
-  moveToTask = task(async () => {
-    const { moveTo, lastMove } = this;
-
-    if (isNone(moveTo)) return;
-
-    if (moveTo !== lastMove) {
-      await this.scrollToIndex(moveTo);
-    }
-
-    return moveTo;
-  });
+  /****************************************************/
+  /* METHODS                                          */
+  /****************************************************/
 
   /**
    * Find the scrolling parent of the component. This may be an HTML element,
@@ -1036,64 +1032,88 @@ class EllaTreadmillComponent extends Component {
     return this;
   }
 
-  /**
-   * The plain object obtained by calling `.getBoundingClientRect()` on the
-   * component's element.
-   *
-   * @property geometryElement
-   * @type {Object}
-   * @public
-   * @readOnly
-   */
-  get geometryElement() {
-    const { element } = this;
+  resizeTask = task({ restartable: true }, async () => {
+    if (this.resizing === 0) {
+      this.sendStateUpdate('on-resize-start');
+    }
 
-    return typeof element?.getBoundingClientRect === 'function'
-      ? element.getBoundingClientRect()
-      : {};
+    this.resizing = this.resizing + 1;
+    this.updateGeometry();
+    this.sendStateUpdate('on-resize');
+
+    await timeout(RECALC_INTERVAL);
+
+    this.resizing = 0;
+    this.updateGeometry();
+    this.sendStateUpdate('on-resize').sendStateUpdate('on-resize-end');
+  });
+
+  willDestroy() {
+    super.willDestroy(...arguments);
+    this._rafWatcherEnd();
   }
 
-  /**
-   * The plain object obtained by calling `.getBoundingClientRect()` on the
-   * component's scrolling parent element (if applicable).
-   *
-   * @property geometryParent
-   * @type {Object}
-   * @public
-   * @readOnly
-   */
-  get geometryParent() {
-    const parent = this.scrollingParent();
+  /****************************************************/
+  /* ACTIONS                                          */
+  /****************************************************/
 
-    return typeof parent?.getBoundingClientRect === 'function'
-      ? parent.getBoundingClientRect()
-      : {};
+  @action
+  handleInsertElement() {
+    this._rafWatcherBegin();
+    this.updateGeometry();
   }
 
-  /**
-   * Provide a scrolling parent height if no scrolling parent can be detected.
-   *
-   * @property _defaultHeight
-   * @type {Number}
-   * @private
-   * @readOnly
-   */
-  get _defaultHeight() {
-    return window ? window.innerHeight : NO_WINDOW_HEIGHT;
+  @action
+  listItemInserted(item) {
+    if (!this.sampleItem) {
+      this.sampleItem = item;
+    }
   }
 
-  /**
-   * Provide an element or parent element width if no rendered width can
-   * be determined.
-   *
-   * @property _defaultWidth
-   * @type {Number}
-   * @private
-   * @readOnly
-   */
-  get _defaultWidth() {
-    return window ? window.innerWidth : NO_WINDOW_WIDTH;
+  @action
+  listItemUpdated(geometry) {
+    this.itemHeight = geometry.height;
+    this.itemWidth = geometry.width;
   }
+
+  @action
+  listItemDestroyed(item) {
+    if (this.sampleItem === item) {
+      set(this, 'sampleItem', null);
+    }
+  }
+
+  /****************************************************/
+  /* TASKS                                            */
+  /****************************************************/
+
+  scrollTask = task({ restartable: true }, async () => {
+    if (this.scrolling === 0) {
+      this.sendStateUpdate('on-scroll-start');
+    }
+
+    this.scrolling = this.scrolling + 1;
+    this.updateGeometry();
+    this.sendStateUpdate('on-scroll');
+
+    await timeout(RECALC_INTERVAL);
+
+    this.scrolling = 0;
+    this.updateGeometry();
+    this.sendStateUpdate('on-scroll').sendStateUpdate('on-scroll-end');
+  });
+
+  moveToTask = task(async () => {
+    const { moveTo, lastMove } = this;
+
+    if (isNone(moveTo)) return;
+
+    if (moveTo !== lastMove) {
+      await this.scrollToIndex(moveTo);
+    }
+
+    return moveTo;
+  });
 }
 
 export default EllaTreadmillComponent;
