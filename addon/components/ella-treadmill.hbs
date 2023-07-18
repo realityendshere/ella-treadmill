@@ -3,6 +3,7 @@
   class="ella-treadmill
     {{if this.resizing "is-resizing" "not-resizing"}}
     {{if this.scrolling "is-scrolling" "not-scrolling"}}"
+  style={{this.styles}}
   role="list"
   data-scroll-top={{this.data-scroll-top}}
   data-scroll-delta={{this.topDelta}}
@@ -11,31 +12,6 @@
   ...attributes
   {{did-insert this.handleInsertElement}}
 >
-  {{!-- Fix dynamic positioning styles! --}}
-  {{! template-lint-disable no-forbidden-elements }}
-  <style type="text/css">
-    #{{this.elementId}} {
-    position: relative;
-    {{#if this.totalHeight}}
-      height: {{this.totalHeight}}{{this._rowUnit}};
-    {{/if}}
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    align-content: flex-start;
-    box-sizing: border-box;
-    }
-
-    #{{this.elementId}} .ella-treadmill-item {
-      -webkit-overflow-scrolling: 'touch';
-    }
-
-    #{{this.elementId}}.is-scrolling .ella-treadmill-item {
-      pointer-events: none;
-    }
-  </style>
-  {{! template-lint-enable no-forbidden-elements }}
-
   {{#let
     this.visibleIndexes
     this.visibleContent

@@ -1,12 +1,12 @@
 import Component from '@glimmer/component';
-import { tracked } from '@glimmer/tracking';
 import { A } from '@ember/array';
-import { action } from '@ember/object';
-import { isNone } from '@ember/utils';
-import { set } from '@ember/object';
+import { action, set } from '@ember/object';
 import { guidFor } from '@ember/object/internals';
+import { htmlSafe } from '@ember/template';
+import { isNone } from '@ember/utils';
 import { run } from '@ember/runloop';
 import { task, timeout } from 'ember-concurrency';
+import { tracked } from '@glimmer/tracking';
 
 const RECALC_INTERVAL = 50;
 const NO_WINDOW_HEIGHT = 1024;
@@ -760,6 +760,30 @@ class EllaTreadmillComponent extends Component {
    */
   get _defaultWidth() {
     return window ? window.innerWidth : NO_WINDOW_WIDTH;
+  }
+
+  /**
+   * Required & computed style for Treadmill element.
+   *
+   * @property styles
+   * @type {String}
+   * @public
+   * @readOnly
+   */
+  get styles() {
+    const { totalHeight, _rowUnit } = this;
+    const styles = [
+      'position: relative;',
+      'width: 100%;',
+      'display: flex;',
+      'flex-wrap: wrap;',
+      'align-content: flex-start;',
+      'box-sizing: border-box;',
+    ];
+
+    if (totalHeight) styles.push(`height: ${totalHeight}${_rowUnit};`);
+
+    return htmlSafe(styles.join(''));
   }
 
   /****************************************************/

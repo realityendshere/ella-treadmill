@@ -1,6 +1,7 @@
 <ella-treadmill-item
   id={{this.this.elementId}}
   class="ella-treadmill-item {{this.classRow}} {{this.classColumn}}"
+  style={{this.styles}}
   aria-hidden={{this.aria-hidden}}
   role="listitem"
   ...attributes
@@ -15,35 +16,6 @@
     @fluctuateColumn
   }}
 >
-  {{!-- Fix dynamic positioning styles! --}}
-  {{! template-lint-disable no-forbidden-elements }}
-  <style type="text/css">
-    #{{this.elementId}} {
-      position: relative;
-      height: {{this.height}}{{this.heightUnit}};
-      width: {{this.width}}{{this.widthUnit}};
-      box-sizing: border-box;
-      display: block;
-      flex: 0 0 {{this.width}}{{this.widthUnit}};
-
-      -o-transform: translateY({{this.translateY}});
-      -o-transform: translate3d(0, {{this.translateY}}, 0);
-
-      -ms-transform: translateY({{this.translateY}});
-      -ms-transform: translate3d(0, {{this.translateY}}, 0);
-
-      -moz-transform: translateY({{this.translateY}});
-      -moz-transform: translate3d(0, {{this.translateY}}, 0);
-
-      -webkit-transform: translateY({{this.translateY}});
-      -webkit-transform: translate3d(0, {{this.translateY}}, 0);
-
-      transform: translateY({{this.translateY}});
-      transform: translate3d(0, {{this.translateY}}, 0);
-    }
-  </style>
-  {{! template-lint-enable no-forbidden-elements }}
-
   {{yield this.item this.index}}
 </ella-treadmill-item>
 

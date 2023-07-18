@@ -1,6 +1,15 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { guidFor } from '@ember/object/internals';
+import { htmlSafe } from '@ember/template';
+
+const TRANSFORM_STYLE_MAP = [
+  ['msTransform', '-ms-transform'],
+  ['OTransform', '-o-transform'],
+  ['MozTransform', '-moz-transform'],
+  ['webkitTransform', '-webkit-transform'],
+  ['transform', 'transform'],
+];
 
 class EllaTreadmillItemComponent extends Component {
   elementId = guidFor(this);
@@ -241,6 +250,42 @@ class EllaTreadmillItemComponent extends Component {
    */
   get widthUnit() {
     return '%';
+  }
+
+  get styles() {
+    const {
+      element,
+      parent,
+      height,
+      heightUnit,
+      width,
+      widthUnit,
+      translateY,
+    } = this;
+    const styles = [
+      'position: relative;',
+      `height: ${height}${heightUnit};`,
+      `width: ${width}${widthUnit};`,
+      'box-sizing: border-box;',
+      'display: block;',
+      `flex: 0 0 ${width}${widthUnit};`,
+      '-webkit-overflow-scrolling: "touch";',
+    ];
+
+    if (parent?.scrolling) styles.push('pointer-events: none;');
+
+    for (const styl of TRANSFORM_STYLE_MAP) {
+      const [key, v] = styl;
+
+      if (!element || typeof element.style[key] === 'string') {
+        styles.push(
+          `${v}: translateY(${translateY});`,
+          `${v}: translate3d(0, ${translateY}, 0);`
+        );
+      }
+    }
+
+    return htmlSafe(styles.join(''));
   }
 
   @action
