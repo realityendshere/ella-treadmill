@@ -48,7 +48,7 @@ module('Integration | Component | ella treadmill item', function (hooks) {
     assert.expect(4);
 
     await render(hbs`
-      <div id="measurement" style="height: 0; width: 100%;">&nbsp;</div>
+      <div id="measurement" style={{html-safe "height: 0; width: 100%;"}}>&nbsp;</div>
       <EllaTreadmillItem />
     `);
 
@@ -69,7 +69,7 @@ module('Integration | Component | ella treadmill item', function (hooks) {
     assert.expect(2);
 
     await render(hbs`
-      <div id="measurement" style="height: 50px; width: 50%;">&nbsp;</div>
+      <div id="measurement" style={{html-safe "height: 50px; width: 50%;"}}>&nbsp;</div>
       <EllaTreadmillItem @height="50" @columns="2" />
     `);
 
@@ -88,7 +88,7 @@ module('Integration | Component | ella treadmill item', function (hooks) {
     assert.expect(2);
 
     await render(hbs`
-      <div id="measurement" style="height: 50px; width: 100%; position: absolute; top: 0; left: 0;">&nbsp;</div>
+      <div id="measurement" style={{html-safe "height: 50px; width: 100%; position: absolute; top: 0; left: 0;"}}>&nbsp;</div>
       <EllaTreadmillItem @height="50" />
     `);
 
@@ -109,7 +109,7 @@ module('Integration | Component | ella treadmill item', function (hooks) {
     this.set('index', 4);
 
     await render(hbs`
-      <div id="measurement" style="height: 50px; width: 100%; position: absolute; top: 0; left: 0;">&nbsp;</div>
+      <div id="measurement" style={{html-safe "height: 50px; width: 100%; position: absolute; top: 0; left: 0;"}}>&nbsp;</div>
       <EllaTreadmillItem @height="50" @index={{this.index}} />
     `);
 
@@ -212,7 +212,7 @@ module('Integration | Component | ella treadmill item', function (hooks) {
     this.set('index', 6);
 
     await render(hbs`
-      <div id="measurement" style="height: 50px; width: 100%; position: absolute; top: 0; left: 0;">&nbsp;</div>
+      <div id="measurement" style={{html-safe "height: 50px; width: 100%; position: absolute; top: 0; left: 0;"}}>&nbsp;</div>
       <EllaTreadmillItem @height="50" @index={{this.index}} @columns={{this.columns}} @pageSize={{this.pageSize}} />
     `);
 

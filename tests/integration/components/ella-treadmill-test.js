@@ -1,6 +1,6 @@
-import { module, test } from 'qunit';
 /* eslint ember/named-functions-in-promises: 0 */
 
+import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { render, waitUntil } from '@ember/test-helpers';
 import { run, later } from '@ember/runloop';
@@ -129,7 +129,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
     this.set('model', []);
 
     await render(hbs`
-      {{#ella-treadmill content=this.model as |item index|}}
+      {{#ella-treadmill content=this.model}}
         I am a listing.
       {{else}}
         Nothing to see here.
@@ -188,7 +188,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
 
     await render(hbs`
       <EllaTreadmill @content={{this.model}} />
-      <div id="measurement" style="width: 100%;">&nbsp;</div>
+      <div id="measurement" style={{html-safe "width: 100%;"}}>&nbsp;</div>
     `);
 
     const element = document.querySelector('ella-treadmill');
@@ -219,8 +219,8 @@ module('Integration | Component | ella treadmill', function (hooks) {
 
     await render(hbs`
       <EllaTreadmill @row={{this.rowHeight}} @content={{this.model}} />
-      <div id="test1" style="height: 24px;">&nbsp;</div>
-      <div id="test2" style="height: 100px;">&nbsp;</div>
+      <div id="test1" style={{html-safe "height: 24px;"}}>&nbsp;</div>
+      <div id="test2" style={{html-safe "height: 100px;"}}>&nbsp;</div>
     `);
 
     const element = document.querySelector('ella-treadmill');
@@ -253,12 +253,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
 
     await render(hbs`
       <EllaTreadmill @row="5.35rem" @content={{this.model}} />
-      <style type="text/css">
-        #measurement {
-          height: {{this.expectedHeight}};
-        }
-      </style>
-      <div id="measurement">&nbsp;</div>
+      <div id="measurement" style={{html-safe (concat "height: " this.expectedHeight)}}>&nbsp;</div>
     `);
 
     const element = document.querySelector('ella-treadmill');
@@ -273,7 +268,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
     this.set('model', LARGE_ARRAY);
 
     await render(hbs`
-      <div style="height: 500px; overflow: auto;">
+      <div style={{html-safe "height: 500px; overflow: auto;"}}>
         <EllaTreadmill @row="20%" @content={{this.model}} />
       </div>
     `);
@@ -401,7 +396,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
 
     await render(hbs`
       <EllaTreadmill @row="2.35em" @content={{this.model}} />
-      <div id="measurement" style="height: 2.35em;">&nbsp;</div>
+      <div id="measurement" style={{html-safe "height: 2.35em;"}}>&nbsp;</div>
     `);
 
     const element = document.querySelector('ella-treadmill');
@@ -454,7 +449,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
 
     await render(hbs`
       <EllaTreadmill @row="3.1rem" @content={{this.model}} />
-      <div id="measurement" style="height: 3.1rem;">&nbsp;</div>
+      <div id="measurement" style={{html-safe "height: 3.1rem;"}}>&nbsp;</div>
     `);
 
     const element = document.querySelector('ella-treadmill');
@@ -814,7 +809,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
     };
 
     await render(hbs`
-      <div style="overflow: auto; height: 500px;" id="scroller">
+      <div style={{html-safe "overflow: auto; height: 500px;"}} id="scroller">
         <EllaTreadmill @content={{this.model}} @row="100" @on-scroll-start={{this.handleScrollStart}} />
       </div>
     `);
@@ -851,7 +846,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
     };
 
     await render(hbs`
-      <div style="overflow: auto; height: 500px;" id="scroller">
+      <div style={{html-safe "overflow: auto; height: 500px;"}} id="scroller">
         <EllaTreadmill @content={{this.model}} @row="100" @on-scroll-end={{this.handleScrollEnd}} />
       </div>
     `);
@@ -903,7 +898,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
     };
 
     await render(hbs`
-      <div id="bumper" style="height: 300px;">&nbsp;</div>
+      <div id="bumper" style={{html-safe "height: 300px;"}}>&nbsp;</div>
       <EllaTreadmill @content={{this.model}} @row="100" @on-scroll={{this.handleListingStateChanged}} />
     `);
 
@@ -996,7 +991,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
     this.set('model', LARGE_ARRAY);
 
     await render(hbs`
-      <div style="overflow: auto; height: 500px;" id="scroller">
+      <div style={{html-safe "overflow: auto; height: 500px;"}} id="scroller">
         <EllaTreadmill @content={{this.model}} @row="100" />
       </div>
     `);
@@ -1025,10 +1020,10 @@ module('Integration | Component | ella treadmill', function (hooks) {
     this.set('model', LARGE_ARRAY);
 
     await render(hbs`
-      <div style="overflow: auto; height: 500px;" id="scroller">
+      <div style={{html-safe "overflow: auto; height: 500px;"}} id="scroller">
         <EllaTreadmill @content={{this.model}} @row="100" />
       </div>
-      <div id="measurement" style="height: 100px;">&nbsp;</div>
+      <div id="measurement" style={{html-safe "height: 100px;"}}>&nbsp;</div>
     `);
 
     const element = document.querySelector('ella-treadmill');
@@ -1058,11 +1053,11 @@ module('Integration | Component | ella treadmill', function (hooks) {
     this.set('model', LARGE_ARRAY);
 
     await render(hbs`
-      <div style="overflow: auto; height: 500px;" id="scroller">
-        <div id="bumper" style="height: 300px;">&nbsp;</div>
+      <div style={{html-safe "overflow: auto; height: 500px;"}} id="scroller">
+        <div id="bumper" style={{html-safe "height: 300px;"}}>&nbsp;</div>
         <EllaTreadmill @content={{this.model}} @row="100" />
       </div>
-      <div id="measurement" style="height: 100px;">&nbsp;</div>
+      <div id="measurement" style={{html-safe "height: 100px;"}}>&nbsp;</div>
     `);
 
     const element = document.querySelector('ella-treadmill');
@@ -1102,7 +1097,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
     this.set('model', LARGE_ARRAY);
 
     await render(hbs`
-      <div style="overflow: auto; height: 500px;" id="scroller">
+      <div style={{html-safe "overflow: auto; height: 500px;"}} id="scroller">
         <EllaTreadmill @content={{this.model}} @row="100" />
       </div>
     `);
@@ -1133,8 +1128,8 @@ module('Integration | Component | ella treadmill', function (hooks) {
     this.set('model', LARGE_ARRAY);
 
     await render(hbs`
-      <div style="overflow: auto; height: 500px;" id="scroller">
-        <div id="bumper" style="height: 300px;">&nbsp;</div>
+      <div style={{html-safe "overflow: auto; height: 500px;"}} id="scroller">
+        <div id="bumper" style={{html-safe "height: 300px;"}}>&nbsp;</div>
         <EllaTreadmill @content={{this.model}} @row="100" />
       </div>
     `);
@@ -1190,7 +1185,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
 
     await render(hbs`
       <EllaTreadmill @content={{this.model}} @row="100" as |item index|>
-        [{{{index}}}]: I am item #{{item}}
+        [{{index}}]: I am item #{{item}}
       </EllaTreadmill>
     `);
 
@@ -1209,8 +1204,8 @@ module('Integration | Component | ella treadmill', function (hooks) {
     this.set('model', LARGE_ARRAY);
 
     await render(hbs`
-      <div style="overflow: auto; height: 500px;" id="scroller">
-        <div id="bumper" style="height: 300px;">&nbsp;</div>
+      <div style={{html-safe "overflow: auto; height: 500px;"}} id="scroller">
+        <div id="bumper" style={{html-safe "height: 300px;"}}>&nbsp;</div>
         <EllaTreadmill @content={{this.model}} @row="100" />
       </div>
     `);
@@ -1230,7 +1225,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
     this.set('model', LARGE_ARRAY);
 
     await render(hbs`
-      <div style="overflow: auto; height: 500px;" id="scroller">
+      <div style={{html-safe "overflow: auto; height: 500px;"}} id="scroller">
         <EllaTreadmill @content={{this.model}} @row="100" />
       </div>
     `);
@@ -1267,8 +1262,8 @@ module('Integration | Component | ella treadmill', function (hooks) {
     this.set('model', LARGE_ARRAY);
 
     await render(hbs`
-      <div style="overflow: auto; height: 500px;" id="scroller">
-        <div id="bumper" style="height: 300px;">&nbsp;</div>
+      <div style={{html-safe "overflow: auto; height: 500px;"}} id="scroller">
+        <div id="bumper" style={{html-safe "height: 300px;"}}>&nbsp;</div>
         <EllaTreadmill @content={{this.model}} @row="100" />
       </div>
     `);
@@ -1306,8 +1301,8 @@ module('Integration | Component | ella treadmill', function (hooks) {
     this.set('rowHeight', rowHeight);
 
     await render(hbs`
-      <div style="overflow: auto; height: 768px;" id="scroller">
-        <div id="bumper" style="height: 300px;">&nbsp;</div>
+      <div style={{html-safe "overflow: auto; height: 768px;"}} id="scroller">
+        <div id="bumper" style={{html-safe "height: 300px;"}}>&nbsp;</div>
         <EllaTreadmill @content={{this.model}} @row={{this.rowHeight}} />
       </div>
     `);
@@ -1350,7 +1345,7 @@ module('Integration | Component | ella treadmill', function (hooks) {
     this.set('model', LARGE_ARRAY);
 
     await render(hbs`
-      <div style="overflow: auto; height: 600px;" id="scroller">
+      <div style={{html-safe "overflow: auto; height: 600px;"}} id="scroller">
         <EllaTreadmill @content={{this.model}} @row="30" @overdraw={{this.overdraw}} />
       </div>
     `);
@@ -1426,20 +1421,20 @@ module('Integration | Component | ella treadmill', function (hooks) {
     await render(hbs`
       <EllaTreadmill @content={{this.model}} @row="60" @minColumnWidth="33%" />
 
-      <div id="test0" style="height: 60px; width: 200px; position: absolute; top: 0; left: 0;">&nbsp;</div>
-      <div id="test1" style="height: 60px; width: 200px; position: absolute; top: 0; left: 200px;">&nbsp;</div>
-      <div id="test2" style="height: 60px; width: 200px; position: absolute; top: 0; left: 400px;">&nbsp;</div>
-      <div id="test3" style="height: 60px; width: 200px; position: absolute; top: 60px; left: 0;">&nbsp;</div>
-      <div id="test4" style="height: 60px; width: 200px; position: absolute; top: 60px; left: 200px;">&nbsp;</div>
-      <div id="test5" style="height: 60px; width: 200px; position: absolute; top: 60px; left: 400px;">&nbsp;</div>
-      <div id="resize0" style="height: 60px; width: 400px; position: absolute; top: 0; left: 0;">&nbsp;</div>
-      <div id="resize1" style="height: 60px; width: 400px; position: absolute; top: 0; left: 400px;">&nbsp;</div>
-      <div id="resize2" style="height: 60px; width: 400px; position: absolute; top: 0; left: 800px;">&nbsp;</div>
-      <div id="resize3" style="height: 60px; width: 400px; position: absolute; top: 60px; left: 0;">&nbsp;</div>
-      <div id="resize4" style="height: 60px; width: 400px; position: absolute; top: 60px; left: 400px;">&nbsp;</div>
-      <div id="resize5" style="height: 60px; width: 400px; position: absolute; top: 60px; left: 800px;">&nbsp;</div>
+      <div id="test0" style={{html-safe "height: 60px; width: 200px; position: absolute; top: 0; left: 0;"}}>&nbsp;</div>
+      <div id="test1" style={{html-safe "height: 60px; width: 200px; position: absolute; top: 0; left: 200px;"}}>&nbsp;</div>
+      <div id="test2" style={{html-safe "height: 60px; width: 200px; position: absolute; top: 0; left: 400px;"}}>&nbsp;</div>
+      <div id="test3" style={{html-safe "height: 60px; width: 200px; position: absolute; top: 60px; left: 0;"}}>&nbsp;</div>
+      <div id="test4" style={{html-safe "height: 60px; width: 200px; position: absolute; top: 60px; left: 200px;"}}>&nbsp;</div>
+      <div id="test5" style={{html-safe "height: 60px; width: 200px; position: absolute; top: 60px; left: 400px;"}}>&nbsp;</div>
+      <div id="resize0" style={{html-safe "height: 60px; width: 400px; position: absolute; top: 0; left: 0;"}}>&nbsp;</div>
+      <div id="resize1" style={{html-safe "height: 60px; width: 400px; position: absolute; top: 0; left: 400px;"}}>&nbsp;</div>
+      <div id="resize2" style={{html-safe "height: 60px; width: 400px; position: absolute; top: 0; left: 800px;"}}>&nbsp;</div>
+      <div id="resize3" style={{html-safe "height: 60px; width: 400px; position: absolute; top: 60px; left: 0;"}}>&nbsp;</div>
+      <div id="resize4" style={{html-safe "height: 60px; width: 400px; position: absolute; top: 60px; left: 400px;"}}>&nbsp;</div>
+      <div id="resize5" style={{html-safe "height: 60px; width: 400px; position: absolute; top: 60px; left: 800px;"}}>&nbsp;</div>
 
-      <div id="testTotal" style="height: 200040px;">&nbsp;</div>
+      <div id="testTotal" style={{html-safe "height: 200040px;"}}>&nbsp;</div>
     `);
 
     const element = document.querySelector('ella-treadmill');
@@ -1535,18 +1530,18 @@ module('Integration | Component | ella treadmill', function (hooks) {
     await render(hbs`
       <EllaTreadmill @content={{this.model}} @row="60" @minColumnWidth="180px" />
 
-      <div id="test0" style="height: 60px; width: 200px; position: absolute; top: 0; left: 0;">&nbsp;</div>
-      <div id="test1" style="height: 60px; width: 200px; position: absolute; top: 0; left: 200px;">&nbsp;</div>
-      <div id="test2" style="height: 60px; width: 200px; position: absolute; top: 0; left: 400px;">&nbsp;</div>
-      <div id="test3" style="height: 60px; width: 200px; position: absolute; top: 60px; left: 0;">&nbsp;</div>
-      <div id="test4" style="height: 60px; width: 200px; position: absolute; top: 60px; left: 200px;">&nbsp;</div>
-      <div id="test5" style="height: 60px; width: 200px; position: absolute; top: 60px; left: 400px;">&nbsp;</div>
-      <div id="resize0" style="height: 60px; width: 180px; position: absolute; top: 0; left: 0;">&nbsp;</div>
-      <div id="resize1" style="height: 60px; width: 180px; position: absolute; top: 0; left: 180px;">&nbsp;</div>
-      <div id="resize2" style="height: 60px; width: 180px; position: absolute; top: 0; left: 360px;">&nbsp;</div>
-      <div id="resize3" style="height: 60px; width: 180px; position: absolute; top: 0; left: 540px;">&nbsp;</div>
-      <div id="resize4" style="height: 60px; width: 180px; position: absolute; top: 0; left: 720px;">&nbsp;</div>
-      <div id="resize5" style="height: 60px; width: 180px; position: absolute; top: 60px; left: 0;">&nbsp;</div>
+      <div id="test0" style={{html-safe "height: 60px; width: 200px; position: absolute; top: 0; left: 0;"}}>&nbsp;</div>
+      <div id="test1" style={{html-safe "height: 60px; width: 200px; position: absolute; top: 0; left: 200px;"}}>&nbsp;</div>
+      <div id="test2" style={{html-safe "height: 60px; width: 200px; position: absolute; top: 0; left: 400px;"}}>&nbsp;</div>
+      <div id="test3" style={{html-safe "height: 60px; width: 200px; position: absolute; top: 60px; left: 0;"}}>&nbsp;</div>
+      <div id="test4" style={{html-safe "height: 60px; width: 200px; position: absolute; top: 60px; left: 200px;"}}>&nbsp;</div>
+      <div id="test5" style={{html-safe "height: 60px; width: 200px; position: absolute; top: 60px; left: 400px;"}}>&nbsp;</div>
+      <div id="resize0" style={{html-safe "height: 60px; width: 180px; position: absolute; top: 0; left: 0;"}}>&nbsp;</div>
+      <div id="resize1" style={{html-safe "height: 60px; width: 180px; position: absolute; top: 0; left: 180px;"}}>&nbsp;</div>
+      <div id="resize2" style={{html-safe "height: 60px; width: 180px; position: absolute; top: 0; left: 360px;"}}>&nbsp;</div>
+      <div id="resize3" style={{html-safe "height: 60px; width: 180px; position: absolute; top: 0; left: 540px;"}}>&nbsp;</div>
+      <div id="resize4" style={{html-safe "height: 60px; width: 180px; position: absolute; top: 0; left: 720px;"}}>&nbsp;</div>
+      <div id="resize5" style={{html-safe "height: 60px; width: 180px; position: absolute; top: 60px; left: 0;"}}>&nbsp;</div>
     `);
 
     const items = document.querySelectorAll(
@@ -1641,16 +1636,16 @@ module('Integration | Component | ella treadmill', function (hooks) {
     this.set('model', LARGE_ARRAY);
 
     await render(hbs`
-      <div id="bumper" style="height: 372px;">&nbsp;</div>
+      <div id="bumper" style={{html-safe "height: 372px;"}}>&nbsp;</div>
 
       <EllaTreadmill @content={{this.model}} @row="150" @minColumnWidth="300px" />
 
-      <div id="test0" style="height: 150px; width: 300px; position: absolute; top: 35022px; left: 0;">&nbsp;</div>
-      <div id="test1" style="height: 150px; width: 300px; position: absolute; top: 35022px; left: 300px;">&nbsp;</div>
-      <div id="test2" style="height: 150px; width: 300px; position: absolute; top: 35022px; left: 600px;">&nbsp;</div>
-      <div id="test3" style="height: 150px; width: 300px; position: absolute; top: 34122px; left: 0;">&nbsp;</div>
-      <div id="test4" style="height: 150px; width: 300px; position: absolute; top: 34122px; left: 300px;">&nbsp;</div>
-      <div id="test5" style="height: 150px; width: 300px; position: absolute; top: 34122px; left: 600px;">&nbsp;</div>
+      <div id="test0" style={{html-safe "height: 150px; width: 300px; position: absolute; top: 35022px; left: 0;"}}>&nbsp;</div>
+      <div id="test1" style={{html-safe "height: 150px; width: 300px; position: absolute; top: 35022px; left: 300px;"}}>&nbsp;</div>
+      <div id="test2" style={{html-safe "height: 150px; width: 300px; position: absolute; top: 35022px; left: 600px;"}}>&nbsp;</div>
+      <div id="test3" style={{html-safe "height: 150px; width: 300px; position: absolute; top: 34122px; left: 0;"}}>&nbsp;</div>
+      <div id="test4" style={{html-safe "height: 150px; width: 300px; position: absolute; top: 34122px; left: 300px;"}}>&nbsp;</div>
+      <div id="test5" style={{html-safe "height: 150px; width: 300px; position: absolute; top: 34122px; left: 600px;"}}>&nbsp;</div>
     `);
 
     const items = document.querySelectorAll(
