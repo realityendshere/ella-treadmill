@@ -800,6 +800,14 @@ class EllaTreadmillComponent extends Component {
     return scroller || window || FAKE_WINDOW;
   }
 
+  /**
+   * Adjust scroll position to bring specified index into view.
+   *
+   * @method scrollToIndex
+   * @param {Number} idx The index to scroll to
+   * @chainable
+   * @public
+   */
   scrollToIndex(idx) {
     const { element, columns, scrollTop, topDelta } = this;
     const parent = this.scrollingParent();
