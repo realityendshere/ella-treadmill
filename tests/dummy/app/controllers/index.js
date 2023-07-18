@@ -15,6 +15,11 @@ export default class IndexController extends Controller {
   }
 
   @action
+  jumpTo(idx) {
+    this.moveTo = idx;
+  }
+
+  @action
   handleScrollStart() {
     console.log('SCROLL START ::', Date.now());
   }
