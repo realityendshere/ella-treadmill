@@ -36,31 +36,37 @@
   </style>
   {{! template-lint-enable no-forbidden-elements }}
 
-  {{#each this.indices as |_ idx|}}
-    <EllaTreadmillItem
-      @parent={{this}}
-      @index={{get this.visibleIndexes (concat "" idx)}}
-      @item={{get this.visibleContent (concat "" idx)}}
-      @height={{this._row}}
-      @heightUnit={{this._rowUnit}}
-      @columns={{this.columns}}
-      @pageSize={{this.numberOfVisibleItems}}
-      @fluctuate={{this.fluctuate}}
-      @fluctuateColumn={{this.fluctuateColumn}}
-      @on-insert={{this.listItemInserted}}
-      @on-update={{this.listItemUpdated}}
-      @on-destroy={{this.listItemDestroyed}}
-      as |item index|
-    >
-      {{#if (has-block)}}
-        {{yield item index}}
-      {{else}}
-        {{get this.visibleContent (concat "" idx)}}
+  {{#let
+    this.visibleIndexes
+    this.visibleContent
+    as |visibleIndexes visibleContent|
+  }}
+    {{#each this.indices as |_ idx|}}
+      <EllaTreadmillItem
+        @parent={{this}}
+        @index={{get visibleIndexes (concat "" idx)}}
+        @item={{get visibleContent (concat "" idx)}}
+        @height={{this._row}}
+        @heightUnit={{this._rowUnit}}
+        @columns={{this.columns}}
+        @pageSize={{this.numberOfVisibleItems}}
+        @fluctuate={{this.fluctuate}}
+        @fluctuateColumn={{this.fluctuateColumn}}
+        @on-insert={{this.listItemInserted}}
+        @on-update={{this.listItemUpdated}}
+        @on-destroy={{this.listItemDestroyed}}
+        as |item index|
+      >
+        {{#if (has-block)}}
+          {{yield item index}}
+        {{else}}
+          {{get visibleContent (concat "" idx)}}
+        {{/if}}
+      </EllaTreadmillItem>
+    {{else}}
+      {{#if (has-block "inverse")}}
+        {{yield to="inverse"}}
       {{/if}}
-    </EllaTreadmillItem>
-  {{else}}
-    {{#if (has-block "inverse")}}
-      {{yield to="inverse"}}
-    {{/if}}
-  {{/each}}
+    {{/each}}
+  {{/let}}
 </ella-treadmill>
