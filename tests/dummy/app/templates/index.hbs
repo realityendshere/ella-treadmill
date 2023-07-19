@@ -42,10 +42,19 @@
     @on-resize-start={{this.handleResizeStart}}
     @on-resize={{this.handleResize}}
     @on-resize-end={{this.handleResizeEnd}}
-    as |item index|
   >
-    <div class="demo">
-      [{{if index index "0"}}]: {{item.note}}
-    </div>
+    <:default as |item index|>
+      <div class="demo">
+        [{{if index index "0"}}]: {{item.note}}
+      </div>
+    </:default>
+
+    <:inverse>
+      {{#if this.model.loading}}
+        Loading...
+      {{else}}
+        <p>Nothing to see here.</p>
+      {{/if}}
+    </:inverse>
   </EllaTreadmill>
 </div>
