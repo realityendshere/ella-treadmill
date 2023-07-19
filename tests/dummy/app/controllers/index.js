@@ -1,41 +1,48 @@
 /* eslint no-console: 0 */
 
 import Controller from '@ember/controller';
-import { alias } from '@ember/object/computed';
 import { set } from '@ember/object';
+import { action } from '@ember/object';
+import { tracked } from '@glimmer/tracking';
 
-export default Controller.extend({
-  small: false,
+export default class IndexController extends Controller {
+  @tracked small = false;
+  @tracked moveTo = null;
 
-  moveTo: null,
-
-  numbers: alias('model'),
-
-  actions: {
-    toggleSmall() {
-      this.toggleProperty('small');
-    },
-
-    handleScrollStart() {
-      console.log('SCROLL START ::', Date.now());
-    },
-
-    handleScrollEnd() {
-      console.log('SCROLL END ::', Date.now());
-    },
-
-    handleResizeStart(props) {
-      this.__indexAtStart__ = props.startingIndex;
-      console.log('RESIZE START ::', Date.now());
-    },
-
-    handleResize() {
-      set(this, 'moveTo', this.__indexAtStart__);
-    },
-
-    handleResizeEnd() {
-      set(this, 'moveTo', this.__indexAtStart__);
-      console.log('RESIZE END ::', Date.now());
-    }
+  @action
+  toggleSmall() {
+    this.small = !this.small;
   }
-});
+
+  @action
+  jumpTo(idx) {
+    this.moveTo = idx;
+  }
+
+  @action
+  handleScrollStart() {
+    console.log('SCROLL START ::', Date.now());
+  }
+
+  @action
+  handleScrollEnd() {
+    console.log('SCROLL END ::', Date.now());
+  }
+
+  @action
+  handleResizeStart(props) {
+    this.__indexAtStart__ = props.startingIndex;
+    console.log('RESIZE START ::', Date.now());
+  }
+
+  @action
+  handleResize() {
+    set(this, 'moveTo', this.__indexAtStart__);
+  }
+
+  @action
+  handleResizeEnd() {
+    set(this, 'moveTo', this.__indexAtStart__);
+    console.log('RESIZE END ::', Date.now());
+  }
+}

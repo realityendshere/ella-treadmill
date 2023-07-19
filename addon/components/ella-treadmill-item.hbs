@@ -1,0 +1,22 @@
+<ella-treadmill-item
+  id={{this.this.elementId}}
+  class="ella-treadmill-item {{this.classRow}} {{this.classColumn}}"
+  style={{this.styles}}
+  aria-hidden={{this.aria-hidden}}
+  role="listitem"
+  ...attributes
+  {{did-insert this.handleInsertElement}}
+  {{did-update
+    this.handleUpdateElement
+    @height
+    @heightUnit
+    @columns
+    @pageSize
+    @fluctuate
+    @fluctuateColumn
+  }}
+>
+  {{yield this.item this.index}}
+</ella-treadmill-item>
+
+

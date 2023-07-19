@@ -1,15 +1,12 @@
-import Component from '@ember/component';
-import {
-  computed,
-  get,
-  set,
-  getProperties,
-  setProperties
-} from '@ember/object';
+import Component from '@glimmer/component';
 import { A } from '@ember/array';
+import { action, set } from '@ember/object';
+import { guidFor } from '@ember/object/internals';
+import { htmlSafe } from '@ember/template';
+import { isNone } from '@ember/utils';
 import { run } from '@ember/runloop';
 import { task, timeout } from 'ember-concurrency';
-import layout from '../templates/components/ella-treadmill';
+import { tracked } from '@glimmer/tracking';
 
 const RECALC_INTERVAL = 50;
 const NO_WINDOW_HEIGHT = 1024;
@@ -19,12 +16,13 @@ const DEFAULT_ROW_HEIGHT = 50;
 const FAKE_WINDOW = {
   clientWidth: NO_WINDOW_WIDTH,
   clientHeight: NO_WINDOW_HEIGHT,
-  scrollY: 0
+  scrollY: 0,
 };
 
-let ancestors = function(node, parents = []) {
-  return (node === null || node.parentNode === null) ?
-    parents : ancestors(node.parentNode, parents.concat([node]));
+const ancestors = function (node, parents = []) {
+  return node === null || node.parentNode === null
+    ? parents
+    : ancestors(node.parentNode, parents.concat([node]));
 };
 
 /**
@@ -51,75 +49,12 @@ let ancestors = function(node, parents = []) {
  * @element ella-treadmill
  */
 
-const EllaTreadmill = Component.extend({
-  layout,
+class EllaTreadmillComponent extends Component {
+  elementId = guidFor(this);
 
-  /**
-   * Tag name for the component's element.
-   *
-   * @property tagName
-   * @type String
-   * @default 'ella-treadmill'
-   * @public
-   */
-  tagName: 'ella-treadmill',
-
-  /**
-   * An array of properties to apply as attributes on the component's element.
-   *
-   * @property attributeBindings
-   * @type {Array|String}
-   * @default [
-   *   'data-scroll-top',
-   *   'topDelta:data-scroll-delta',
-   *   'startingIndex:data-first-visible-index',
-   *   'numberOfVisibleItems:data-visible-items'
-   * ]
-   * @public
-   */
-  attributeBindings: [
-    'data-scroll-top',
-    'topDelta:data-scroll-delta',
-    'startingIndex:data-first-visible-index',
-    'numberOfVisibleItems:data-visible-items'
-  ],
-
-  /**
-   * An array of additional CSS class names to add to the component's element.
-   *
-   * @property classNames
-   * @type {Array|String}
-   * @default ['ella-treadmill']
-   * @public
-   */
-  classNames: ['ella-treadmill'],
-
-  /**
-   * An array of additional CSS class names to conditionally add to the
-   * component's element.
-   *
-   * @property classNameBindings
-   * @type {Array|String}
-   * @default [
-   *   'resizing:is-resizing:not-resizing',
-   *   'scrolling:is-scrolling:not-scrolling'
-   * ]
-   * @public
-   */
-  classNameBindings: [
-    'resizing:is-resizing:not-resizing',
-    'scrolling:is-scrolling:not-scrolling'
-  ],
-
-  /**
-   * Applied as the `role` attribute on the component's element.
-   *
-   * @property ariaRole
-   * @type {String}
-   * @default 'list'
-   * @public
-   */
-  ariaRole: 'list',
+  /****************************************************/
+  /* TRACKED PROPERTIES                               */
+  /****************************************************/
 
   /**
    * The component element's height captured on first render and on
@@ -134,7 +69,7 @@ const EllaTreadmill = Component.extend({
    * @public
    * @readOnly
    */
-  elementHeight: 0,
+  @tracked elementHeight = 0;
 
   /**
    * The component element's height captured on first render and on
@@ -149,7 +84,141 @@ const EllaTreadmill = Component.extend({
    * @public
    * @readOnly
    */
-  elementWidth: 0,
+  @tracked elementWidth = 0;
+
+  /**
+   * The element height reported by the first rendered child listing.
+   *
+   * This property is updated frequently by the component. Setting it has no
+   * lasting effect.
+   *
+   * @property itemHeight
+   * @type {Number}
+   * @default 0
+   * @public
+   * @readOnly
+   */
+  @tracked itemHeight = 0;
+
+  /**
+   * The element width reported by the first rendered child listing.
+   *
+   * This property is updated frequently by the component. Setting it has no
+   * lasting effect.
+   *
+   * @property itemWidth
+   * @type {Number}
+   * @default 0
+   * @public
+   * @readOnly
+   */
+  @tracked itemWidth = 0;
+
+  /**
+   * The scrollable parent's height captured on first render and on
+   * scroll/resize events.
+   *
+   * This property is updated frequently by the component. Setting it has no
+   * lasting effect.
+   *
+   * @property parentHeight
+   * @type {Number}
+   * @default 0
+   * @public
+   * @readOnly
+   */
+  @tracked parentHeight = 0;
+
+  /**
+   * The scrollable parent's height captured on first render and on
+   * scroll/resize events.
+   *
+   * This property is updated frequently by the component. Setting it has no
+   * lasting effect.
+   *
+   * @property parentWidth
+   * @type {Number}
+   * @default 0
+   * @public
+   * @readOnly
+   */
+  @tracked parentWidth = 0;
+
+  /**
+   * Indicates when `resize` events are firing. Toggles the
+   * `is-resizing` class.
+   *
+   * This property is updated frequently by the component. Setting it has no
+   * lasting effect.
+   *
+   * @property resizing
+   * @type {Number}
+   * @default 0
+   * @public
+   * @readOnly
+   */
+  @tracked resizing = 0;
+
+  /**
+   * A sample child element to reference when computing how many child elements
+   * are necessary to cover the visible scroll area.
+   *
+   * This is typcially the first rendered child item.
+   *
+   * This property is updated by the component. Setting it has no
+   * lasting effect.
+   *
+   * @property sampleItem
+   * @type {Component|Null}
+   * @default null
+   * @public
+   * @readOnly
+   */
+  @tracked sampleItem = null;
+
+  /**
+   * Indicates when `scroll` events are firing. Toggles the
+   * `is-scrolling` class.
+   *
+   * This property is updated frequently by the component. Setting it has no
+   * lasting effect.
+   *
+   * @property scrolling
+   * @type {Number}
+   * @default 0
+   * @public
+   * @readOnly
+   */
+  @tracked scrolling = 0;
+
+  /**
+   * Indicates the current scroll position.
+   *
+   * This property is updated by the component. Setting it has no
+   * lasting effect.
+   *
+   * @property scrollTop
+   * @type {Number}
+   * @default 0
+   * @public
+   * @readOnly
+   */
+  @tracked scrollTop = 0;
+
+  /**
+   * The distance in pixels between the top of this component and the top of
+   * the scrollable parent container.
+   *
+   * @property topDelta
+   * @type {Number}
+   * @public
+   * @readOnly
+   */
+  @tracked topDelta = null;
+
+  /****************************************************/
+  /* ARGS & "COMPUTED" PROPERTIES                     */
+  /****************************************************/
 
   /**
    * How frequently to cycle through class names that indicate membership in a
@@ -170,7 +239,9 @@ const EllaTreadmill = Component.extend({
    * @default 2
    * @public
    */
-  fluctuate: 2,
+  get fluctuate() {
+    return this.args.fluctuate || 2;
+  }
 
   /**
    * How frequently to cycle through class names that indicate membership in a
@@ -192,35 +263,9 @@ const EllaTreadmill = Component.extend({
    * @default 2
    * @public
    */
-  fluctuateColumn: 2,
-
-  /**
-   * The element height reported by the first rendered child listing.
-   *
-   * This property is updated frequently by the component. Setting it has no
-   * lasting effect.
-   *
-   * @property itemHeight
-   * @type {Number}
-   * @default 0
-   * @public
-   * @readOnly
-   */
-  itemHeight: 0,
-
-  /**
-   * The element width reported by the first rendered child listing.
-   *
-   * This property is updated frequently by the component. Setting it has no
-   * lasting effect.
-   *
-   * @property itemWidth
-   * @type {Number}
-   * @default 0
-   * @public
-   * @readOnly
-   */
-  itemWidth: 0,
+  get fluctuateColumn() {
+    return this.args.fluctuateColumn || 2;
+  }
 
   /**
    * The minimum width of a listing. If `minColumnWidth` is less than 50% of
@@ -241,7 +286,9 @@ const EllaTreadmill = Component.extend({
    * @default '100%'
    * @public
    */
-  minColumnWidth: '100%',
+  get minColumnWidth() {
+    return this.args.minColumnWidth || '100%';
+  }
 
   /**
    * An additional number of rows, indicated by a percentage, to render above
@@ -262,52 +309,9 @@ const EllaTreadmill = Component.extend({
    * @default 0
    * @public
    */
-  overdraw: 0,
-
-  /**
-   * The scrollable parent's height captured on first render and on
-   * scroll/resize events.
-   *
-   * This property is updated frequently by the component. Setting it has no
-   * lasting effect.
-   *
-   * @property parentHeight
-   * @type {Number}
-   * @default 0
-   * @public
-   * @readOnly
-   */
-  parentHeight: 0,
-
-  /**
-   * The scrollable parent's height captured on first render and on
-   * scroll/resize events.
-   *
-   * This property is updated frequently by the component. Setting it has no
-   * lasting effect.
-   *
-   * @property parentWidth
-   * @type {Number}
-   * @default 0
-   * @public
-   * @readOnly
-   */
-  parentWidth: 0,
-
-  /**
-   * Indicates when `resize` events are firing. Toggles the
-   * `is-resizing` class.
-   *
-   * This property is updated frequently by the component. Setting it has no
-   * lasting effect.
-   *
-   * @property resizing
-   * @type {Number}
-   * @default 0
-   * @public
-   * @readOnly
-   */
-  resizing: 0,
+  get overdraw() {
+    return this.args.overdraw || 0;
+  }
 
   /**
    * The height of each row.
@@ -319,53 +323,9 @@ const EllaTreadmill = Component.extend({
    * @default 50
    * @public
    */
-  row: DEFAULT_ROW_HEIGHT,
-
-  /**
-   * A sample child element to reference when computing how many child elements
-   * are necessary to cover the visible scroll area.
-   *
-   * This is typcially the first rendered child item.
-   *
-   * This property is updated by the component. Setting it has no
-   * lasting effect.
-   *
-   * @property sampleItem
-   * @type {Component|Null}
-   * @default null
-   * @public
-   * @readOnly
-   */
-  sampleItem: null,
-
-  /**
-   * Indicates when `scroll` events are firing. Toggles the
-   * `is-scrolling` class.
-   *
-   * This property is updated frequently by the component. Setting it has no
-   * lasting effect.
-   *
-   * @property scrolling
-   * @type {Number}
-   * @default 0
-   * @public
-   * @readOnly
-   */
-  scrolling: 0,
-
-  /**
-   * Indicates the current scroll position.
-   *
-   * This property is updated by the component. Setting it has no
-   * lasting effect.
-   *
-   * @property scrollTop
-   * @type {Number}
-   * @default 0
-   * @public
-   * @readOnly
-   */
-  scrollTop: 0,
+  get row() {
+    return this.args.row || DEFAULT_ROW_HEIGHT;
+  }
 
   /**
    * The number of items to render per row.
@@ -376,13 +336,11 @@ const EllaTreadmill = Component.extend({
    * @public
    * @readOnly
    */
-  columns: computed('minColumnWidth', 'elementWidth', function() {
-    let col = get(this, 'minColumnWidth');
-    let colUnit = this.unitString(col);
-    let elementWidth = get(this, 'elementWidth');
+  get columns() {
+    const { minColumnWidth, elementWidth, unitString } = this;
+    const col = parseFloat(minColumnWidth, 10);
+    const colUnit = unitString(minColumnWidth);
     let result;
-
-    col = parseFloat(col, 10);
 
     switch (colUnit) {
       case '%':
@@ -390,7 +348,6 @@ const EllaTreadmill = Component.extend({
         break;
       case 'px':
         result = Math.floor(elementWidth / col);
-
         break;
       default:
         result = 1;
@@ -398,7 +355,7 @@ const EllaTreadmill = Component.extend({
     }
 
     return Math.max(result, 1);
-  }).readOnly(),
+  }
 
   /**
    * @property data-scroll-top
@@ -407,9 +364,9 @@ const EllaTreadmill = Component.extend({
    * @private
    * @readOnly
    */
-  'data-scroll-top': computed('scrollTop', function() {
-    return get(this, 'scrollTop') || '0';
-  }).readOnly(),
+  get 'data-scroll-top'() {
+    return this.scrollTop || '0';
+  }
 
   /**
    * An array with a length equal to the number of items to display. The
@@ -421,9 +378,9 @@ const EllaTreadmill = Component.extend({
    * @public
    * @readOnly
    */
-  indices: computed('numberOfVisibleItems', function() {
-    return [...Array(get(this, 'numberOfVisibleItems'))];
-  }).readOnly(),
+  get indices() {
+    return [...Array(this.numberOfVisibleItems)];
+  }
 
   /**
    * The Emberella Treadmill will scroll to the item with the numeric index
@@ -431,9 +388,9 @@ const EllaTreadmill = Component.extend({
    * to the 300th item in the list.
    *
    * ```
-   * {{#ella-treadmill content=model moveTo=300 as |item| }}
+   * <EllaTreadmill @content=model @moveTo=300 as |item|>
    *   // ITEM CONTENT
-   * {{/ella-treadmill}}
+   * </EllaTreadmill>
    * ```
    *
    * @property moveTo
@@ -441,17 +398,15 @@ const EllaTreadmill = Component.extend({
    * @default undefined
    * @public
    */
-  moveTo: computed('_moveTo', {
-    get() {
-      return get(this, '_moveTo');
-    },
+  get moveTo() {
+    const v = parseInt(this.args.moveTo, 10);
 
-    set(key, value) {
-      value = parseInt(value, 10);
+    return isNaN(v) ? null : v;
+  }
 
-      return value ? set(this, '_moveTo', value) : set(this, '_moveTo', undefined);
-    }
-  }),
+  get lastMove() {
+    return this.moveToTask.lastSuccessful?.value ?? null;
+  }
 
   /**
    * The computed number of items to render.
@@ -461,9 +416,11 @@ const EllaTreadmill = Component.extend({
    * @public
    * @readOnly
    */
-  numberOfVisibleItems: computed('visibleRows', 'columns', 'content.[]', function() {
-    return Math.min(get(this, 'visibleRows') * get(this, 'columns'), get(this, 'content.length') || 0);
-  }).readOnly(),
+  get numberOfVisibleItems() {
+    const { visibleRows, columns, content } = this;
+
+    return Math.min(visibleRows * columns, content?.length || 0);
+  }
 
   /**
    * The computed minimum number of rows to render.
@@ -473,13 +430,13 @@ const EllaTreadmill = Component.extend({
    * @public
    * @readOnly
    */
-  rowCount: computed('parentHeight', 'itemHeight', function() {
-    let parentHeight = get(this, 'parentHeight') || get(this, '_defaultHeight');
-    let itemHeight = get(this, 'itemHeight');
-    let rowCount = (parentHeight / itemHeight) || 0;
+  get rowCount() {
+    const { parentHeight, _defaultHeight, itemHeight } = this;
+    const outerHeight = parentHeight || _defaultHeight;
+    const rowCount = outerHeight / itemHeight || 0;
 
-    return (rowCount && rowCount !== Infinity) ? Math.ceil(rowCount) : 0;
-  }).readOnly(),
+    return rowCount && rowCount !== Infinity ? Math.ceil(rowCount) : 0;
+  }
 
   /**
    * The index of the first item of content to render into the visible portion
@@ -491,33 +448,23 @@ const EllaTreadmill = Component.extend({
    * @public
    * @readOnly
    */
-  startingIndex: computed('topDelta', 'itemHeight', 'numberOfVisibleItems', 'content.[]', 'columns', '_overdrawRows', function() {
-    let columns = get(this, 'columns');
-    let idx = Math.floor(get(this, 'topDelta') / get(this, 'itemHeight')) * columns;
-    let len = get(this, 'content.length');
-    let od = get(this, '_overdrawRows');
+  get startingIndex() {
+    const {
+      columns,
+      topDelta,
+      itemHeight,
+      content,
+      _overdrawRows,
+      numberOfVisibleItems,
+    } = this;
+    const len = content?.length || 0;
+    let idx = Math.floor(topDelta / itemHeight) * columns;
 
     // Adjust starting index for overdraw above "stage"
-    idx = idx - (od * columns);
+    idx = idx - _overdrawRows * columns;
 
-    return Math.min(len - get(this, 'numberOfVisibleItems'), Math.max(0, idx)) || 0;
-  }).readOnly(),
-
-  /**
-   * The distance in pixels between the top of this component and the top of
-   * the scrollable parent container.
-   *
-   * @property topDelta
-   * @type {Number}
-   * @public
-   * @readOnly
-   */
-  topDelta: computed('scrollTop', function() {
-    let elementTop = get(this, 'geometryElement.top');
-    let parentTop = get(this, 'geometryParent.top') || 0;
-
-    return (parentTop - elementTop) || 0;
-  }).readOnly(),
+    return Math.min(len - numberOfVisibleItems, Math.max(0, idx)) || 0;
+  }
 
   /**
    * The numeric height of the component's element.
@@ -532,13 +479,14 @@ const EllaTreadmill = Component.extend({
    * @public
    * @readOnly
    */
-  totalHeight: computed('content.[]', '_row', 'columns', function() {
-    let row = parseFloat(get(this, '_row'), 10);
-    let columns = parseFloat(get(this, 'columns'), 10);
-    let len = get(this, 'content.length');
+  get totalHeight() {
+    const { _row, columns, content } = this;
+    const row = parseFloat(_row, 10);
+    const cols = parseFloat(columns, 10);
+    const len = content?.length || 0;
 
-    return row * Math.ceil(len / columns);
-  }).readOnly(),
+    return row * Math.ceil(len / cols);
+  }
 
   /**
    * The slice of content to render.
@@ -548,14 +496,11 @@ const EllaTreadmill = Component.extend({
    * @public
    * @readOnly
    */
-  visibleContent: computed('visibleIndexes', '_content', function() {
-    let {
-      visibleIndexes,
-      _content
-    } = getProperties(this, 'visibleIndexes', '_content');
+  get visibleContent() {
+    const { visibleIndexes, content } = this;
 
-    return A(_content.objectsAt(visibleIndexes));
-  }).readOnly(),
+    return content.objectsAt(visibleIndexes);
+  }
 
   /**
    * The indexes of the content to render.
@@ -565,16 +510,13 @@ const EllaTreadmill = Component.extend({
    * @public
    * @readOnly
    */
-  visibleIndexes: computed('startingIndex', 'numberOfVisibleItems', 'content.[]', function() {
-    let {
-      startingIndex,
-      numberOfVisibleItems
-    } = getProperties(this, 'startingIndex', 'numberOfVisibleItems');
-
-    let mod = startingIndex % numberOfVisibleItems;
-    let page = Math.floor(startingIndex / numberOfVisibleItems);
-    let maxIdx = Math.min(numberOfVisibleItems, get(this, 'content.length'));
-    let result = A();
+  get visibleIndexes() {
+    const { startingIndex, numberOfVisibleItems, content } = this;
+    const len = content?.length || 0;
+    const mod = startingIndex % numberOfVisibleItems;
+    const page = Math.floor(startingIndex / numberOfVisibleItems);
+    const maxIdx = Math.min(numberOfVisibleItems, len);
+    const result = A();
 
     for (let i = 0; i < maxIdx; ++i) {
       let p = page;
@@ -583,11 +525,11 @@ const EllaTreadmill = Component.extend({
         p = page + 1;
       }
 
-      result.push((p * numberOfVisibleItems) + i);
+      result.push(p * numberOfVisibleItems + i);
     }
 
     return result;
-  }).readOnly(),
+  }
 
   /**
    * Computed total number of rows to render including overdraw.
@@ -597,11 +539,11 @@ const EllaTreadmill = Component.extend({
    * @public
    * @readOnly
    */
-  visibleRows: computed('rowCount', '_overdrawRows', function() {
-    let { rowCount, _overdrawRows } = getProperties(this, 'rowCount', '_overdrawRows');
+  get visibleRows() {
+    const { rowCount, _overdrawRows } = this;
 
-    return (Math.ceil(rowCount + (2 * _overdrawRows)) || 0) + 1;
-  }).readOnly(),
+    return (Math.ceil(rowCount + 2 * _overdrawRows) || 0) + 1;
+  }
 
   /**
    * Determine the available function for `cancelAnimationFrame` or equivalent.
@@ -611,27 +553,29 @@ const EllaTreadmill = Component.extend({
    * @private
    * @readOnly
    */
-  _cancelAnimationFrameFn: computed(function() {
-    return get(window || {}, 'cancelAnimationFrame') || clearTimeout;
-  }).readOnly(),
+  get _cancelAnimationFrameFn() {
+    return (window || {}).cancelAnimationFrame || clearTimeout;
+  }
 
   /**
    * Coerce provided content into an Ember Array
    *
-   * @property _content
+   * @property content
    * @type {Array}
    * @private
    * @readOnly
    */
-  _content: computed('content.[]', function() {
-    let content = get(this, 'content');
+  get content() {
+    const { content = [] } = this.args;
 
-    if (typeof content.objectsAt !== 'function') {
-      content = A([].concat(content));
-    }
+    return typeof content?.objectsAt !== 'function'
+      ? A([].concat(content))
+      : content;
+  }
 
-    return content;
-  }).readOnly(),
+  get element() {
+    return document.getElementById(this.elementId);
+  }
 
   /**
    * The number of additional rows to render above and below the visible area.
@@ -641,12 +585,12 @@ const EllaTreadmill = Component.extend({
    * @private
    * @readOnly
    */
-  _overdrawRows: computed('rowCount', 'overdraw', function() {
-    let rowCount = get(this, 'rowCount');
-    let od = (parseInt(get(this, 'overdraw'), 10) || 0) / 100;
+  get _overdrawRows() {
+    const { rowCount, overdraw } = this;
+    const od = (parseInt(overdraw, 10) || 0) / 100;
 
-    return Math.ceil(rowCount * od)
-  }).readOnly(),
+    return Math.ceil(rowCount * od);
+  }
 
   /**
    * Callback function for resize events.
@@ -656,13 +600,13 @@ const EllaTreadmill = Component.extend({
    * @private
    * @readOnly
    */
-  _resizeHandler: computed(function() {
-    let callback = () => {
-      get(this, 'resizeTask').perform();
+  get _resizeHandler() {
+    const callback = () => {
+      this.resizeTask.perform();
     };
 
     return callback;
-  }).readOnly(),
+  }
 
   /**
    * Determine the available function for `requestAnimationFrame` or equivalent.
@@ -672,11 +616,14 @@ const EllaTreadmill = Component.extend({
    * @private
    * @readOnly
    */
-  _requestAnimationFrameFn: computed(function() {
-    return get(window || {}, 'requestAnimationFrame') || function (fn) {
+  get _requestAnimationFrameFn() {
+    const nativeRaf = (window || {}).requestAnimationFrame;
+    const simulatedRaf = function (fn) {
       return setTimeout(fn, 20);
     };
-  }).readOnly(),
+
+    return nativeRaf || simulatedRaf;
+  }
 
   /**
    * Compute a meaningful numeric style for row height. For example, if the
@@ -688,28 +635,30 @@ const EllaTreadmill = Component.extend({
    * @private
    * @readOnly
    */
-  _row: computed('row', 'parentHeight', function() {
-    let row = get(this, 'row') || '';
-    let rowUnit = this.unitString(row);
-    let parent;
-    let parentHeight;
+  get _row() {
+    const { parentHeight } = this;
+    let { row = '' } = this;
+    const rowUnit = this.unitString(row);
+    const { clientHeight } = this.scrollingParent();
+    let rowHeight;
     let result;
 
     row = parseFloat(row, 10);
 
     switch (rowUnit) {
       case '%':
-        parent = this.scrollingParent();
-        parentHeight = get(parent, 'clientHeight') || get(this, '_defaultHeight');
-        result = (row / 100) * parentHeight;
+        rowHeight =
+          (parentHeight !== clientHeight ? clientHeight : parentHeight) ||
+          this._defaultHeight;
+        result = (row / 100) * rowHeight;
         break;
       default:
-        result = (row && row > 0) ? row : DEFAULT_ROW_HEIGHT;
+        result = row && row > 0 ? row : DEFAULT_ROW_HEIGHT;
         break;
     }
 
     return result;
-  }).readOnly(),
+  }
 
   /**
    * Compute a meaningful unit of measurement for row height. For example, a
@@ -721,10 +670,10 @@ const EllaTreadmill = Component.extend({
    * @private
    * @readOnly
    */
-  _rowUnit: computed('row', function() {
-    let row = get(this, 'row') || '';
-    let rowUnit = this.unitString(row);
+  get _rowUnit() {
+    const row = this.row || '';
     let result;
+    const rowUnit = this.unitString(row);
 
     switch (rowUnit) {
       case '%':
@@ -736,7 +685,7 @@ const EllaTreadmill = Component.extend({
     }
 
     return result;
-  }).readOnly(),
+  }
 
   /**
    * Callback function for scroll events.
@@ -746,86 +695,100 @@ const EllaTreadmill = Component.extend({
    * @private
    * @readOnly
    */
-  _scrollHandler: computed(function() {
-    let callback = () => {
-      get(this, 'scrollTask').perform();
+  get _scrollHandler() {
+    const callback = () => {
+      this.scrollTask.perform();
     };
 
     return callback;
-  }).readOnly(),
+  }
 
-  didInsertElement() {
-    this._rafWatcherBegin();
-    this.updateGeometry();
-  },
+  /**
+   * The plain object obtained by calling `.getBoundingClientRect()` on the
+   * component's element.
+   *
+   * @property geometryElement
+   * @type {Object}
+   * @public
+   * @readOnly
+   */
+  get geometryElement() {
+    const { element } = this;
 
-  willDestroyElement() {
-    this._rafWatcherEnd();
-  },
+    return typeof element?.getBoundingClientRect === 'function'
+      ? element.getBoundingClientRect()
+      : {};
+  }
 
-  actions: {
-    listItemInserted(item) {
-      if (!get(this, 'sampleItem')) {
-        set(this, 'sampleItem', item);
-      }
-    },
+  /**
+   * The plain object obtained by calling `.getBoundingClientRect()` on the
+   * component's scrolling parent element (if applicable).
+   *
+   * @property geometryParent
+   * @type {Object}
+   * @public
+   * @readOnly
+   */
+  get geometryParent() {
+    const parent = this.scrollingParent();
 
-    listItemUpdated(geometry) {
-      setProperties(this, {
-        itemHeight: geometry.height,
-        itemWidth: geometry.width
-      });
-    },
+    return typeof parent?.getBoundingClientRect === 'function'
+      ? parent.getBoundingClientRect()
+      : {};
+  }
 
-    listItemDestroyed(item) {
-      if (get(this, 'sampleItem') === item) {
-        set(this, 'sampleItem', null);
-      }
-    }
-  },
+  /**
+   * Provide a scrolling parent height if no scrolling parent can be detected.
+   *
+   * @property _defaultHeight
+   * @type {Number}
+   * @private
+   * @readOnly
+   */
+  get _defaultHeight() {
+    return window ? window.innerHeight : NO_WINDOW_HEIGHT;
+  }
 
-  resizeTask: task(function* () {
-    if (get(this, 'resizing') === 0) {
-      this.sendStateUpdate('on-resize-start');
-    }
+  /**
+   * Provide an element or parent element width if no rendered width can
+   * be determined.
+   *
+   * @property _defaultWidth
+   * @type {Number}
+   * @private
+   * @readOnly
+   */
+  get _defaultWidth() {
+    return window ? window.innerWidth : NO_WINDOW_WIDTH;
+  }
 
-    this.incrementProperty('resizing');
-    this.updateGeometry().sendStateUpdate('on-resize');
+  /**
+   * Required & computed style for Treadmill element.
+   *
+   * @property styles
+   * @type {String}
+   * @public
+   * @readOnly
+   */
+  get styles() {
+    const { totalHeight, _rowUnit } = this;
+    const styles = [
+      'position: relative;',
+      'width: 100%;',
+      'display: flex;',
+      'flex-wrap: wrap;',
+      'align-content: flex-start;',
+      'box-sizing: border-box;',
+    ];
 
-    yield timeout(RECALC_INTERVAL);
+    if (totalHeight) styles.push(`height: ${totalHeight}${_rowUnit};`);
 
-    set(this, 'resizing', 0);
+    return htmlSafe(styles.join(''));
+  }
 
-    this.updateGeometry();
-    this.notifyPropertyChange('visibleContent');
-    this.sendStateUpdate('on-resize').sendStateUpdate('on-resize-end');
-  }).restartable(),
-
-  scrollTask: task(function* () {
-    if (get(this, 'scrolling') === 0) {
-      this.sendStateUpdate('on-scroll-start');
-    }
-
-    this.incrementProperty('scrolling');
-    this.updateGeometry().sendStateUpdate('on-scroll');
-
-    yield timeout(RECALC_INTERVAL);
-
-    set(this, 'scrolling', 0);
-
-    this.updateGeometry();
-    this.notifyPropertyChange('visibleContent');
-    this.sendStateUpdate('on-scroll').sendStateUpdate('on-scroll-end');
-  }).restartable(),
-
-  moveToTask: task(function* () {
-    let moveTo = get(this, 'moveTo');
-
-    if (moveTo) {
-      yield this.scrollToIndex(moveTo);
-      set(this, 'moveTo', null);
-    }
-  }),
+  /****************************************************/
+  /* METHODS                                          */
+  /****************************************************/
 
   /**
    * Find the scrolling parent of the component. This may be an HTML element,
@@ -836,40 +799,47 @@ const EllaTreadmill = Component.extend({
    * @public
    */
   scrollingParent() {
-    let element = get(this, 'element');
+    const { element } = this;
 
     if (!element) {
       return window || FAKE_WINDOW;
     }
 
-    let overflowProperties = function(node) {
+    const overflowProperties = function (node) {
       return [
         getComputedStyle(node, null).getPropertyValue('overflow'),
         getComputedStyle(node, null).getPropertyValue('overflow-x'),
-        getComputedStyle(node, null).getPropertyValue('overflow-y')
+        getComputedStyle(node, null).getPropertyValue('overflow-y'),
       ].join(' ');
     };
 
-    let scroller = A(ancestors(element.parentNode)).find((parent) => {
+    const scroller = A(ancestors(element.parentNode)).find((parent) => {
       return /(auto|scroll)/.test(overflowProperties(parent));
     });
 
     return scroller || window || FAKE_WINDOW;
-  },
+  }
 
+  /**
+   * Adjust scroll position to bring specified index into view.
+   *
+   * @method scrollToIndex
+   * @param {Number} idx The index to scroll to
+   * @chainable
+   * @public
+   */
   scrollToIndex(idx) {
-    let parent = this.scrollingParent();
-    let element = get(this, 'element');
+    const { element, columns, scrollTop, topDelta } = this;
+    const parent = this.scrollingParent();
 
     if (!parent || !element) {
       return this;
     }
 
-    let columns = get(this, 'columns');
-    let itemHeight = get(this, 'sampleItem.element.clientHeight');
-    let row = Math.floor(idx / columns);
-    let top = row * itemHeight;
-    let delta = get(this, 'scrollTop') - get(this, 'topDelta');
+    const itemHeight = this.sampleItem?.element?.clientHeight;
+    const row = Math.floor(idx / columns);
+    const top = row * itemHeight;
+    const delta = scrollTop - topDelta;
 
     if (typeof parent.scrollTo === 'function') {
       parent.scrollTo(parent.scrollX, top + delta);
@@ -878,7 +848,7 @@ const EllaTreadmill = Component.extend({
     }
 
     return this;
-  },
+  }
 
   /**
    * Adheres to the recommended use of "closure actions."
@@ -890,14 +860,14 @@ const EllaTreadmill = Component.extend({
    * @public
    */
   sendClosureAction(action, ...args) {
-    let fn = get(this, action);
+    const fn = this.args[action];
 
     if (typeof fn === 'function') {
       fn(...args);
     }
 
     return this;
-  },
+  }
 
   /**
    * Send action(s) with state data about this listing.
@@ -908,18 +878,30 @@ const EllaTreadmill = Component.extend({
    * @public
    */
   sendStateUpdate(action = 'on-update') {
-    let props = getProperties(this,
-      'scrollTop', 'topDelta', 'startingIndex', 'numberOfVisibleItems', 'visibleIndexes'
-    );
+    const {
+      scrollTop,
+      topDelta,
+      startingIndex,
+      numberOfVisibleItems,
+      visibleIndexes,
+    } = this;
 
-    props.visibleIndexes = props.visibleIndexes.slice().sort(function(a, b) {
+    const props = {
+      scrollTop,
+      topDelta,
+      startingIndex,
+      numberOfVisibleItems,
+      visibleIndexes,
+    };
+
+    props.visibleIndexes = props.visibleIndexes.slice().sort(function (a, b) {
       return a - b;
     });
 
     this.sendClosureAction(action, props);
 
     return this;
-  },
+  }
 
   /**
    * Take a sizing style like `100px` or `22.56rem` and find its unit of
@@ -932,10 +914,18 @@ const EllaTreadmill = Component.extend({
    * @public
    */
   unitString(measure = '', instead = 'px') {
-    let unit = `${measure}`.match(/[^-\d.]+$/g);
+    const unit = `${measure}`.match(/[^-\d.]+$/g);
 
     return unit ? unit[0] : instead;
-  },
+  }
+
+  computeTopDelta() {
+    const { geometryElement, geometryParent } = this;
+    const elementTop = geometryElement?.top || 0;
+    const parentTop = geometryParent?.top || 0;
+
+    return parentTop - elementTop || 0;
+  }
 
   /**
    * Updates properties regarding scroll position and parent dimensions.
@@ -945,79 +935,95 @@ const EllaTreadmill = Component.extend({
    * @public
    */
   updateGeometry() {
-    let parent = this.scrollingParent();
-    let geometryParent = get(this, 'geometryParent');
+    const parent = this.scrollingParent();
+    const { geometryParent, _defaultHeight, _defaultWidth } = this;
 
-    setProperties(this, {
-      scrollTop: (parent ? (parent.scrollTop || parent.scrollY) : 0) || null,
-      parentHeight: get(geometryParent, 'height') || get(this, '_defaultHeight'),
-      parentWidth: get(geometryParent, 'width') || get(this, '_defaultWidth'),
-      elementHeight: get(this, 'element.clientHeight') || get(this, '_defaultHeight'),
-      elementWidth: get(this, 'element.clientWidth') || get(this, '_defaultWidth')
-    });
+    this.scrollTop = (parent ? parent.scrollTop || parent.scrollY : 0) || null;
+    this.topDelta = this.computeTopDelta();
+    this.parentHeight = geometryParent.height || _defaultHeight;
+    this.parentWidth = geometryParent.width || _defaultWidth;
+    this.elementHeight = this.element?.clientHeight || _defaultHeight;
+    this.elementWidth = this.element?.clientWidth || _defaultWidth;
 
     return this;
-  },
+  }
 
   _rafWatcherBegin() {
-    let rafFn = get(this, '_requestAnimationFrameFn');
+    const rafFn = this._requestAnimationFrameFn;
 
-    let step = () => {
+    const step = () => {
       this._rafWatcherPerform();
       nextStep();
     };
 
-    let nextStep = () => {
+    const nextStep = () => {
       this.__rafWatcherId__ = rafFn(step);
     };
 
     this._rafWatcherSetup();
 
     nextStep();
-  },
+  }
 
   _rafWatcherEnd() {
-    let rafCancelFn = get(this, '_cancelAnimationFrameFn');
+    const rafCancelFn = this._cancelAnimationFrameFn;
 
     if (this.__rafId__) {
       rafCancelFn(this.__rafId__);
       this.__rafId__ = undefined;
     }
-  },
+  }
 
   _rafWatcherPerform() {
-    let parent = this.scrollingParent();
-    let scrollTop = parent ? (parent.scrollTop || parent.scrollY) : 0;
+    const {
+      element,
+      moveTo,
+      lastMove,
+      __elementWidth__,
+      __elementHeight__,
+      __parentWidth__,
+      __parentHeight__,
+      __scrollTop__,
+    } = this;
+    const parent = this.scrollingParent();
+    const scrollTop = parent ? parent.scrollTop || parent.scrollY : 0;
     let scrollChanged = false;
 
-    if (scrollTop !== this.__scrollTop__) {
-      scrollChanged = true;
+    if (scrollTop !== __scrollTop__) {
+      scrollChanged = !isNone(scrollTop);
       this.__scrollTop__ = scrollTop;
     }
 
-    let elementWidth = get(this, 'element.clientWidth');
-    let elementHeight = get(this, 'element.clientHeight');
-    let parentWidth = get(parent, 'clientWidth') || get(parent, 'innerWidth');
-    let parentHeight = get(parent, 'clientHeight') || get(parent, 'innerHeight');
+    const elementWidth = element?.clientWidth;
+    const elementHeight = element?.clientHeight;
+    const parentWidth = parent.clientWidth || parent.innerWidth;
+    const parentHeight = parent.clientHeight || parent.innerHeight;
+    const isInitialSize =
+      isNone(__elementWidth__) ||
+      isNone(__elementHeight__) ||
+      isNone(__parentWidth__) ||
+      isNone(__parentHeight__);
     let sizeChanged = false;
 
     if (
-      elementWidth !== this.__elementWidth__ ||
-      elementHeight !== this.__elementHeight__ ||
-      parentWidth !== this.__parentWidth__ ||
-      parentHeight !== this.__parentHeight__
+      elementWidth !== __elementWidth__ ||
+      elementHeight !== __elementHeight__ ||
+      parentWidth !== __parentWidth__ ||
+      parentHeight !== __parentHeight__
     ) {
-      sizeChanged = true;
+      sizeChanged = !isInitialSize;
       this.__elementWidth__ = elementWidth;
       this.__elementHeight__ = elementHeight;
       this.__parentWidth__ = parentWidth;
       this.__parentHeight__ = parentHeight;
     }
 
-    let scrollHandler = get(this, '_scrollHandler');
-    let resizeHandler = get(this, '_resizeHandler');
+    if (this.isDestroyed) return;
 
-    let callHandlers = () => {
+    const scrollHandler = this._scrollHandler;
+    const resizeHandler = this._resizeHandler;
+
+    const callHandlers = () => {
       if (scrollChanged) {
         scrollHandler();
       }
@@ -1026,95 +1032,112 @@ const EllaTreadmill = Component.extend({
         resizeHandler();
       }
 
-      get(this, 'moveToTask').perform();
-    }
+      this.moveToTask.perform();
+    };
 
-    if (scrollChanged || sizeChanged || get(this, '_moveTo')) {
+    if (isInitialSize) this.updateGeometry();
+    if (scrollChanged || sizeChanged || moveTo !== lastMove) {
       run(callHandlers);
     }
-  },
+  }
 
   _rafWatcherSetup() {
-    let parent = this.scrollingParent();
+    const { element } = this;
+    const parent = this.scrollingParent();
 
-    this.__elementWidth__ = get(this, 'element.clientWidth');
-    this.__elementHeight__ = get(this, 'element.clientHeight');
+    this.__elementWidth__ = element?.clientWidth;
+    this.__elementHeight__ = element?.clientHeight;
 
-    this.__parentWidth__ = get(parent, 'clientWidth') || get(parent, 'innerWidth');
-    this.__parentHeight__ = get(parent, 'clientHeight') || get(parent, 'innerHeight');
+    this.__parentWidth__ = parent.clientWidth || parent.innerWidth;
+    this.__parentHeight__ = parent.clientHeight || parent.innerHeight;
 
-    this.__scrollTop__ = parent ? (parent.scrollTop || parent.scrollY) : 0;
+    this.__scrollTop__ = parent ? parent.scrollTop || parent.scrollY : 0;
 
     return this;
   }
-});
 
-/**
- * The plain object obtained by calling `.getBoundingClientRect()` on the
- * component's element.
- *
- * @property geometryElement
- * @type {Object}
- * @public
- * @readOnly
- */
-Object.defineProperty(EllaTreadmill.prototype, 'geometryElement', {
-  get() {
-    let element = get(this, 'element');
-
-    if (!element) {
-      return {};
+  resizeTask = task({ restartable: true }, async () => {
+    if (this.resizing === 0) {
+      this.sendStateUpdate('on-resize-start');
     }
 
-    return element.getBoundingClientRect();
+    this.resizing = this.resizing + 1;
+    this.updateGeometry();
+    this.sendStateUpdate('on-resize');
+
+    await timeout(RECALC_INTERVAL);
+
+    this.resizing = 0;
+    this.updateGeometry();
+    this.sendStateUpdate('on-resize').sendStateUpdate('on-resize-end');
+  });
+
+  willDestroy() {
+    super.willDestroy(...arguments);
+    this._rafWatcherEnd();
   }
-});
 
-/**
- * The plain object obtained by calling `.getBoundingClientRect()` on the
- * component's scrolling parent element (if applicable).
- *
- * @property geometryParent
- * @type {Object}
- * @public
- * @readOnly
- */
-Object.defineProperty(EllaTreadmill.prototype, 'geometryParent', {
-  get() {
-    let parent = this.scrollingParent();
+  /****************************************************/
+  /* ACTIONS                                          */
+  /****************************************************/
 
-    return (parent && typeof parent.getBoundingClientRect === 'function') ?
-      parent.getBoundingClientRect() : {};
+  @action
+  handleInsertElement() {
+    this._rafWatcherBegin();
+    this.updateGeometry();
   }
-});
 
-/**
- * Provide a scrolling parent height if no scrolling parent can be detected.
- *
- * @property _defaultHeight
- * @type {Number}
- * @private
- * @readOnly
- */
-Object.defineProperty(EllaTreadmill.prototype, '_defaultHeight', {
-  get() {
-    return (window) ? window.innerHeight : NO_WINDOW_HEIGHT;
+  @action
+  listItemInserted(item) {
+    if (!this.sampleItem) {
+      this.sampleItem = item;
+    }
   }
-});
 
-/**
- * Provide an element or parent element width if no rendered width can
- * be determined.
- *
- * @property _defaultWidth
- * @type {Number}
- * @private
- * @readOnly
- */
-Object.defineProperty(EllaTreadmill.prototype, '_defaultWidth', {
-  get() {
-    return (window) ? window.innerWidth : NO_WINDOW_WIDTH;
+  @action
+  listItemUpdated(geometry) {
+    this.itemHeight = geometry.height;
+    this.itemWidth = geometry.width;
   }
-});
 
-export default EllaTreadmill;
+  @action
+  listItemDestroyed(item) {
+    if (this.sampleItem === item) {
+      set(this, 'sampleItem', null);
+    }
+  }
+
+  /****************************************************/
+  /* TASKS                                            */
+  /****************************************************/
+
+  scrollTask = task({ restartable: true }, async () => {
+    if (this.scrolling === 0) {
+      this.sendStateUpdate('on-scroll-start');
+    }
+
+    this.scrolling = this.scrolling + 1;
+    this.updateGeometry();
+    this.sendStateUpdate('on-scroll');
+
+    await timeout(RECALC_INTERVAL);
+
+    this.scrolling = 0;
+    this.updateGeometry();
+    this.sendStateUpdate('on-scroll').sendStateUpdate('on-scroll-end');
+  });
+
+  moveToTask = task(async () => {
+    const { moveTo, lastMove } = this;
+
+    if (isNone(moveTo)) return;
+
+    if (moveTo !== lastMove) {
+      await this.scrollToIndex(moveTo);
+    }
+
+    return moveTo;
+  });
+}
+
+export default EllaTreadmillComponent;
