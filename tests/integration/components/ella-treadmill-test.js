@@ -504,9 +504,9 @@ module('Integration | Component | ella treadmill', function (hooks) {
       <EllaTreadmill @row="20%" @content={{this.model}} />
     `);
 
-    let element = document.querySelector('ella-treadmill');
+    const element = document.querySelector('ella-treadmill');
     const itemElement = document.querySelector('ella-treadmill-item');
-    let itemCountAttr = parseInt(
+    const itemCountAttr = parseInt(
       element.attributes['data-visible-items'].value,
       10
     );

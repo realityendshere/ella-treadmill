@@ -19,7 +19,7 @@ const FAKE_WINDOW = {
   scrollY: 0,
 };
 
-let ancestors = function (node, parents = []) {
+const ancestors = function (node, parents = []) {
   return node === null || node.parentNode === null
     ? parents
     : ancestors(node.parentNode, parents.concat([node]));
@@ -671,7 +671,7 @@ class EllaTreadmillComponent extends Component {
    * @readOnly
    */
   get _rowUnit() {
-    let row = this.row || '';
+    const row = this.row || '';
     let result;
     const rowUnit = this.unitString(row);
 
@@ -914,7 +914,7 @@ class EllaTreadmillComponent extends Component {
    * @public
    */
   unitString(measure = '', instead = 'px') {
-    let unit = `${measure}`.match(/[^-\d.]+$/g);
+    const unit = `${measure}`.match(/[^-\d.]+$/g);
 
     return unit ? unit[0] : instead;
   }

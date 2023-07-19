@@ -24,6 +24,7 @@ module.exports = {
     node: true,
   },
   rules: {
+    'prefer-const': 'error',
     'qunit/require-expect': [2, 'always'],
   },
   overrides: [
